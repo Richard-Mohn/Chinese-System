@@ -6,6 +6,7 @@ import { doc, onSnapshot, updateDoc, Timestamp } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import DeliveryMap from '@/components/DeliveryMap';
 
 interface Order {
   id: string;
@@ -13,13 +14,23 @@ interface Order {
   totalAmount: number;
   currentStatus: string;
   orderType: string;
+  driverId?: string;
+  customerInfo: {
+    address?: string;
+  };
   is_express?: boolean;
   has_live_cam?: boolean;
+}
+
+interface DriverLocation {
+  latitude: number;
+  longitude: number;
 }
 
 const OrderTrackingPage = () => {
   const { orderId } = useParams();
   const [order, setOrder] = useState<Order | null>(null);
+  const [driverLoc, setDriverLoc] = useState<DriverLocation | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [isUpgrading, setIsUpgrading] = useState(false);
 
@@ -28,7 +39,24 @@ const OrderTrackingPage = () => {
 
     const unsubscribe = onSnapshot(doc(db, 'orders', orderId as string), (doc) => {
       if (doc.exists()) {
-        setOrder({ id: doc.id, ...doc.data() } as Order);
+        const orderData = { id: doc.id, ...doc.data() } as Order;
+        setOrder(orderData);
+        
+        // If order is out for delivery and has a driver, track the driver
+        if (orderData.currentStatus === 'Out for Delivery' && orderData.driverId) {
+          const unsubDriver = onSnapshot(doc(db, 'drivers', orderData.driverId), (driverDoc) => {
+            if (driverDoc.exists()) {
+              const driverData = driverDoc.data();
+              if (driverData.currentLocation) {
+                setDriverLoc({
+                  latitude: driverData.currentLocation.latitude,
+                  longitude: driverData.currentLocation.longitude
+                });
+              }
+            }
+          });
+          return () => unsubDriver();
+        }
       }
       setLoading(false);
     });
@@ -53,7 +81,7 @@ const OrderTrackingPage = () => {
     }
   };
 
-  const statuses = ['Received', 'Preparing', 'Cooking', 'Ready', 'Completed'];
+  const statuses = ['Received', 'Preparing', 'Cooking', 'Ready', 'Out for Delivery', 'Delivered', 'Completed'];
   const currentStatusIndex = statuses.indexOf(order?.currentStatus || 'Received');
 
   if (loading) {
@@ -137,43 +165,24 @@ const OrderTrackingPage = () => {
                     {order.currentStatus === 'Preparing' && 'Our chefs are hand-preparing the freshest ingredients for your meal.'}
                     {order.currentStatus === 'Cooking' && 'Your meal is being wok-fired right now at high intensity.'}
                     {order.currentStatus === 'Ready' && 'Success! Your food is packaged and waiting for you.'}
+                    {order.currentStatus === 'Out for Delivery' && 'Your Golden Dragon feast is on its way to you!'}
                   </p>
                 </div>
               </div>
 
-              {order.has_live_cam ? (
-                <div className="bg-black rounded-[2.5rem] overflow-hidden relative shadow-2xl group border-4 border-indigo-600/30">
-                  <div className="absolute top-6 left-6 z-10 flex items-center gap-3">
-                    <div className="w-2 h-2 bg-red-600 rounded-full animate-ping" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white shadow-sm">Chef's Eye Live HD</span>
-                  </div>
-                  <video 
-                    autoPlay 
-                    muted 
-                    loop 
-                    playsInline
-                    className="w-full h-full object-cover aspect-video opacity-80 group-hover:opacity-100 transition-opacity"
-                  >
-                    <source src="https://assets.mixkit.co/videos/preview/mixkit-chef-preparing-a-meal-in-a-professional-kitchen-863-large.mp4" type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 pointer-events-none border-[20px] border-white/5" />
-                </div>
-              ) : (
-                <div className="bg-zinc-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group border border-indigo-500/30 shadow-2xl">
-                  <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:scale-110 transition-transform">🎥</div>
-                  <h3 className="text-lg font-black uppercase tracking-tight mb-2 text-indigo-400">Chef's Eye Live</h3>
-                  <p className="text-zinc-400 text-xs font-medium mb-6 leading-relaxed">
-                    Watch our master chefs fire up the wok and prepare your specific order in real-time. Upgrade to 4K live feed.
-                  </p>
-                  <button 
-                    onClick={handleUpgradeCam}
-                    disabled={isUpgrading}
-                    className="bg-white text-black px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-zinc-200 transition-all active:scale-95 disabled:opacity-50"
-                  >
-                    {isUpgrading ? 'Unlocking...' : 'Unlock HD Feed (+$2.99)'}
-                  </button>
+              {/* Delivery Tracking Map */}
+              {order.currentStatus === 'Out for Delivery' && (
+                <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                  <h2 className="text-xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tight mb-4">On the Road</h2>
+                  <DeliveryMap driverLocation={driverLoc} />
                 </div>
               )}
+
+              {/* Live Kitchen Feed */}
+              <div>
+                <h2 className="text-xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tight mb-4">Kitchen View</h2>
+                {order.has_live_cam ? (
+
             </div>
 
             {/* Right Col: Order Summary */}

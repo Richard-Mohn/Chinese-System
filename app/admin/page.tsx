@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, Timestamp, setDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -49,13 +49,52 @@ const AdminDashboard = () => {
 
   const updateStatus = async (orderId: string, newStatus: string) => {
     try {
-      await updateDoc(doc(db, 'orders', orderId), {
+      const updates: any = {
         currentStatus: newStatus,
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // If status is "Out for Delivery", assign a placeholder driver for now
+      if (newStatus === 'Out for Delivery') {
+        updates.driverId = 'driver-001';
+        
+        // Ensure driver document exists
+        await setDoc(doc(db, 'drivers', 'driver-001'), {
+          id: 'driver-001',
+          name: 'Speedy Dragon',
+          currentLocation: { latitude: 37.5407, longitude: -77.4360 }
+        }, { merge: true });
+      }
+
+      await updateDoc(doc(db, 'orders', orderId), updates);
     } catch (error) {
       console.error("Error updating status:", error);
     }
+  };
+
+  const simulateMovement = async () => {
+    const driverId = 'driver-001';
+    let lat = 37.5407;
+    let lng = -77.4360;
+
+    const interval = setInterval(async () => {
+      lat += 0.001;
+      lng += 0.001;
+      try {
+        await updateDoc(doc(db, 'drivers', driverId), {
+          currentLocation: { latitude: lat, longitude: lng }
+        });
+        console.log("Simulating movement...", lat, lng);
+      } catch (err) {
+        console.error("Simulation failed:", err);
+        clearInterval(interval);
+      }
+    }, 2000);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      console.log("Simulation stopped.");
+    }, 20000);
   };
 
   if (authLoading || loading) {
@@ -72,6 +111,12 @@ const AdminDashboard = () => {
           </div>
           
           <div className="flex gap-4">
+            <button 
+              onClick={simulateMovement}
+              className="bg-zinc-900 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border border-zinc-800 hover:bg-zinc-800 transition-all"
+            >
+              Simulate Delivery 🛵
+            </button>
             <div className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-500/20">
               Live Feed Active
             </div>
@@ -116,7 +161,7 @@ const AdminDashboard = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {['Received', 'Preparing', 'Cooking', 'Ready', 'Completed'].map(status => (
+                    {['Received', 'Preparing', 'Cooking', 'Ready', 'Out for Delivery', 'Delivered', 'Completed'].map(status => (
                       <button
                         key={status}
                         onClick={() => updateStatus(order.id, status)}

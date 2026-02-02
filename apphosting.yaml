@@ -1,0 +1,14 @@
+# Firebase App Hosting configuration
+kind: "apphosting.yaml"
+version: "v1"
+runConfig:
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+env:
+  - variable: NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+    value: "pk.eyJ1IjoicmljaGFyZG1vaG4iLCJhIjoiY21rZ2VrOW5xMDR1ajNlbzZmZ2lva3JvMCJ9.DHyWToPkcvhOuzVL7PY8Qg"
+  - variable: STRIPE_SECRET_KEY
+    secret: STRIPE_SECRET_KEY
