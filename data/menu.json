@@ -1,0 +1,1736 @@
+[
+  {
+    "id": "1",
+    "category": "Appetizers",
+    "name": "Egg Roll",
+    "description": "Crispy egg roll filled with roast pork and vegetables.",
+    "prices": { "order": 1.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Egg+Roll"
+  },
+  {
+    "id": "2",
+    "category": "Appetizers",
+    "name": "Shrimp Roll",
+    "description": "Crispy roll filled with shrimp and vegetables.",
+    "prices": { "order": 1.85 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Roll"
+  },
+  {
+    "id": "3a",
+    "category": "Appetizers",
+    "name": "Vegetable Roll",
+    "description": "Crispy spring roll filled with mixed vegetables.",
+    "prices": { "order": 1.20 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Vegetable+Roll"
+  },
+  {
+    "id": "3",
+    "category": "Appetizers",
+    "name": "Cheese Steak Egg Roll",
+    "description": "Egg roll filled with steak and cheese.",
+    "prices": { "order": 2.75 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Cheese+Steak+Egg+Roll"
+  },
+  {
+    "id": "4",
+    "category": "Appetizers",
+    "name": "Fantail Shrimp (4)",
+    "description": "Deep-fried breaded shrimp (4 pieces).",
+    "prices": { "order": 4.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fantail+Shrimp"
+  },
+  {
+    "id": "5",
+    "category": "Appetizers",
+    "name": "Fried Wonton (9)",
+    "description": "Crispy fried wontons (9 pieces, meatless).",
+    "prices": { "order": 4.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fried+Wonton"
+  },
+  {
+    "id": "6",
+    "category": "Appetizers",
+    "name": "Crab Rangoon (9)",
+    "description": "Crispy wonton wrappers filled with cream cheese and imitation crab (9 pieces).",
+    "prices": { "order": 5.55 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Crab+Rangoon"
+  },
+  {
+    "id": "7",
+    "category": "Appetizers",
+    "name": "French Fries",
+    "description": "Crinkle cut fried potatoes.",
+    "prices": { "order": 2.80 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=French+Fries"
+  },
+  {
+    "id": "8",
+    "category": "Appetizers",
+    "name": "Steamed or Fried Dumplings (9)",
+    "description": "Pork dumplings, served steamed or fried (9 pieces).",
+    "prices": { "order": 6.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Dumplings"
+  },
+  {
+    "id": "9",
+    "category": "Appetizers",
+    "name": "Teriyaki Beef (4)",
+    "description": "Skewered beef marinated in teriyaki sauce (4 sticks).",
+    "prices": { "order": 6.85 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Teriyaki+Beef"
+  },
+  {
+    "id": "10",
+    "category": "Appetizers",
+    "name": "Teriyaki Chicken (5)",
+    "description": "Skewered chicken marinated in teriyaki sauce (5 sticks).",
+    "prices": { "order": 6.85 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Teriyaki+Chicken"
+  },
+  {
+    "id": "11",
+    "category": "Appetizers",
+    "name": "Pu Pu Platter",
+    "description": "Assortment of appetizers: Egg Roll, Ribs, Shrimp, Wings, Teriyaki Beef.",
+    "prices": { "order": 10.55 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pu+Pu+Platter"
+  },
+  {
+    "id": "12",
+    "category": "Appetizers",
+    "name": "Bar-B-Q Spare Ribs",
+    "description": "Roasted pork ribs with BBQ sauce.",
+    "prices": { "small": 6.75, "large": 12.10 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=BBQ+Spare+Ribs"
+  },
+  {
+    "id": "13",
+    "category": "Appetizers",
+    "name": "Boneless Spare Ribs",
+    "description": "Sliced roasted pork with sweet BBQ sauce.",
+    "prices": { "small": 6.55, "large": 10.55 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Boneless+Spare+Ribs"
+  },
+  {
+    "id": "14",
+    "category": "Appetizers",
+    "name": "Shrimp Toast (6)",
+    "description": "Bread triangles coated with minced shrimp paste and fried.",
+    "prices": { "order": 4.85 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Toast"
+  },
+  {
+    "id": "15",
+    "category": "Appetizers",
+    "name": "Chinese Donuts (20)",
+    "description": "Fried sugar donuts (20 pieces).",
+    "prices": { "order": 4.85 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chinese+Donuts"
+  },
+  {
+    "id": "16",
+    "category": "Soup",
+    "name": "Wonton Soup",
+    "description": "Pork wontons in chicken broth.",
+    "prices": { "pt": 3.30, "qt": 4.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Wonton+Soup"
+  },
+  {
+    "id": "17",
+    "category": "Soup",
+    "name": "Egg Drop Soup",
+    "description": "Silky egg ribbons in chicken broth.",
+    "prices": { "pt": 3.30, "qt": 4.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Egg+Drop+Soup"
+  },
+  {
+    "id": "18",
+    "category": "Soup",
+    "name": "Hot & Sour Soup",
+    "description": "Spicy and tangy broth with tofu, bamboo shoots, and mushrooms.",
+    "prices": { "pt": 3.55, "qt": 5.30 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hot+and+Sour+Soup"
+  },
+  {
+    "id": "19",
+    "category": "Soup",
+    "name": "House Special Soup",
+    "description": "Mixed meats and vegetables in clear broth.",
+    "prices": { "order": 7.20 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=House+Special+Soup"
+  },
+  {
+    "id": "20",
+    "category": "Soup",
+    "name": "Vegetable Soup",
+    "description": "Mixed fresh vegetables in clear broth.",
+    "prices": { "pt": 3.30, "qt": 4.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Vegetable+Soup"
+  },
+  {
+    "id": "21",
+    "category": "Soup",
+    "name": "Chicken Rice Soup",
+    "description": "Chicken and white rice in broth.",
+    "prices": { "pt": 3.30, "qt": 4.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Rice+Soup"
+  },
+  {
+    "id": "22",
+    "category": "Soup",
+    "name": "Chicken or Pork Noodle Soup",
+    "description": "Choice of Chicken or Pork with noodles in broth.",
+    "prices": { "pt": 3.30, "qt": 4.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Noodle+Soup"
+  },
+  {
+    "id": "23",
+    "category": "Soup",
+    "name": "Seafood Soup",
+    "description": "Shrimp, scallop, and crab meat in broth.",
+    "prices": { "order": 7.80 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Seafood+Soup"
+  },
+  {
+    "id": "24",
+    "category": "Fried Rice",
+    "name": "Vegetable Fried Rice",
+    "description": "Stir-fried rice with mixed vegetables.",
+    "prices": { "pt": 6.10, "qt": 8.55 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Vegetable+Fried+Rice"
+  },
+  {
+    "id": "25",
+    "category": "Fried Rice",
+    "name": "Roast Pork or Chicken Fried Rice",
+    "description": "Stir-fried rice with choice of Roast Pork or Chicken.",
+    "prices": { "pt": 6.60, "qt": 9.15 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+or+Chicken+Fried+Rice"
+  },
+  {
+    "id": "26",
+    "category": "Fried Rice",
+    "name": "Beef Fried Rice",
+    "description": "Stir-fried rice with beef.",
+    "prices": { "pt": 6.60, "qt": 9.15 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Fried+Rice"
+  },
+  {
+    "id": "27",
+    "category": "Fried Rice",
+    "name": "Shrimp Fried Rice",
+    "description": "Stir-fried rice with shrimp.",
+    "prices": { "pt": 6.60, "qt": 9.15 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Fried+Rice"
+  },
+  {
+    "id": "28",
+    "category": "Fried Rice",
+    "name": "Young Chow Fried Rice",
+    "description": "Special fried rice with chicken, pork, and shrimp (white style).",
+    "prices": { "pt": 6.80, "qt": 9.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Young+Chow+Fried+Rice"
+  },
+  {
+    "id": "29",
+    "category": "Fried Rice",
+    "name": "House Special Fried Rice",
+    "description": "Dark soy sauce fried rice with chicken, pork, and shrimp.",
+    "prices": { "pt": 6.80, "qt": 9.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=House+Special+Fried+Rice"
+  },
+  {
+    "id": "30",
+    "category": "Fried Rice",
+    "name": "Lobster Fried Rice",
+    "description": "Stir-fried rice with lobster meat.",
+    "prices": { "order": 9.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Lobster+Fried+Rice"
+  },
+  {
+    "id": "30a",
+    "category": "Fried Rice",
+    "name": "Crab Meat Fried Rice",
+    "description": "Stir-fried rice with crab meat.",
+    "prices": { "pt": 6.60, "qt": 9.15 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Crab+Meat+Fried+Rice"
+  },
+  {
+    "id": "31",
+    "category": "Lo Mein",
+    "name": "Vegetable Lo Mein",
+    "description": "Soft noodles stir-fried with vegetables.",
+    "prices": { "pt": 6.30, "qt": 8.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Vegetable+Lo+Mein"
+  },
+  {
+    "id": "32",
+    "category": "Lo Mein",
+    "name": "Roast Pork or Chicken Lo Mein",
+    "description": "Soft noodles stir-fried with choice of Pork or Chicken.",
+    "prices": { "pt": 6.75, "qt": 9.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+or+Chicken+Lo+Mein"
+  },
+  {
+    "id": "33",
+    "category": "Lo Mein",
+    "name": "Beef Lo Mein",
+    "description": "Soft noodles stir-fried with beef.",
+    "prices": { "pt": 6.75, "qt": 9.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Lo+Mein"
+  },
+  {
+    "id": "34",
+    "category": "Lo Mein",
+    "name": "Shrimp Lo Mein",
+    "description": "Soft noodles stir-fried with shrimp.",
+    "prices": { "pt": 6.75, "qt": 9.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Lo+Mein"
+  },
+  {
+    "id": "35",
+    "category": "Lo Mein",
+    "name": "House Special Lo Mein",
+    "description": "Soft noodles stir-fried with chicken, pork, and shrimp.",
+    "prices": { "pt": 7.30, "qt": 10.60 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=House+Special+Lo+Mein"
+  },
+  {
+    "id": "36",
+    "category": "Lo Mein",
+    "name": "Lobster Lo Mein",
+    "description": "Soft noodles stir-fried with lobster meat.",
+    "prices": { "order": 10.60 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Lobster+Lo+Mein"
+  },
+  {
+    "id": "37",
+    "category": "Chow Mein or Chop Suey",
+    "name": "Vegetable Chow Mein",
+    "description": "Stir-fried vegetables in white sauce (Chow Mein serves with dry noodles).",
+    "prices": { "pt": 6.35, "qt": 8.75 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Vegetable+Chow+Mein"
+  },
+  {
+    "id": "38",
+    "category": "Chow Mein or Chop Suey",
+    "name": "Roast Pork or Chicken Chow Mein",
+    "description": "Pork or Chicken with veggies in white sauce (Chow Mein serves with dry noodles).",
+    "prices": { "pt": 6.80, "qt": 9.55 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+or+Chicken+Chow+Mein"
+  },
+  {
+    "id": "39",
+    "category": "Chow Mein or Chop Suey",
+    "name": "Beef Chow Mein",
+    "description": "Beef with veggies in white sauce (Chow Mein serves with dry noodles).",
+    "prices": { "pt": 6.80, "qt": 9.55 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Chow+Mein"
+  },
+  {
+    "id": "40",
+    "category": "Chow Mein or Chop Suey",
+    "name": "Shrimp Chow Mein",
+    "description": "Shrimp with veggies in white sauce (Chow Mein serves with dry noodles).",
+    "prices": { "pt": 6.80, "qt": 9.55 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Chow+Mein"
+  },
+  {
+    "id": "41",
+    "category": "Chow Mein or Chop Suey",
+    "name": "House Special Chow Mein",
+    "description": "Combo of meats with veggies in white sauce (Chow Mein serves with dry noodles).",
+    "prices": { "pt": 7.40, "qt": 10.65 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=House+Special+Chow+Mein"
+  },
+  {
+    "id": "42",
+    "category": "Chow Mei Fun",
+    "name": "Vegetable Chow Mei Fun",
+    "description": "Thin rice noodles stir-fried with vegetables.",
+    "prices": { "order": 8.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Vegetable+Chow+Mei+Fun"
+  },
+  {
+    "id": "43",
+    "category": "Chow Mei Fun",
+    "name": "Roast Pork or Chicken Chow Mei Fun",
+    "description": "Thin rice noodles stir-fried with choice of Pork or Chicken.",
+    "prices": { "order": 9.75 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+or+Chicken+Chow+Mei+Fun"
+  },
+  {
+    "id": "44",
+    "category": "Chow Mei Fun",
+    "name": "Beef Chow Mei Fun",
+    "description": "Thin rice noodles stir-fried with beef.",
+    "prices": { "order": 9.75 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Chow+Mei+Fun"
+  },
+  {
+    "id": "45",
+    "category": "Chow Mei Fun",
+    "name": "Shrimp Chow Mei Fun",
+    "description": "Thin rice noodles stir-fried with shrimp.",
+    "prices": { "order": 9.75 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Chow+Mei+Fun"
+  },
+  {
+    "id": "46",
+    "category": "Chow Mei Fun",
+    "name": "Singapore Chow Mei Fun",
+    "description": "Thin rice noodles with curry powder, chicken, pork, and shrimp.",
+    "prices": { "order": 10.75 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Singapore+Chow+Mei+Fun"
+  },
+  {
+    "id": "47",
+    "category": "Egg Foo Young",
+    "name": "Vegetable Egg Foo Young",
+    "description": "Chinese omelet with vegetables, served with gravy and rice.",
+    "prices": { "order": 8.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Vegetable+Egg+Foo+Young"
+  },
+  {
+    "id": "48",
+    "category": "Egg Foo Young",
+    "name": "Roast Pork or Chicken Egg Foo Young",
+    "description": "Chinese omelet with Pork or Chicken, served with gravy and rice.",
+    "prices": { "order": 8.80 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+or+Chicken+Egg+Foo+Young"
+  },
+  {
+    "id": "49",
+    "category": "Egg Foo Young",
+    "name": "Beef or Shrimp Egg Foo Young",
+    "description": "Chinese omelet with Beef or Shrimp, served with gravy and rice.",
+    "prices": { "order": 8.80 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+or+Shrimp+Egg+Foo+Young"
+  },
+  {
+    "id": "50",
+    "category": "Egg Foo Young",
+    "name": "Crabmeat Egg Foo Young",
+    "description": "Chinese omelet with crabmeat, served with gravy and rice.",
+    "prices": { "order": 8.80 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Crabmeat+Egg+Foo+Young"
+  },
+  {
+    "id": "51",
+    "category": "Egg Foo Young",
+    "name": "House Special Egg Foo Young",
+    "description": "Chinese omelet with mixed meats, served with gravy and rice.",
+    "prices": { "order": 9.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=House+Special+Egg+Foo+Young"
+  },
+  {
+    "id": "52",
+    "category": "Vegetables",
+    "name": "Mixed Vegetables",
+    "description": "Assorted fresh vegetables sauteed in brown sauce.",
+    "prices": { "order": 8.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Mixed+Vegetables"
+  },
+  {
+    "id": "53",
+    "category": "Vegetables",
+    "name": "Broccoli with Garlic Sauce",
+    "description": "Broccoli florets in spicy garlic sauce.",
+    "prices": { "order": 8.25 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Broccoli+Garlic+Sauce"
+  },
+  {
+    "id": "54",
+    "category": "Vegetables",
+    "name": "Bean Curd Szechuan Style",
+    "description": "Tofu cooked in spicy Szechuan sauce.",
+    "prices": { "order": 8.25 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Szechuan+Bean+Curd"
+  },
+  {
+    "id": "55",
+    "category": "Vegetables",
+    "name": "Bean Curd Home Style",
+    "description": "Fried tofu with vegetables in brown sauce.",
+    "prices": { "order": 8.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Home+Style+Bean+Curd"
+  },
+  {
+    "id": "56",
+    "category": "Pork",
+    "name": "Roast Pork with Chinese Vegetable",
+    "description": "Sliced roast pork with bok choy/Chinese greens.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+with+Vegetables"
+  },
+  {
+    "id": "57",
+    "category": "Pork",
+    "name": "Roast Pork with Mushroom",
+    "description": "Sliced roast pork with mushrooms and brown sauce.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+with+Mushroom"
+  },
+  {
+    "id": "58",
+    "category": "Pork",
+    "name": "Roast Pork with Snow Peas",
+    "description": "Sliced roast pork with fresh snow peas.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+with+Snow+Peas"
+  },
+  {
+    "id": "59",
+    "category": "Pork",
+    "name": "Roast Pork with Pepper",
+    "description": "Sliced roast pork with bell peppers.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+with+Pepper"
+  },
+  {
+    "id": "60",
+    "category": "Pork",
+    "name": "Roast Pork with Broccoli",
+    "description": "Sliced roast pork with broccoli in brown sauce.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+with+Broccoli"
+  },
+  {
+    "id": "61",
+    "category": "Pork",
+    "name": "Hunan Pork",
+    "description": "Sliced pork with mixed vegetables in spicy Hunan sauce.",
+    "prices": { "order": 10.70 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hunan+Pork"
+  },
+  {
+    "id": "62",
+    "category": "Pork",
+    "name": "Pork with Garlic Sauce",
+    "description": "Shredded pork with vegetables in spicy garlic sauce.",
+    "prices": { "order": 10.70 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+Garlic+Sauce"
+  },
+  {
+    "id": "63",
+    "category": "Chicken",
+    "name": "Moo Goo Gai Pan",
+    "description": "Sliced white meat chicken with mushrooms and vegetables in white sauce.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Moo+Goo+Gai+Pan"
+  },
+  {
+    "id": "64",
+    "category": "Chicken",
+    "name": "Chicken with Broccoli",
+    "description": "Sliced chicken with broccoli in brown sauce.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+with+Broccoli"
+  },
+  {
+    "id": "65",
+    "category": "Chicken",
+    "name": "Chicken with Snow Peas",
+    "description": "Sliced chicken with fresh snow peas.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+with+Snow+Peas"
+  },
+  {
+    "id": "66",
+    "category": "Chicken",
+    "name": "Chicken with Pepper",
+    "description": "Sliced chicken with bell peppers.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+with+Pepper"
+  },
+  {
+    "id": "67",
+    "category": "Chicken",
+    "name": "Chicken with Black Bean Sauce",
+    "description": "Chicken in fermented black bean sauce.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Black+Bean+Sauce"
+  },
+  {
+    "id": "68",
+    "category": "Chicken",
+    "name": "Curry Chicken with Onion",
+    "description": "Chicken and onions in spicy yellow curry sauce.",
+    "prices": { "pt": 7.05, "qt": 10.70 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Curry+Chicken"
+  },
+  {
+    "id": "69",
+    "category": "Chicken",
+    "name": "General Tso's Chicken",
+    "description": "Deep fried chicken chunks in spicy general tso's sauce.",
+    "prices": { "order": 10.70 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=General+Tsos+Chicken"
+  },
+  {
+    "id": "70",
+    "category": "Chicken",
+    "name": "Hunan Chicken",
+    "description": "Chicken with vegetables in spicy Hunan sauce.",
+    "prices": { "order": 10.70 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hunan+Chicken"
+  },
+  {
+    "id": "71",
+    "category": "Chicken",
+    "name": "Chicken with Garlic Sauce",
+    "description": "Sliced chicken and vegetables in spicy garlic sauce.",
+    "prices": { "order": 10.70 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Garlic+Sauce"
+  },
+  {
+    "id": "72",
+    "category": "Chicken",
+    "name": "Chicken w. Cashew Nuts",
+    "description": "Diced chicken with cashew nuts and vegetables.",
+    "prices": { "order": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Cashew+Nuts"
+  },
+  {
+    "id": "73",
+    "category": "Chicken",
+    "name": "Szechuan Chicken",
+    "description": "Chicken with vegetables in spicy Szechuan sauce.",
+    "prices": { "order": 10.70 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Szechuan+Chicken"
+  },
+  {
+    "id": "74",
+    "category": "Beef",
+    "name": "Beef with Chinese Vegetable",
+    "description": "Sliced beef with bok choy/Chinese greens.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+with+Vegetables"
+  },
+  {
+    "id": "75",
+    "category": "Beef",
+    "name": "Beef with Broccoli",
+    "description": "Sliced beef with broccoli in brown sauce.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+with+Broccoli"
+  },
+  {
+    "id": "76",
+    "category": "Beef",
+    "name": "Beef with Snow Peas",
+    "description": "Sliced beef with fresh snow peas.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+with+Snow+Peas"
+  },
+  {
+    "id": "77",
+    "category": "Beef",
+    "name": "Pepper Steak with Onion",
+    "description": "Sliced beef with bell peppers and onions.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pepper+Steak"
+  },
+  {
+    "id": "78",
+    "category": "Beef",
+    "name": "Curry Beef with Onion",
+    "description": "Beef and onion in spicy yellow curry sauce.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Curry+Beef"
+  },
+  {
+    "id": "79",
+    "category": "Beef",
+    "name": "Mongolian Beef",
+    "description": "Beef with scallions and onions in savory sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Mongolian+Beef"
+  },
+  {
+    "id": "80",
+    "category": "Beef",
+    "name": "Hunan Beef",
+    "description": "Beef with vegetables in spicy Hunan sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hunan+Beef"
+  },
+  {
+    "id": "81",
+    "category": "Beef",
+    "name": "Beef with Garlic Sauce",
+    "description": "Beef with vegetables in spicy garlic sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Garlic+Sauce"
+  },
+  {
+    "id": "82",
+    "category": "Beef",
+    "name": "Szechuan Beef",
+    "description": "Beef with vegetables in spicy Szechuan sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Szechuan+Beef"
+  },
+  {
+    "id": "83",
+    "category": "Beef",
+    "name": "Sha Cha Beef",
+    "description": "Beef in Chinese BBQ (Sha Cha) sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sha+Cha+Beef"
+  },
+  {
+    "id": "84",
+    "category": "Seafood",
+    "name": "Shrimp with Chinese Vegetable",
+    "description": "Shrimp with bok choy/Chinese greens.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+with+Vegetables"
+  },
+  {
+    "id": "85",
+    "category": "Seafood",
+    "name": "Shrimp with Lobster Sauce",
+    "description": "Shrimp in a savory egg sauce with ground pork.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Lobster+Sauce"
+  },
+  {
+    "id": "86",
+    "category": "Seafood",
+    "name": "Shrimp with Broccoli",
+    "description": "Shrimp with broccoli in brown sauce.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+with+Broccoli"
+  },
+  {
+    "id": "87",
+    "category": "Seafood",
+    "name": "Shrimp with Snow Peas",
+    "description": "Shrimp with fresh snow peas.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+with+Snow+Peas"
+  },
+  {
+    "id": "88",
+    "category": "Seafood",
+    "name": "Shrimp with Pepper",
+    "description": "Shrimp with bell peppers.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+with+Pepper"
+  },
+  {
+    "id": "89",
+    "category": "Seafood",
+    "name": "Shrimp with Black Bean Sauce",
+    "description": "Shrimp in fermented black bean sauce.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Black+Bean+Sauce"
+  },
+  {
+    "id": "90",
+    "category": "Seafood",
+    "name": "Shrimp w. Cashew Nuts",
+    "description": "Shrimp with cashew nuts and vegetables.",
+    "prices": { "order": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Cashew+Nuts"
+  },
+  {
+    "id": "91",
+    "category": "Seafood",
+    "name": "Hunan Shrimp",
+    "description": "Shrimp with vegetables in spicy Hunan sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hunan+Shrimp"
+  },
+  {
+    "id": "92",
+    "category": "Seafood",
+    "name": "Curry Shrimp with Onion",
+    "description": "Shrimp and onion in spicy yellow curry.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Curry+Shrimp"
+  },
+  {
+    "id": "94",
+    "category": "Seafood",
+    "name": "Kung Po Shrimp",
+    "description": "Shrimp with peanuts and vegetables in spicy sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Kung+Po+Shrimp"
+  },
+  {
+    "id": "95",
+    "category": "Seafood",
+    "name": "Shrimp with Garlic Sauce",
+    "description": "Shrimp with vegetables in spicy garlic sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Garlic+Sauce"
+  },
+  {
+    "id": "96",
+    "category": "Seafood",
+    "name": "Scallops with Garlic Sauce",
+    "description": "Scallops with vegetables in spicy garlic sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Scallops+Garlic+Sauce"
+  },
+  {
+    "id": "97",
+    "category": "Seafood",
+    "name": "Szechuan Shrimp",
+    "description": "Shrimp with vegetables in spicy Szechuan sauce.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Szechuan+Shrimp"
+  },
+  {
+    "id": "98",
+    "category": "Sweet & Sour",
+    "name": "Sweet & Sour Chicken or Pork",
+    "description": "Breaded meat with red sweet and sour dipping sauce.",
+    "prices": { "order": 8.60 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sweet+and+Sour+Chicken"
+  },
+  {
+    "id": "99",
+    "category": "Sweet & Sour",
+    "name": "Sweet & Sour Shrimp",
+    "description": "Breaded shrimp with red sweet and sour dipping sauce.",
+    "prices": { "order": 9.85 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sweet+and+Sour+Shrimp"
+  },
+  {
+    "id": "100",
+    "category": "Sweet & Sour",
+    "name": "Sweet & Sour Triple",
+    "description": "Chicken, Pork, and Shrimp with sweet and sour sauce.",
+    "prices": { "order": 9.85 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sweet+and+Sour+Triple"
+  },
+  {
+    "id": "101",
+    "category": "Steamed Dishes",
+    "name": "Steamed Chicken w. Mixed Veg",
+    "description": "Diet dish: Steamed chicken and vegetables, sauce on side.",
+    "prices": { "pt": 7.05, "qt": 9.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Steamed+Chicken+Veg"
+  },
+  {
+    "id": "102",
+    "category": "Steamed Dishes",
+    "name": "Steamed Beef w. Mixed Veg",
+    "description": "Diet dish: Steamed beef and vegetables, sauce on side.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Steamed+Beef+Veg"
+  },
+  {
+    "id": "103",
+    "category": "Steamed Dishes",
+    "name": "Steamed Shrimp w. Mixed Veg",
+    "description": "Diet dish: Steamed shrimp and vegetables, sauce on side.",
+    "prices": { "pt": 7.45, "qt": 11.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Steamed+Shrimp+Veg"
+  },
+  {
+    "id": "104",
+    "category": "Steamed Dishes",
+    "name": "Steamed Mixed Vegetables",
+    "description": "Diet dish: Steamed mixed vegetables, sauce on side.",
+    "prices": { "order": 8.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Steamed+Vegetables"
+  },
+  {
+    "id": "105",
+    "category": "Yat Gat Mein",
+    "name": "Plain Yat Gat Mein",
+    "description": "Boiled noodles.",
+    "prices": { "order": 6.50 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Plain+Yat+Gat+Mein"
+  },
+  {
+    "id": "106",
+    "category": "Yat Gat Mein",
+    "name": "Pork Yat Gat Mein",
+    "description": "Boiled noodles with pork.",
+    "prices": { "order": 7.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+Yat+Gat+Mein"
+  },
+  {
+    "id": "107",
+    "category": "Yat Gat Mein",
+    "name": "Chicken Yat Gat Mein",
+    "description": "Boiled noodles with chicken.",
+    "prices": { "order": 7.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Yat+Gat+Mein"
+  },
+  {
+    "id": "108",
+    "category": "Yat Gat Mein",
+    "name": "Beef Yat Gat Mein",
+    "description": "Boiled noodles with beef.",
+    "prices": { "order": 7.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Yat+Gat+Mein"
+  },
+  {
+    "id": "109",
+    "category": "Yat Gat Mein",
+    "name": "Shrimp Yat Gat Mein",
+    "description": "Boiled noodles with shrimp.",
+    "prices": { "order": 7.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Yat+Gat+Mein"
+  },
+  {
+    "id": "110",
+    "category": "American Dishes",
+    "name": "Fried Shrimp Basket",
+    "description": "Breaded popcorn shrimp served with fries.",
+    "prices": { "order": 8.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fried+Shrimp+Basket"
+  },
+  {
+    "id": "111",
+    "category": "American Dishes",
+    "name": "Fried Filet of Fish (4 piece)",
+    "description": "Breaded fish filets, served with fries.",
+    "prices": { "order": 7.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fried+Fish"
+  },
+  {
+    "id": "112",
+    "category": "American Dishes",
+    "name": "Fried Crab Stick (5 piece)",
+    "description": "Fried imitation crab sticks, served with fries.",
+    "prices": { "order": 7.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fried+Crab+Sticks"
+  },
+  {
+    "id": "113",
+    "category": "American Dishes",
+    "name": "Fried Scallops (10 piece)",
+    "description": "Breaded scallops, served with fries.",
+    "prices": { "order": 7.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fried+Scallops"
+  },
+  {
+    "id": "114",
+    "category": "American Dishes",
+    "name": "Steamed Shrimp",
+    "description": "Peel and eat style steamed shrimp.",
+    "prices": { "order": 7.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Steamed+Shrimp"
+  },
+  {
+    "id": "115",
+    "category": "American Dishes",
+    "name": "Teriyaki Chicken",
+    "description": "Chicken sticks in teriyaki sauce, served with fries.",
+    "prices": { "order": 8.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Teriyaki+Chicken"
+  },
+  {
+    "id": "116",
+    "category": "American Dishes",
+    "name": "Spare Ribs Tips",
+    "description": "Pork rib tips, served with fries.",
+    "prices": { "order": 7.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Spare+Ribs+Tips"
+  },
+  {
+    "id": "117",
+    "category": "American Dishes",
+    "name": "General Tso's Wings (8 Pcs)",
+    "description": "Chicken wings tossed in General Tso's sauce.",
+    "prices": { "order": 8.95 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=General+Tsos+Wings"
+  },
+  {
+    "id": "118",
+    "category": "American Dishes",
+    "name": "Honey Wings (8 Pcs)",
+    "description": "Chicken wings tossed in honey sauce.",
+    "prices": { "order": 8.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Honey+Wings"
+  },
+  {
+    "id": "119",
+    "category": "American Dishes",
+    "name": "Fried Jumbo Shrimp (7)",
+    "description": "Large breaded fried shrimp.",
+    "prices": { "order": 8.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fried+Jumbo+Shrimp"
+  },
+  {
+    "id": "120",
+    "category": "American Dishes",
+    "name": "Chicken Nugget w. Fried Rice (10)",
+    "description": "10 Chicken nuggets served with fried rice.",
+    "prices": { "order": 7.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Nuggets"
+  },
+  {
+    "id": "121",
+    "category": "American Dishes",
+    "name": "Bourbon Chicken w. Fried Rice",
+    "description": "Sweet bourbon chicken served with fried rice.",
+    "prices": { "order": 8.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Bourbon+Chicken"
+  },
+  {
+    "id": "122",
+    "category": "American Dishes",
+    "name": "Wing w. Garlic Sauce (8 Pcs)",
+    "description": "Chicken wings tossed in spicy garlic sauce.",
+    "prices": { "order": 8.95 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Garlic+Wings"
+  },
+  {
+    "id": "123",
+    "category": "American Dishes",
+    "name": "Honey Chicken w. Fried Rice",
+    "description": "Honey chicken served with fried rice.",
+    "prices": { "order": 8.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Honey+Chicken"
+  },
+  {
+    "id": "W4",
+    "category": "Fried Chicken Wings",
+    "name": "4 Fried Chicken Wings",
+    "description": "Crispy fried whole chicken wings.",
+    "prices": { "plain": 6.50, "with_fries": 8.85, "with_fried_rice": 9.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=4+Chicken+Wings"
+  },
+  {
+    "id": "W6",
+    "category": "Fried Chicken Wings",
+    "name": "6 Fried Chicken Wings",
+    "description": "Crispy fried whole chicken wings.",
+    "prices": { "plain": 9.15, "with_fries": 11.35, "with_fried_rice": 12.45 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=6+Chicken+Wings"
+  },
+  {
+    "id": "W8",
+    "category": "Fried Chicken Wings",
+    "name": "8 Fried Chicken Wings",
+    "description": "Crispy fried whole chicken wings.",
+    "prices": { "plain": 12.10, "with_fries": 14.20, "with_fried_rice": 15.50 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=8+Chicken+Wings"
+  },
+  {
+    "id": "W10",
+    "category": "Fried Chicken Wings",
+    "name": "10 Fried Chicken Wings",
+    "description": "Crispy fried whole chicken wings.",
+    "prices": { "plain": 15.40, "with_fries": 17.55, "with_fried_rice": 18.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=10+Chicken+Wings"
+  },
+  {
+    "id": "SUB1",
+    "category": "Subs",
+    "name": "Steak & Cheese",
+    "description": "Sub with steak, cheese, lettuce, mayo, onion.",
+    "prices": { "6_inch": 6.90, "8_inch": 8.30, "12_inch": 9.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Steak+and+Cheese+Sub"
+  },
+  {
+    "id": "SUB2",
+    "category": "Subs",
+    "name": "Steak, Egg & Cheese",
+    "description": "Sub with steak, egg, cheese, lettuce, mayo, onion.",
+    "prices": { "6_inch": 8.15, "8_inch": 9.05, "12_inch": 10.70 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Steak+Egg+Cheese+Sub"
+  },
+  {
+    "id": "SUB3",
+    "category": "Subs",
+    "name": "Filet Fish with Cheese",
+    "description": "Sub with fried fish, cheese, lettuce, mayo, onion.",
+    "prices": { "6_inch": 6.90, "8_inch": 8.30, "12_inch": 9.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fish+Sub"
+  },
+  {
+    "id": "SUB4",
+    "category": "Subs",
+    "name": "Cheeseburger Sub",
+    "description": "Sub with burger patties, cheese, lettuce, mayo, onion.",
+    "prices": { "8_inch": 8.30, "12_inch": 9.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Cheeseburger+Sub"
+  },
+  {
+    "id": "SUB5",
+    "category": "Subs",
+    "name": "Cheeseburger & Egg",
+    "description": "Sub with burger patties, egg, cheese, lettuce, mayo, onion.",
+    "prices": { "8_inch": 9.05, "12_inch": 10.99 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Cheeseburger+Egg+Sub"
+  },
+  {
+    "id": "SUB6",
+    "category": "Subs",
+    "name": "Chicken Sub",
+    "description": "Sub with chicken, cheese, lettuce, mayo, onion.",
+    "prices": { "6_inch": 6.90, "8_inch": 8.30, "12_inch": 9.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Sub"
+  },
+  {
+    "id": "B1",
+    "category": "On A Bun",
+    "name": "Cheeseburger",
+    "description": "Burger with cheese, lettuce, mayo.",
+    "prices": { "sandwich": 4.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Cheeseburger"
+  },
+  {
+    "id": "B2",
+    "category": "On A Bun",
+    "name": "Hamburg",
+    "description": "Burger with lettuce, mayo.",
+    "prices": { "sandwich": 4.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hamburger"
+  },
+  {
+    "id": "B3",
+    "category": "On A Bun",
+    "name": "Double Cheeseburger",
+    "description": "Two patties, cheese, lettuce, mayo.",
+    "prices": { "sandwich": 6.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Double+Cheeseburger"
+  },
+  {
+    "id": "B4",
+    "category": "On A Bun",
+    "name": "Double Hamburg",
+    "description": "Two patties, lettuce, mayo.",
+    "prices": { "sandwich": 6.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Double+Hamburger"
+  },
+  {
+    "id": "B5",
+    "category": "On A Bun",
+    "name": "Fish Cheese",
+    "description": "Fried fish sandwich with cheese.",
+    "prices": { "sandwich": 4.90 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Fish+Cheese+Sandwich"
+  },
+  {
+    "id": "S1",
+    "category": "Chef's Specialties",
+    "name": "Lemon Chicken",
+    "description": "Fresh chicken breast deep fried until crispy, served lemon sauce.",
+    "prices": { "order": 10.99 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Lemon+Chicken"
+  },
+  {
+    "id": "S2",
+    "category": "Chef's Specialties",
+    "name": "General Tso's Chicken",
+    "description": "Boneless chicken deep fried, sauteed mushroom, snow peas & vegetable.",
+    "prices": { "medium": 8.15, "large": 10.99 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=General+Tsos+Chicken"
+  },
+  {
+    "id": "S4",
+    "category": "Chef's Specialties",
+    "name": "Orange Chicken",
+    "description": "Deep fried chunk chicken with orange peel.",
+    "prices": { "order": 10.99 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Orange+Chicken"
+  },
+  {
+    "id": "S5",
+    "category": "Chef's Specialties",
+    "name": "Sesame or Orange Beef",
+    "description": "Beef deep fried until crispy with sesame seeds or orange peel.",
+    "prices": { "order": 11.45 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sesame+Beef"
+  },
+  {
+    "id": "S6",
+    "category": "Chef's Specialties",
+    "name": "Shrimp & Chicken Kew",
+    "description": "Chicken, shrimp & mixed Chinese vegetables with special sauce.",
+    "prices": { "order": 12.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Chicken+Kew"
+  },
+  {
+    "id": "S7",
+    "category": "Chef's Specialties",
+    "name": "Four Seasons",
+    "description": "Shrimp, chicken, beef & roast pork w. special sauce.",
+    "prices": { "order": 12.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Four+Seasons"
+  },
+  {
+    "id": "S8",
+    "category": "Chef's Specialties",
+    "name": "Hunan Combination",
+    "description": "Chicken, shrimp & beef with different kinds of vegetables in brown sauce.",
+    "prices": { "order": 12.25 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hunan+Combination"
+  },
+  {
+    "id": "S9",
+    "category": "Chef's Specialties",
+    "name": "Scallop & Shrimp with Garlic Sauce",
+    "description": "Fresh scallop & shrimp in garlic sauce w. veg.",
+    "prices": { "order": 12.25 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Scallop+Shrimp+Garlic"
+  },
+  {
+    "id": "S10",
+    "category": "Chef's Specialties",
+    "name": "Happy Family",
+    "description": "Fresh jumbo shrimp, sliced pork, beef, chicken, lobster meat & vegetable mixed with brown sauce.",
+    "prices": { "order": 12.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Happy+Family"
+  },
+  {
+    "id": "S11",
+    "category": "Chef's Specialties",
+    "name": "Seafood Delights",
+    "description": "Fresh King crab meat, lobster meat, jumbo shrimp & scallops with mixed vegetables in white sauce",
+    "prices": { "order": 13.20 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Seafood+Delights"
+  },
+  {
+    "id": "S12",
+    "category": "Chef's Specialties",
+    "name": "Wok's Delight",
+    "description": "Prawns, fresh scallops, sliced beef, white meat chicken & Chinese veg. sauteed w. chef's special sauce.",
+    "prices": { "order": 12.95 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Woks+Delight"
+  },
+  {
+    "id": "S13",
+    "category": "Chef's Specialties",
+    "name": "Lake Tung Ting Shrimp",
+    "description": "Jumbo shrimp marinated w. broccoli, mushrooms with white sauce.",
+    "prices": { "order": 12.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Lake+Tung+Ting+Shrimp"
+  },
+  {
+    "id": "S14",
+    "category": "Chef's Specialties",
+    "name": "General Tso's Shrimp",
+    "description": "Breaded shrimp in spicy General Tso's sauce.",
+    "prices": { "order": 12.25 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=General+Tsos+Shrimp"
+  },
+  {
+    "id": "S15",
+    "category": "Chef's Specialties",
+    "name": "Triple Delight",
+    "description": "Union of beef, chicken, shrimp & a few vegetables.",
+    "prices": { "order": 12.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Triple+Delight"
+  },
+  {
+    "id": "S16",
+    "category": "Chef's Specialties",
+    "name": "Kung Po Delight",
+    "description": "Hot shrimp, chicken and beef stir fried with peanuts in hot pepper sauce.",
+    "prices": { "order": 12.85 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Kung+Po+Delight"
+  },
+  {
+    "id": "S17",
+    "category": "Chef's Specialties",
+    "name": "Subgum Wonton",
+    "description": "Jumbo shrimp, beef, chicken, pork, mushroom, baby corn, served w. crispy wonton.",
+    "prices": { "order": 12.25 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Subgum+Wonton"
+  },
+  {
+    "id": "S19",
+    "category": "Chef's Specialties",
+    "name": "Dragon & Phoenix",
+    "description": "General Tso's Chicken and Shrimp with Chili Sauce.",
+    "prices": { "order": 11.60 },
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Dragon+and+Phoenix"
+  },
+  {
+    "id": "S20",
+    "category": "Chef's Specialties",
+    "name": "Bourbon Chicken",
+    "description": "Sweet bourbon chicken.",
+    "prices": { "order": 11.15 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Bourbon+Chicken"
+  },
+  {
+    "id": "S21",
+    "category": "Chef's Specialties",
+    "name": "Honey Chicken",
+    "description": "Breaded chicken in honey sauce.",
+    "prices": { "order": 11.15 },
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Honey+Chicken"
+  },
+  {
+    "id": "C1",
+    "category": "Combination Platters",
+    "name": "Broccoli w. Garlic Sauce",
+    "description": "Broccoli in garlic sauce. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Broccoli+Garlic+Combo"
+  },
+  {
+    "id": "C2",
+    "category": "Combination Platters",
+    "name": "Chicken Chow Mein",
+    "description": "Chicken chow mein. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Chow+Mein+Combo"
+  },
+  {
+    "id": "C3",
+    "category": "Combination Platters",
+    "name": "Shrimp Chow Mein",
+    "description": "Shrimp chow mein. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Chow+Mein+Combo"
+  },
+  {
+    "id": "C4",
+    "category": "Combination Platters",
+    "name": "Roast Pork or Chicken Lo Mein",
+    "description": "Lo mein (Pork or Chicken). Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Lo+Mein+Combo"
+  },
+  {
+    "id": "C5",
+    "category": "Combination Platters",
+    "name": "Roast Pork with Chinese Vegetables",
+    "description": "Roast pork with veg. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+Veg+Combo"
+  },
+  {
+    "id": "C6",
+    "category": "Combination Platters",
+    "name": "Roast Pork Egg Foo Young",
+    "description": "Egg foo young. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Egg+Foo+Young+Combo"
+  },
+  {
+    "id": "C7",
+    "category": "Combination Platters",
+    "name": "Sweet & Sour Chicken or Pork",
+    "description": "Sweet & sour. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sweet+and+Sour+Combo"
+  },
+  {
+    "id": "C8",
+    "category": "Combination Platters",
+    "name": "Moo Goo Gai Pan",
+    "description": "Moo goo gai pan. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Moo+Goo+Gai+Pan+Combo"
+  },
+  {
+    "id": "C9",
+    "category": "Combination Platters",
+    "name": "Chicken w. Broccoli",
+    "description": "Chicken and broccoli. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Broccoli+Combo"
+  },
+  {
+    "id": "C10",
+    "category": "Combination Platters",
+    "name": "Kung Po Chicken",
+    "description": "Kung po chicken (spicy). Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Kung+Po+Chicken+Combo"
+  },
+  {
+    "id": "C11",
+    "category": "Combination Platters",
+    "name": "Hunan Chicken",
+    "description": "Hunan chicken (spicy). Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hunan+Chicken+Combo"
+  },
+  {
+    "id": "C12",
+    "category": "Combination Platters",
+    "name": "Chicken with Garlic Sauce",
+    "description": "Chicken garlic sauce. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Garlic+Combo"
+  },
+  {
+    "id": "C13",
+    "category": "Combination Platters",
+    "name": "Beef with Broccoli",
+    "description": "Beef and broccoli. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Broccoli+Combo"
+  },
+  {
+    "id": "C14",
+    "category": "Combination Platters",
+    "name": "Pepper Steak with Onion",
+    "description": "Pepper steak. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pepper+Steak+Combo"
+  },
+  {
+    "id": "C15",
+    "category": "Combination Platters",
+    "name": "Szechuan Beef",
+    "description": "Szechuan beef. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Szechuan+Beef+Combo"
+  },
+  {
+    "id": "C16",
+    "category": "Combination Platters",
+    "name": "Shrimp with Broccoli",
+    "description": "Shrimp and broccoli. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Broccoli+Combo"
+  },
+  {
+    "id": "C17",
+    "category": "Combination Platters",
+    "name": "Shrimp with Garlic Sauce",
+    "description": "Shrimp garlic sauce. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Garlic+Combo"
+  },
+  {
+    "id": "C18",
+    "category": "Combination Platters",
+    "name": "Shrimp with Lobster Sauce",
+    "description": "Shrimp lobster sauce. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Lobster+Combo"
+  },
+  {
+    "id": "C19",
+    "category": "Combination Platters",
+    "name": "General Tso's Chicken",
+    "description": "General tso's. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=General+Tsos+Combo"
+  },
+  {
+    "id": "C20",
+    "category": "Combination Platters",
+    "name": "Sesame Chicken",
+    "description": "Sesame chicken. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sesame+Chicken+Combo"
+  },
+  {
+    "id": "C21",
+    "category": "Combination Platters",
+    "name": "Boneless Spare Ribs",
+    "description": "Boneless ribs. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Boneless+Ribs+Combo"
+  },
+  {
+    "id": "C22",
+    "category": "Combination Platters",
+    "name": "Bar-B-Q Spare Ribs",
+    "description": "BBQ ribs. Served with Fried Rice & Egg Roll.",
+    "prices": { "order": 9.70 },
+    "combo_includes": "Fried Rice & Egg Roll",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=BBQ+Ribs+Combo"
+  },
+  {
+    "id": "L1",
+    "category": "Lunch Specials",
+    "name": "Mixed Vegetable",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Mixed+Veg+Lunch"
+  },
+  {
+    "id": "L2",
+    "category": "Lunch Specials",
+    "name": "Broccoli w. Garlic Sauce",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Broccoli+Garlic+Lunch"
+  },
+  {
+    "id": "L3",
+    "category": "Lunch Specials",
+    "name": "Chicken Chow Mein (or Roast Pork)",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chow+Mein+Lunch"
+  },
+  {
+    "id": "L4",
+    "category": "Lunch Specials",
+    "name": "Shrimp Chow Mein",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Chow+Mein+Lunch"
+  },
+  {
+    "id": "L5",
+    "category": "Lunch Specials",
+    "name": "Roast Pork Egg Foo Young (or Chicken)",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Egg+Foo+Young+Lunch"
+  },
+  {
+    "id": "L6",
+    "category": "Lunch Specials",
+    "name": "Roast Pork Lo Mein (or Chicken)",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Lo+Mein+Lunch"
+  },
+  {
+    "id": "L7",
+    "category": "Lunch Specials",
+    "name": "Roast Pork with Chinese Veg",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+Veg+Lunch"
+  },
+  {
+    "id": "L8",
+    "category": "Lunch Specials",
+    "name": "Roast Pork with Broccoli",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pork+Broccoli+Lunch"
+  },
+  {
+    "id": "L9",
+    "category": "Lunch Specials",
+    "name": "Sweet & Sour Chicken (or Pork)",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sweet+and+Sour+Lunch"
+  },
+  {
+    "id": "L10",
+    "category": "Lunch Specials",
+    "name": "Moo Goo Gai Pan",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Moo+Goo+Gai+Pan+Lunch"
+  },
+  {
+    "id": "L11",
+    "category": "Lunch Specials",
+    "name": "Chicken with Broccoli",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Broccoli+Lunch"
+  },
+  {
+    "id": "L12",
+    "category": "Lunch Specials",
+    "name": "Szechuan Chicken",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Szechuan+Chicken+Lunch"
+  },
+  {
+    "id": "L13",
+    "category": "Lunch Specials",
+    "name": "Kung Po Chicken",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Kung+Po+Chicken+Lunch"
+  },
+  {
+    "id": "L14",
+    "category": "Lunch Specials",
+    "name": "Hunan Chicken",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Hunan+Chicken+Lunch"
+  },
+  {
+    "id": "L15",
+    "category": "Lunch Specials",
+    "name": "Chicken with Garlic Sauce",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Chicken+Garlic+Lunch"
+  },
+  {
+    "id": "L16",
+    "category": "Lunch Specials",
+    "name": "Beef with Broccoli",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Broccoli+Lunch"
+  },
+  {
+    "id": "L17",
+    "category": "Lunch Specials",
+    "name": "Beef or Shrimp Egg Foo Young",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Egg+Foo+Young+Lunch"
+  },
+  {
+    "id": "L18",
+    "category": "Lunch Specials",
+    "name": "Pepper Steak",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Pepper+Steak+Lunch"
+  },
+  {
+    "id": "L19",
+    "category": "Lunch Specials",
+    "name": "Beef with Chinese Veg",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Beef+Veg+Lunch"
+  },
+  {
+    "id": "L20",
+    "category": "Lunch Specials",
+    "name": "Sesame Chicken",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Sesame+Chicken+Lunch"
+  },
+  {
+    "id": "L21",
+    "category": "Lunch Specials",
+    "name": "General Tso's Chicken",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=General+Tsos+Lunch"
+  },
+  {
+    "id": "L22",
+    "category": "Lunch Specials",
+    "name": "Shrimp with Lobster Sauce",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Lobster+Lunch"
+  },
+  {
+    "id": "L23",
+    "category": "Lunch Specials",
+    "name": "Shrimp with Broccoli",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Broccoli+Lunch"
+  },
+  {
+    "id": "L24",
+    "category": "Lunch Specials",
+    "name": "Shrimp with Garlic Sauce",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "isSpicy": true,
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Garlic+Lunch"
+  },
+  {
+    "id": "L25",
+    "category": "Lunch Specials",
+    "name": "Shrimp with Chinese Veg",
+    "description": "Served with Fried Rice and Soda.",
+    "prices": { "order": 7.70 },
+    "combo_includes": "Fried Rice and Soda",
+    "image_url": "https://placehold.co/800x600/e74c3c/ffffff?text=Shrimp+Veg+Lunch"
+  }
+]
