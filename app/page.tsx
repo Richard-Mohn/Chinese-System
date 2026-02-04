@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaMapMarkerAlt, FaVideo, FaRocket, FaShieldAlt, FaArrowRight, FaCheck } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaVideo, FaRocket, FaShieldAlt, FaArrowRight, FaCheck, FaTruck } from 'react-icons/fa';
 
 interface FeatureCardProps {
   icon: any;
