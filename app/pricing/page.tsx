@@ -3,7 +3,14 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-const PricingTier = ({ title, price, features, featured = false }) => (
+interface PricingTierProps {
+  title: string;
+  price: string;
+  features: string[];
+  featured?: boolean;
+}
+
+const PricingTier = ({ title, price, features, featured = false }: PricingTierProps) => (
   <motion.div
     className={`border rounded-lg p-8 text-center ${featured ? 'bg-black text-white' : 'bg-gray-50'}`}
     whileHover={{ y: -10 }}

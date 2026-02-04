@@ -9,10 +9,10 @@ runConfig:
   memoryMiB: 512
 env:
   - variable: NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-    value: "pk.eyJ1IjoicmljaGFyZG1vaG4iLCJhIjoiY21rZ2VrOW5xMDR1ajNlbzZmZ2lva3JvMCJ9.DHyWToPkcvhOuzVL7PY8Qg"
+    secret: NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
   - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-    value: "pk_test_51SwWBk18EsXETRxPO0vZQRQRm0uQNXhduOpMr48Dm5ObpRHc6xu4Y6EpUrFjDFj7cwL2YdDpZGLqIfPfXgdWhrGZ00ca3KQsp2"
+    secret: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   - variable: NEXT_PUBLIC_OWNER_SECRET_CODE
-    value: "owner_dragon_secret"
+    secret: NEXT_PUBLIC_OWNER_SECRET_CODE
   - variable: STRIPE_SECRET_KEY
     secret: STRIPE_SECRET_KEY

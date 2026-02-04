@@ -12,9 +12,9 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
           <div className="mb-6 md:mb-0">
-            <h3 className="text-xl font-bold text-black mb-2">Golden Dragon</h3>
+            <h3 className="text-xl font-bold text-black mb-2">OrderFlow</h3>
             <p className="text-gray-500 text-sm">
-              Authentic Chinese cuisine, delivered to your door.
+              Mobile ordering platform for restaurants and food businesses.
             </p>
           </div>
           <div className="flex items-center gap-6">

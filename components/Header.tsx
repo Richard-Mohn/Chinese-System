@@ -7,7 +7,12 @@ import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-const NavLink = ({ href, children }) => (
+interface NavLinkProps {
+  href: string;
+  children: React.ReactNode;
+}
+
+const NavLink = ({ href, children }: NavLinkProps) => (
   <Link href={href} passHref>
     <motion.div
       className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-black"
@@ -46,7 +51,7 @@ const Header = () => {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="text-2xl font-bold text-black">
-            Golden Dragon
+            OrderFlow
           </span>
         </Link>
 

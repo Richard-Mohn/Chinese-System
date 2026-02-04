@@ -25,7 +25,7 @@ export default function About() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          The Golden Dragon has been a cherished part of the community for over 20 years, bringing the authentic tastes of China to your table.
+          The OrderFlow team is dedicated to empowering restaurants and food businesses.
         </motion.p>
       </motion.section>
 
@@ -35,10 +35,10 @@ export default function About() {
             <div>
               <h2 className="text-4xl font-bold mb-6">From Our Family to Yours</h2>
               <p className="text-gray-600 mb-4">
-                Founded by the Wei family in 2004, The Golden Dragon started as a small restaurant with a big dream: to share the rich, diverse flavors of their homeland with their new community.
+                Founded by experienced restaurateurs, OrderFlow was born from a simple idea: to create a powerful, affordable ordering platform that puts business owners first. We understand the challenges of the food service industry because we've lived them.
               </p>
               <p className="text-gray-600">
-                Today, we continue that tradition, using time-honored recipes and the freshest ingredients to create dishes that are both classic and innovative. Every meal is a celebration of our heritage and our passion for good food.
+                Our mission is to provide you with the tools to thrive in a competitive market, offering transparent pricing and robust features that empower you to connect directly with your customers.
               </p>
             </div>
             <div>

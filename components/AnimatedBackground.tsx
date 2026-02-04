@@ -2,11 +2,18 @@
 
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { TextureLoader, Vector3 } from 'three';
+import { Texture, Vector3, Mesh } from 'three';
 import { useTexture } from '@react-three/drei';
 
-const FoodItem = ({ texture, position, scale, rotationSpeed }) => {
-  const ref = useRef();
+interface FoodItemProps {
+  texture: Texture;
+  position: Vector3;
+  scale: number;
+  rotationSpeed: { x: number; y: number };
+}
+
+const FoodItem = ({ texture, position, scale, rotationSpeed }: FoodItemProps) => {
+  const ref = useRef<Mesh>(null);
 
   useFrame((state, delta) => {
     if (ref.current) {

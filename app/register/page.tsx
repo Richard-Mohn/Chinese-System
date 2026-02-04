@@ -48,7 +48,7 @@ export default function RegisterPage() {
             Create an Account
           </h1>
           <p className="text-center text-gray-500 mb-8">
-            Get started with Golden Dragon
+            Get started with OrderFlow
           </p>
 
           {error && (

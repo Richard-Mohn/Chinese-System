@@ -30,7 +30,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Golden Dragon
+            OrderFlow
           </motion.h1>
           <motion.p 
             className="text-lg md:text-xl text-gray-600 mb-8"
@@ -38,7 +38,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            Authentic Chinese Cuisine, Delivered.
+            Mobile Ordering Platform for Restaurants.
           </motion.p>
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}

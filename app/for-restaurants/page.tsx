@@ -381,7 +381,6 @@ export default function ForRestaurants() {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }
