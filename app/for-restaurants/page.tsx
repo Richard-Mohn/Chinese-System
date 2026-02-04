@@ -102,20 +102,20 @@ export default function ForRestaurants() {
             />
             <FeatureCard 
               icon={FaBullhorn}
-              title="Direct Marketing"
-              description="Own your customer data. Build loyalty with integrated SMS and email campaign tools."
+              title="Marketing Automation"
+              description="Build digital repeat business with automated email and SMS tools. Own your customer relationship."
               delay={0.4}
             />
             <FeatureCard 
               icon={FaCreditCard}
-              title="Instant Settlement"
-              description="Don't wait weeks for your money. Get your revenue deposited daily with zero platform markup."
+              title="Fraud Protection"
+              description="Full chargeback protection and secure, daily settlement. Your revenue is protected 24/7."
               delay={0.5}
             />
             <FeatureCard 
               icon={FaUsers}
-              title="Team Management"
-              description="Robust role-based access for staff, drivers, and managers across all your locations."
+              title="Order with Google"
+              description="High-visibility integration with Google Search and Maps to drive more local traffic."
               delay={0.6}
             />
           </div>

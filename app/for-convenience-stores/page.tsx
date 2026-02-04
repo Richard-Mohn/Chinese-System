@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaQrcode, FaCoffee, FaBeer, FaBolt, FaMobileAlt, FaPercent, FaArrowRight } from 'react-icons/fa';
+import { FaQrcode, FaCoffee, FaBeer, FaBolt, FaMobileAlt, FaPercent, FaArrowRight, FaCheckCircle } from 'react-icons/fa';
 
 interface FeatureCardProps {
   icon: any;
@@ -108,14 +108,14 @@ export default function ForConvenienceStores() {
             />
             <FeatureCard 
               icon={FaMobileAlt}
-              title="Live Inventory"
-              description="Sync your stock levels in real-time. Avoid customer frustration with instant availability updates."
+              title="Order with Google"
+              description="Be found by hungry customers on Google Search and Maps. Instant ordering from search results."
               delay={0.5}
             />
             <FeatureCard 
-              icon={FaBeer}
-              title="Compliance Ready"
-              description="Built-in age verification prompts and secure logs for controlled items."
+              icon={FaCheckCircle}
+              title="Fraud Protection"
+              description="Complete coverage for chargebacks and secure processing for every retail transaction."
               delay={0.6}
             />
           </div>

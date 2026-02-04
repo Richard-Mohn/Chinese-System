@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaMapMarkerAlt, FaVideo, FaRocket, FaShieldAlt, FaArrowRight } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaVideo, FaRocket, FaShieldAlt, FaArrowRight, FaCheck } from 'react-icons/fa';
 
 interface FeatureCardProps {
   icon: any;
@@ -104,14 +104,14 @@ export default function Home() {
             />
             <FeatureCard 
               icon={FaRocket}
-              title="Zero Fees"
-              description="Keep 100% of your hard-earned revenue. No predatory commissions, ever."
+              title="Order with Google"
+              description="Seamless integration with Google Search and Maps. Turn searchers into customers instantly."
               delay={0.3}
             />
             <FeatureCard 
               icon={FaShieldAlt}
-              title="Smart Insights"
-              description="Advanced AI-driven analytics to optimize your inventory and staffing automatically."
+              title="Fraud Protection"
+              description="Enterprise-grade chargeback protection and secure payment processing for every order."
               delay={0.4}
             />
           </div>

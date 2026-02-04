@@ -101,10 +101,22 @@ export default function Comparison() {
               delay={0.5}
             />
             <ComparisonRow 
+              feature="Order with Google"
+              locl="Full Integration"
+              competitors="Limited / Add-on"
+              delay={0.6}
+            />
+            <ComparisonRow 
+              feature="Fraud Protection"
+              locl="Zero-Cost Coverage"
+              competitors="Extra Fee / No"
+              delay={0.7}
+            />
+            <ComparisonRow 
               feature="Payment Settlement"
               locl="Instant / Daily"
               competitors="Weekly / Bi-weekly"
-              delay={0.6}
+              delay={0.8}
             />
           </div>
 

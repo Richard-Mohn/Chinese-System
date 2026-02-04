@@ -91,14 +91,14 @@ export default function Pricing() {
               title="Starter"
               price="$0"
               description="Everything you need to launch."
-              features={['Unlimited Menu Items', 'Direct Ordering', 'Email Support', 'Basic Analytics', 'Mobile Optimized']}
+              features={['Unlimited Menu Items', 'Order with Google', 'Fraud Protection', 'Direct Ordering', 'Basic Analytics']}
               delay={0.1}
             />
             <PricingCard 
               title="Growth"
               price="$47"
               description="For bustling local businesses."
-              features={['Sub-second GPS Tracking', 'Live Chef Cam', 'Priority Support', 'Custom Branding', 'SMS Marketing', 'Advanced AI Insights']}
+              features={['Sub-second GPS Tracking', 'Live Chef Cam', 'SMS Marketing Automation', 'AI-Powered Insights', 'Priority 24/7 Support']}
               featured
               delay={0.2}
             />
