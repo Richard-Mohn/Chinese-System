@@ -16,7 +16,13 @@
     }
   ],
   "hosting": {
-    "apphosting": "chinesesystem"
+    "public": "public",
+    "rewrites": [
+      {
+        "source": "**",
+        "apphosting": "chinesesystem"
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules",
