@@ -72,9 +72,19 @@ export default function Home() {
                 Join the Waitlist
                 <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="/about" className="px-10 py-5 bg-white text-zinc-900 border-2 border-zinc-200 rounded-full font-bold text-lg hover:border-zinc-900 transition-all">
-                The Vision
-              </Link>
+              <button 
+                onClick={() => {
+                  const code = prompt("Enter Partner Access Code:");
+                  if (code === "804605146") {
+                    window.location.href = "/dashboard";
+                  } else if (code) {
+                    alert("Invalid Code");
+                  }
+                }}
+                className="px-10 py-5 bg-white text-zinc-900 border-2 border-zinc-200 rounded-full font-bold text-lg hover:border-zinc-900 transition-all"
+              >
+                Partner Access
+              </button>
             </motion.div>
           </div>
 

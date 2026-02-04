@@ -4,9 +4,40 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { FaPizzaSlice, FaHistory, FaGift, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
+
+const StatCard = ({ title, value, color, delay }) => (
+  <motion.div
+    className="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_50px_rgba(0,0,0,0.02)] border border-zinc-100 flex flex-col items-start"
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay }}
+  >
+    <p className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">{title}</p>
+    <p className={`text-4xl font-black ${color}`}>{value}</p>
+  </motion.div>
+);
+
+const NavCard = ({ icon: Icon, title, description, href, delay }) => (
+  <Link href={href} className="group">
+    <motion.div
+      className="bg-white p-10 rounded-[3rem] border border-zinc-100 group-hover:border-black transition-all duration-500 h-full flex flex-col items-start"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+    >
+      <div className="w-14 h-14 bg-zinc-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors duration-500">
+        <Icon className="text-2xl" />
+      </div>
+      <h3 className="text-xl font-bold text-black mb-2">{title}</h3>
+      <p className="text-zinc-500 text-sm font-medium leading-relaxed">{description}</p>
+    </motion.div>
+  </Link>
+);
 
 export default function CustomerDashboard() {
-  const { user, loclUser, loading, isCustomer } = useAuth();
+  const { user, loclUser, loading, isCustomer, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,163 +48,107 @@ export default function CustomerDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-zinc-50 dark:bg-zinc-900">
-        <div className="text-lg font-semibold text-zinc-600 dark:text-zinc-400">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="text-lg font-bold text-zinc-400 animate-pulse">Loading LOCL...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-black text-zinc-900 dark:text-white">
-                My Orders
-              </h1>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                {user?.email}
-              </p>
-            </div>
-            <Link
-              href="/logout"
-              className="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-all"
-            >
-              Logout
-            </Link>
-          </div>
+    <div className="min-h-screen bg-transparent pt-32 pb-20 px-4">
+      <div className="container mx-auto max-w-6xl">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-black mb-2">
+              My Orders<span className="text-indigo-600">.</span>
+            </h1>
+            <p className="text-lg font-medium text-zinc-500">
+              Welcome back, {loclUser?.displayName?.split(' ')[0] || 'User'}
+            </p>
+          </motion.div>
+          <motion.button
+            onClick={() => logout()}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-center gap-2 px-6 py-3 bg-zinc-50 text-zinc-600 rounded-full font-bold text-sm hover:bg-red-50 hover:text-red-600 transition-all"
+          >
+            <FaSignOutAlt />
+            Logout
+          </motion.button>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 font-bold mb-2">
-              Loyalty Points
-            </p>
-            <p className="text-3xl font-black text-indigo-600">450</p>
-          </div>
-
-          <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 font-bold mb-2">
-              Total Orders
-            </p>
-            <p className="text-3xl font-black text-emerald-600">18</p>
-          </div>
-
-          <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 font-bold mb-2">
-              Total Spent
-            </p>
-            <p className="text-3xl font-black text-blue-600">$342.50</p>
-          </div>
-
-          <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 font-bold mb-2">
-              Member Since
-            </p>
-            <p className="text-3xl font-black text-purple-600">6mo</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+          <StatCard title="Loyalty Points" value="450" color="text-indigo-600" delay={0.1} />
+          <StatCard title="Total Orders" value="18" color="text-emerald-600" delay={0.2} />
+          <StatCard title="Total Spent" value="$342" color="text-black" delay={0.3} />
+          <StatCard title="Membership" value="6mo" color="text-blue-600" delay={0.4} />
         </div>
 
-        {/* Navigation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Link href="/menu" className="group">
-            <div className="bg-white dark:bg-zinc-800 p-8 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 hover:border-indigo-500 dark:hover:border-indigo-600 transition-all hover:shadow-lg">
-              <div className="text-4xl mb-4">🍕</div>
-              <h3 className="text-xl font-black text-zinc-900 dark:text-white mb-2">
-                Browse Menu
-              </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Order from your favorite restaurant
-              </p>
-            </div>
-          </Link>
-
-          <Link href="/customer/orders" className="group">
-            <div className="bg-white dark:bg-zinc-800 p-8 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 hover:border-blue-500 dark:hover:border-blue-600 transition-all hover:shadow-lg">
-              <div className="text-4xl mb-4">📋</div>
-              <h3 className="text-xl font-black text-zinc-900 dark:text-white mb-2">
-                Order History
-              </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Track your past orders
-              </p>
-            </div>
-          </Link>
-
-          <Link href="/customer/loyalty" className="group">
-            <div className="bg-white dark:bg-zinc-800 p-8 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 dark:hover:border-emerald-600 transition-all hover:shadow-lg">
-              <div className="text-4xl mb-4">🎁</div>
-              <h3 className="text-xl font-black text-zinc-900 dark:text-white mb-2">
-                Loyalty Rewards
-              </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                View rewards and redeem points
-              </p>
-            </div>
-          </Link>
-
-          <Link href="/customer/profile" className="group">
-            <div className="bg-white dark:bg-zinc-800 p-8 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 hover:border-purple-500 dark:hover:border-purple-600 transition-all hover:shadow-lg">
-              <div className="text-4xl mb-4">👤</div>
-              <h3 className="text-xl font-black text-zinc-900 dark:text-white mb-2">
-                Profile
-              </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Update addresses and preferences
-              </p>
-            </div>
-          </Link>
+        {/* Navigation Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <NavCard 
+            icon={FaPizzaSlice} 
+            title="Browse Menu" 
+            description="Order from your favorite local shops."
+            href="/menu"
+            delay={0.1}
+          />
+          <NavCard 
+            icon={FaHistory} 
+            title="History" 
+            description="Track and re-order past favorites."
+            href="/customer/orders"
+            delay={0.2}
+          />
+          <NavCard 
+            icon={FaGift} 
+            title="Rewards" 
+            description="View and redeem your points."
+            href="/customer/loyalty"
+            delay={0.3}
+          />
+          <NavCard 
+            icon={FaUserCircle} 
+            title="Profile" 
+            description="Manage your addresses and settings."
+            href="/customer/profile"
+            delay={0.4}
+          />
         </div>
 
-        {/* Active Orders */}
-        <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-8">
-          <h2 className="text-2xl font-black text-zinc-900 dark:text-white mb-6">
-            Recent Orders
-          </h2>
-          <div className="space-y-4">
-            <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="font-bold text-zinc-900 dark:text-white">Order #1234</p>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">China Wok Restaurant</p>
+        {/* Recent Activity */}
+        <motion.div 
+          className="bg-white rounded-[3rem] border border-zinc-100 p-12 shadow-[0_10px_50px_rgba(0,0,0,0.02)]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
+          <h2 className="text-3xl font-black text-black mb-10 tracking-tight">Recent Activity</h2>
+          <div className="space-y-6">
+            {[1, 2].map((i) => (
+              <div key={i} className="flex justify-between items-center py-6 border-b border-zinc-50 last:border-0 group cursor-pointer">
+                <div className="flex gap-6 items-center">
+                  <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-xl group-hover:bg-black group-hover:text-white transition-colors">
+                    🥡
+                  </div>
+                  <div>
+                    <p className="font-bold text-black text-lg">Order #882{i}</p>
+                    <p className="text-zinc-400 font-medium">Nov 1{i}, 2025 • 3 items</p>
+                  </div>
                 </div>
-                <span className="bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 px-3 py-1 rounded-full text-sm font-bold">
-                  Delivered
-                </span>
-              </div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
-                2x Kung Pao Chicken + 1x Fried Rice - $18.50
-              </p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                Delivered on Nov 15, 2024
-              </p>
-            </div>
-
-            <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="font-bold text-zinc-900 dark:text-white">Order #1233</p>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">China Wok Restaurant</p>
+                <div className="text-right">
+                  <p className="font-black text-black text-lg">$24.50</p>
+                  <span className="text-xs font-black uppercase tracking-widest text-emerald-500">Delivered</span>
                 </div>
-                <span className="bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 px-3 py-1 rounded-full text-sm font-bold">
-                  Delivered
-                </span>
               </div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
-                1x Pad Thai + 1x Spring Rolls - $16.25
-              </p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                Delivered on Nov 12, 2024
-              </p>
-            </div>
+            ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
