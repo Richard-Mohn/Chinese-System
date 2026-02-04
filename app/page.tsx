@@ -202,6 +202,57 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Delivery Deep Dive */}
+      <section className="py-32 px-4 bg-zinc-50 rounded-[4rem] mx-4 mb-20">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="order-2 lg:order-1 aspect-video bg-white rounded-[3rem] border border-zinc-100 flex items-center justify-center relative overflow-hidden shadow-2xl group">
+               {/* Map Grid Pattern */}
+               <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+               <motion.div 
+                className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-2xl relative z-10"
+                animate={{ 
+                  x: [0, 50, 20, -30, 0],
+                  y: [0, -30, 40, 10, 0]
+                }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+               >
+                  <FaTruck className="text-xl" />
+                  <div className="absolute -inset-4 bg-blue-600/20 rounded-full animate-ping" />
+               </motion.div>
+               <div className="absolute bottom-8 left-8 bg-black text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em]">Live Signal: Active</div>
+            </div>
+
+            <motion.div
+              className="order-1 lg:order-2"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <span className="text-blue-600 font-black uppercase tracking-widest text-sm mb-4 block">Premium Module</span>
+              <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tight">The "Elite Fleet" Module.</h2>
+              <p className="text-xl text-zinc-500 font-medium leading-relaxed mb-10">
+                Stop guessing. Start tracking. Our sub-second GPS engine gives you absolute visibility over your delivery operations, reducing costs and delighting customers.
+              </p>
+              <ul className="space-y-4 mb-12">
+                <li className="flex items-center gap-3 font-bold text-black italic">
+                  <FaCheck className="text-blue-600 not-italic" /> Sub-second GPS coordinate updates
+                </li>
+                <li className="flex items-center gap-3 font-bold text-black italic">
+                  <FaCheck className="text-blue-600 not-italic" /> Automated driver routing & dispatch
+                </li>
+                <li className="flex items-center gap-3 font-bold text-black italic">
+                  <FaCheck className="text-blue-600 not-italic" /> Real-time customer tracking links
+                </li>
+              </ul>
+              <Link href="/register" className="inline-flex items-center gap-2 text-black font-black text-lg border-b-2 border-black pb-1 hover:gap-4 transition-all">
+                Explore the Fleet Hub <FaArrowRight />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Trust Banner */}
       <section className="py-20 border-t border-gray-50">
         <div className="container mx-auto px-4 text-center">
