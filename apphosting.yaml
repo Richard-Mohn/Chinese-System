@@ -1,23 +1,18 @@
-# Settings for Backend (on Cloud Run).
-# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
+# Firebase App Hosting configuration
+kind: "apphosting.yaml"
+version: "v1"
 runConfig:
   minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512
-
-# Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
-
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  maxInstances: 10
+  concurrency: 80
+  cpu: 2
+  memoryMiB: 1024
+env:
+  - variable: NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+    secret: NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+  - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    secret: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  - variable: NEXT_PUBLIC_OWNER_SECRET_CODE
+    secret: NEXT_PUBLIC_OWNER_SECRET_CODE
+  - variable: STRIPE_SECRET_KEY
+    secret: STRIPE_SECRET_KEY
