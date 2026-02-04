@@ -3,7 +3,14 @@
 import { motion } from 'framer-motion';
 import { FaUsers, FaLightbulb, FaHandshake } from 'react-icons/fa';
 
-const ValueCard = ({ icon: Icon, title, description, delay }) => (
+interface ValueCardProps {
+  icon: any;
+  title: string;
+  description: string;
+  delay: number;
+}
+
+const ValueCard = ({ icon: Icon, title, description, delay }: ValueCardProps) => (
   <motion.div
     className="bg-white p-10 rounded-[2.5rem] shadow-[0_10px_50px_rgba(0,0,0,0.03)] border border-zinc-100 flex flex-col items-center text-center group"
     initial={{ y: 20, opacity: 0 }}

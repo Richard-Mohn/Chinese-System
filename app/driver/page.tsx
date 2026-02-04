@@ -7,7 +7,14 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FaTruck, FaRoute, FaCheckCircle, FaSignOutAlt, FaMapMarkerAlt, FaHistory, FaUserCircle, FaMoneyBillWave } from 'react-icons/fa';
 
-const DriverStat = ({ title, value, color, delay }) => (
+interface DriverStatProps {
+  title: string;
+  value: string;
+  color: string;
+  delay: number;
+}
+
+const DriverStat = ({ title, value, color, delay }: DriverStatProps) => (
   <motion.div
     className="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_50px_rgba(0,0,0,0.02)] border border-zinc-100 flex flex-col items-start"
     initial={{ opacity: 0, y: 10 }}
@@ -19,7 +26,15 @@ const DriverStat = ({ title, value, color, delay }) => (
   </motion.div>
 );
 
-const NavCard = ({ icon: Icon, title, description, href, delay }) => (
+interface NavCardProps {
+  icon: any;
+  title: string;
+  description: string;
+  href: string;
+  delay: number;
+}
+
+const NavCard = ({ icon: Icon, title, description, href, delay }: NavCardProps) => (
   <Link href={href} className="group">
     <motion.div
       className="bg-white p-10 rounded-[3rem] border border-zinc-100 group-hover:border-black transition-all duration-500 h-full flex flex-col items-start"

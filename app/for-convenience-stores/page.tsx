@@ -4,7 +4,14 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaQrcode, FaCoffee, FaBeer, FaBolt, FaMobileAlt, FaPercent, FaArrowRight } from 'react-icons/fa';
 
-const FeatureCard = ({ icon: Icon, title, description, delay }) => (
+interface FeatureCardProps {
+  icon: any;
+  title: string;
+  description: string;
+  delay: number;
+}
+
+const FeatureCard = ({ icon: Icon, title, description, delay }: FeatureCardProps) => (
   <motion.div
     className="bg-white p-10 rounded-[3rem] shadow-[0_10px_50px_rgba(0,0,0,0.03)] border border-zinc-100 flex flex-col items-start text-left group hover:border-zinc-300 transition-all duration-500"
     initial={{ y: 20, opacity: 0 }}

@@ -7,7 +7,14 @@ import { motion } from 'framer-motion';
 import { FaChartLine, FaUsers, FaBoxOpen, FaCog, FaSignOutAlt, FaPlus, FaClipboardList, FaTruck, FaUtensils, FaGift, FaBullhorn } from 'react-icons/fa';
 import Link from 'next/link';
 
-const BusinessStat = ({ title, value, change, delay }) => (
+interface BusinessStatProps {
+  title: string;
+  value: string;
+  change: string;
+  delay: number;
+}
+
+const BusinessStat = ({ title, value, change, delay }: BusinessStatProps) => (
   <motion.div
     className="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_50px_rgba(0,0,0,0.02)] border border-zinc-100"
     initial={{ opacity: 0, y: 10 }}
@@ -22,7 +29,16 @@ const BusinessStat = ({ title, value, change, delay }) => (
   </motion.div>
 );
 
-const NavCard = ({ icon: Icon, title, description, href, delay, colorClass }) => (
+interface NavCardProps {
+  icon: any;
+  title: string;
+  description: string;
+  href: string;
+  delay: number;
+  colorClass: string;
+}
+
+const NavCard = ({ icon: Icon, title, description, href, delay, colorClass }: NavCardProps) => (
   <Link href={href} className="group">
     <motion.div
       className="bg-white p-10 rounded-[3rem] border border-zinc-100 group-hover:border-black transition-all duration-500 h-full flex flex-col items-start"
