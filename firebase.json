@@ -17,20 +17,7 @@
   ],
   "hosting": {
     "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "ordersystem",
-          "region": "us-east4"
-        }
-      }
-    ]
+    "apphosting": "ordersystem"
   },
   "firestore": {
     "rules": "firestore.rules",

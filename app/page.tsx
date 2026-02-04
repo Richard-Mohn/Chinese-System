@@ -38,9 +38,9 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="inline-block px-4 py-1.5 mb-6 rounded-full bg-gray-50 border border-gray-100 text-sm font-medium tracking-wide text-gray-600"
+              className="inline-block px-4 py-1.5 mb-6 rounded-full bg-blue-50 border border-blue-100 text-sm font-black tracking-widest text-blue-600 uppercase"
             >
-              Coming Summer 2026
+              The New Standard
             </motion.div>
             
             <motion.h1
@@ -58,8 +58,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              The 2026 standard for local commerce. 
-              Built for profit, not platforms.
+              Simple, powerful mobile ordering for your local business. 
+              Take back your margins and own your customer relationship.
             </motion.p>
 
             <motion.div
@@ -68,8 +68,8 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.6 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link href="/register" className="group px-10 py-5 bg-zinc-900 text-white rounded-full font-bold text-lg flex items-center gap-3 hover:bg-black transition-all active:scale-95 shadow-xl">
-                Join the Waitlist
+              <Link href="/register" className="group px-10 py-5 bg-black text-white rounded-full font-bold text-lg flex items-center gap-3 hover:bg-zinc-800 transition-all active:scale-95 shadow-xl">
+                Get Started
                 <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <button 
