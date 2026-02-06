@@ -48,8 +48,8 @@ const StatBlock = ({ value, label, delay }: StatBlockProps) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay }}
   >
-    <div className="text-2xl md:text-5xl font-black tracking-tight mb-1 md:mb-2">{value}</div>
-    <div className="text-[10px] md:text-sm font-bold text-zinc-400 uppercase tracking-wider">{label}</div>
+    <div className="text-3xl md:text-5xl font-black tracking-tight mb-1 md:mb-2">{value}</div>
+    <div className="text-[11px] md:text-sm font-bold text-zinc-400 uppercase tracking-wider">{label}</div>
   </motion.div>
 );
 
@@ -60,21 +60,21 @@ export default function Home() {
     <div className="min-h-screen bg-white selection:bg-black selection:text-white">
 
       {/* ━━━ HERO ━━━ */}
-      <section className="relative pt-24 md:pt-40 pb-12 md:pb-24 px-4 overflow-hidden">
+      <section className="relative pt-28 md:pt-40 pb-16 md:pb-24 px-4 overflow-hidden">
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center mb-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-5 py-2 mb-8 rounded-full bg-gradient-to-r from-orange-50 to-red-50 border border-orange-100/60 text-sm font-black tracking-widest text-orange-600 uppercase"
+              className="inline-flex items-center gap-2 px-5 py-2 mb-6 rounded-full bg-gradient-to-r from-orange-50 to-red-50 border border-orange-100/60 text-sm font-black tracking-widest text-orange-600 uppercase"
             >
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               Now Accepting Crypto
             </motion.div>
 
             <motion.h1
-              className="text-5xl md:text-[8rem] font-black mb-4 md:mb-6 tracking-tighter text-zinc-900 leading-[0.85]"
+              className="text-[3.25rem] md:text-[8rem] font-black mb-4 md:mb-6 tracking-tighter text-zinc-900 leading-[0.85]"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
@@ -93,7 +93,7 @@ export default function Home() {
             </motion.p>
 
             <motion.p
-              className="text-sm md:text-base text-zinc-400 max-w-xl mx-auto mb-8 md:mb-12 leading-relaxed hidden md:block"
+              className="text-sm md:text-base text-zinc-400 max-w-xl mx-auto mb-6 md:mb-12 leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
