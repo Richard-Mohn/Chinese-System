@@ -22,7 +22,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 if (getApps().length === 0) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const serviceAccount = require('@/../serviceAccountKey.json');
+    const serviceAccount = require(process.cwd() + '/serviceAccountKey.json');
     initializeApp({ credential: cert(serviceAccount) });
   } catch {
     initializeApp();
