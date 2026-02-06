@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   output: 'standalone',
+  // Output to workspace root so Firebase App Hosting adapter can find it
+  distDir: '../.next',
   reactStrictMode: true,
   trailingSlash: true,
   images: {
