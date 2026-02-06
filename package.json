@@ -13,8 +13,7 @@
     "start": "cd restaurant-app && npm run start",
     "lint": "cd restaurant-app && npm run lint",
     "type-check": "cd restaurant-app && npm run type-check",
-    "seed": "cd restaurant-app && npm run seed",
-    "deploy": "firebase deploy"
+    "seed": "cd restaurant-app && npm run seed"
   },
   "keywords": [
     "ordering",

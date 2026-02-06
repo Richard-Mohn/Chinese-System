@@ -227,27 +227,38 @@ npm run type-check
 
 ## 🚀 Deployment
 
-### Firebase App Hosting
+### Firebase App Hosting + GitHub Integration
 
-The app uses Firebase App Hosting for automatic deployment:
+MohnMenu uses **Firebase App Hosting** with automatic GitHub integration. No manual deployment commands needed!
 
-```bash
-# Deploy to staging
-firebase deploy --only hosting:staging
+**How it works:**
+1. Push code to `main` branch on GitHub
+2. GitHub Actions runs tests and builds the app
+3. Firebase App Hosting automatically detects the changes
+4. Auto-rollout creates a new deployment
+5. Your app is live instantly
 
-# Deploy to production
-firebase deploy --only hosting:production
-```
+**Your Deployment URLs:**
+- **Backend API**: `ordersystem--chinese-system.us-east4.hosted.app`
+- **Custom Domain**: `mohnmenu.com`
+- **Project ID**: `chinese-system`
 
-### GitHub Actions
+### GitHub Actions Workflow
 
-CI/CD pipelines in `.github/workflows/`:
+CI/CD pipeline in `.github/workflows/build.yml`:
 
-- **`test.yml`** - Run tests on every PR
-- **`deploy.yml`** - Auto-deploy on merge to main
-- **`lint.yml`** - Code quality checks
+1. **Build** - Installs dependencies, runs type-check
+2. **Test** - Verifies TypeScript compilation
+3. **Auto-Deploy** - Firebase App Hosting detects changes and deploys
 
-Deployment status: ✅ **[CONFIGURED]**
+**What you DON'T need to do:**
+- ❌ Run `firebase deploy` manually
+- ❌ Upload files to Firebase Hosting
+- ❌ Manage deployment tokens in CI/CD
+
+Just push to GitHub and Firebase handles the rest! ✅
+
+Deployment status: ✅ **[AUTO FROM GITHUB]**
 
 ## 📖 Documentation
 
