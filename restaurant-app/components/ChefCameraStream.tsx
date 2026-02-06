@@ -41,23 +41,23 @@ export const ChefCameraStream: React.FC<ChefCameraStreamProps> = ({
     if (!video || !streamUrl) return;
 
     // Dynamic import of HLS.js
-    import('hls.js').then((HLS) => {
-      const hls = new HLS.default();
+    import('hls.js').then(({ default: Hls }) => {
+      const hls = new Hls();
 
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
 
-      hls.on('hlsManifestParsed', () => {
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setIsLoading(false);
         if (autoPlay) {
           video.play().catch(() => setError('Playback failed'));
         }
       });
 
-      hls.on('hlsError', (event, data) => {
-        if (data.type === 'networkError') {
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
           setError('Network error - stream unavailable');
-        } else if (data.type === 'mediaError') {
+        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
           setError('Media error - invalid stream format');
         } else {
           setError('Stream error - please try again later');
