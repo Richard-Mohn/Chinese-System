@@ -19,7 +19,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 if (getApps().length === 0) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const serviceAccount = require('@/../../serviceAccountKey.json');
+    const serviceAccount = require('@/../serviceAccountKey.json');
     initializeApp({ credential: cert(serviceAccount) });
   } catch {
     // Fall back to default credentials in production
