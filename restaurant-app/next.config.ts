@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  // Removed output: 'export' — SSR required for multi-tenant dynamic routes & proxy
+  output: 'standalone',
   reactStrictMode: true,
   trailingSlash: true,
   images: {
