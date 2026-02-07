@@ -886,7 +886,7 @@ export default function OrderPage({
 
       {/* ── Floating Cart Button (Mobile) ────────────────────── */}
       {getTotalItems() > 0 && !cartOpen && (
-        <div className="fixed bottom-6 left-4 right-4 z-30 lg:hidden">
+        <div className="fixed bottom-6 left-4 right-4 z-[95] lg:hidden">
           <button
             onClick={() => setCartOpen(true)}
             className="w-full py-4 bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-between px-6 shadow-2xl"
@@ -906,7 +906,7 @@ export default function OrderPage({
             initial={{ opacity: 0, y: 60, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] bg-zinc-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 max-w-sm"
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[105] bg-zinc-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 max-w-sm"
           >
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shrink-0">
               <FaCheck className="text-sm" />
@@ -932,7 +932,7 @@ export default function OrderPage({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center"
+            className="fixed inset-0 z-[110] bg-black/60 flex items-end sm:items-center justify-center"
             onClick={() => setShowItemModal(null)}
           >
             <motion.div
@@ -1044,7 +1044,7 @@ export default function OrderPage({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60"
+            className="fixed inset-0 z-[110] bg-black/60"
             onClick={() => setCartOpen(false)}
           >
             <motion.div
@@ -1142,7 +1142,7 @@ export default function OrderPage({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center overflow-y-auto"
+            className="fixed inset-0 z-[110] bg-black/60 flex items-end sm:items-center justify-center overflow-y-auto"
             onClick={() => setCheckoutOpen(false)}
           >
             <motion.div

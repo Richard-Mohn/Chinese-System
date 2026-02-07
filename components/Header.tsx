@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -93,10 +94,15 @@ const DropLink = ({ href, icon: Icon, label, desc, onClick }: DropLinkProps) => 
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [authModal, setAuthModal] = useState<{ open: boolean; tab: 'login' | 'signup' }>({ open: false, tab: 'login' });
+
+  // Hide global header on order pages (they have their own nav)
+  const hideHeader = pathname?.startsWith('/order/');
+  if (hideHeader) return null;
 
   useEffect(() => {
     const h = () => setIsScrolled(window.scrollY > 10);
