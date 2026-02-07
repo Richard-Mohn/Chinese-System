@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   FaShoppingCart, FaMapMarkerAlt, FaBitcoin, FaTruck, FaDesktop,
-  FaBolt, FaPaintBrush, FaArrowRight, FaCheck
+  FaBolt, FaPaintBrush, FaArrowRight, FaCheck, FaBicycle
 } from 'react-icons/fa';
 
 const FEATURES = [
@@ -14,6 +14,13 @@ const FEATURES = [
     title: 'Online Ordering',
     description: 'Accept orders directly from your branded website. Card, crypto, or cash — no commissions, no third-party apps.',
     color: 'from-orange-500 to-red-500',
+  },
+  {
+    slug: 'community-delivery',
+    icon: FaBicycle,
+    title: 'Community Courier',
+    description: 'Hyper-local micro-delivery by bikes, scooters & walkers. Just $0.25 per order — no 30% commissions. Couriers sign up in under 60 seconds.',
+    color: 'from-emerald-500 to-teal-500',
   },
   {
     slug: 'gps-tracking',

@@ -46,6 +46,12 @@ export type DriverStatus =
   | 'on_delivery'        // Currently delivering
   | 'on_break';          // Taking a break
 
+// Courier vehicle type
+export type CourierVehicle = 'bike' | 'walk' | 'car' | 'scooter';
+
+// Platform fee configuration
+export const PLATFORM_FEE_CENTS = 25; // $0.25 per order
+
 // Order status throughout fulfillment
 export type OrderStatus = 
   | 'pending'            // Just placed, awaiting confirmation
@@ -168,6 +174,16 @@ export interface MohnMenuBusiness {
     showMenuStats?: boolean;
     /** Enable inventory / stock tracking for menu items */
     inventoryEnabled?: boolean;
+    /** Community Courier delivery settings */
+    courierDelivery?: {
+      enabled: boolean;
+      /** Delivery radius in miles (default: 2) */
+      radiusMiles: number;
+      /** Maximum delivery radius in miles */
+      maxRadiusMiles: number;
+    };
+    /** Enable flash sales / limited-run items */
+    flashSalesEnabled?: boolean;
   };
   
   // Features (determined by tier, but can be customized)
@@ -391,6 +407,18 @@ export interface MenuItem {
   averageRating?: number;
   /** Number of reviews */
   reviewCount?: number;
+
+  // ── Flash Sale / Limited Run ──
+  /** Flash sale price (overrides normal price during sale window) */
+  flashSalePrice?: number;
+  /** Sale start time (ISO string) */
+  saleStartTime?: string;
+  /** Sale end time (ISO string) */
+  saleEndTime?: string;
+  /** Whether this is a limited-run item (disappears after stock hits 0) */
+  isLimitedRun?: boolean;
+  /** Maximum quantity available for limited runs */
+  maxQuantity?: number;
 }
 
 export interface MenuItemOption {
@@ -552,7 +580,7 @@ export interface MohnMenuDriver {
   profileImage?: string;
   
   // Driver type
-  driverType: 'inhouse' | 'marketplace';
+  driverType: 'inhouse' | 'marketplace' | 'courier';
   
   // Vehicle info
   vehicle?: {
@@ -561,6 +589,10 @@ export interface MohnMenuDriver {
     licensePlate: string;
     color: string;
   };
+
+  // Courier-specific
+  courierVehicle?: CourierVehicle;
+  deliveryRadiusMiles?: number;
   
   // Status
   status: DriverStatus;

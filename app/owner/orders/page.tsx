@@ -29,13 +29,13 @@ interface Order {
   tip?: number;
 }
 
-const STATUS_FLOW = ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered'];
+const STATUS_FLOW = ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
 const STATUS_LABELS: Record<string, string> = {
   pending: 'Pending',
   confirmed: 'Confirmed',
   preparing: 'Preparing',
   ready: 'Ready',
-  'out-for-delivery': 'Out for Delivery',
+  out_for_delivery: 'Out for Delivery',
   delivered: 'Delivered',
   completed: 'Completed',
   cancelled: 'Cancelled',
@@ -46,7 +46,7 @@ const STATUS_COLORS: Record<string, string> = {
   confirmed: 'bg-blue-100 text-blue-700 border-blue-200',
   preparing: 'bg-orange-100 text-orange-700 border-orange-200',
   ready: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  'out-for-delivery': 'bg-purple-100 text-purple-700 border-purple-200',
+  out_for_delivery: 'bg-purple-100 text-purple-700 border-purple-200',
   delivered: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   cancelled: 'bg-red-100 text-red-700 border-red-200',

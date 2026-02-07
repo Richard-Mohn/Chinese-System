@@ -9,7 +9,7 @@
 
 'use client';
 
-import { useState, useRef, type MouseEvent as ReactMouseEvent } from 'react';
+import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from 'react';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -26,6 +26,10 @@ interface RawMenuItem {
   reviewCount?: number;
   averageRating?: number;
   stock?: number | null;
+  flashSalePrice?: number;
+  saleStartTime?: string;
+  saleEndTime?: string;
+  isLimitedRun?: boolean;
 }
 
 interface MenuBrowserProps {
@@ -48,6 +52,41 @@ function formatPriceLabel(key: string): string {
 
 function getLowestPrice(prices: Record<string, number>): number {
   return Math.min(...Object.values(prices));
+}
+
+// ─── Flash Sale helpers ─────────────────────────────────────
+
+function isFlashSaleActive(item: RawMenuItem): boolean {
+  if (!item.flashSalePrice) return false;
+  const now = Date.now();
+  if (item.saleStartTime && new Date(item.saleStartTime).getTime() > now) return false;
+  if (item.saleEndTime && new Date(item.saleEndTime).getTime() < now) return false;
+  return true;
+}
+
+function FlashCountdown({ endTime }: { endTime: string }) {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const update = () => {
+      const diff = new Date(endTime).getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft('Ended'); return; }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setTimeLeft(h > 0 ? `${h}h ${m}m` : `${m}m ${s}s`);
+    };
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [endTime]);
+
+  if (timeLeft === 'Ended') return null;
+  return (
+    <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+      {timeLeft} left
+    </span>
+  );
 }
 
 // ─── Component ──────────────────────────────────────────────
@@ -189,13 +228,16 @@ export default function MenuBrowser({ items, orderPath, orderingEnabled, showSta
               const hasSizes = priceEntries.length > 1;
               const lowestPrice = getLowestPrice(item.prices);
               const outOfStock = item.stock !== undefined && item.stock !== null && item.stock <= 0;
+              const onSale = isFlashSaleActive(item);
 
               return (
                 <div
                   key={item.id}
-                  className={`bg-white rounded-2xl border border-zinc-100 hover:border-zinc-300 transition-all overflow-hidden group relative ${
-                    outOfStock ? 'opacity-60' : ''
-                  }`}
+                  className={`bg-white rounded-2xl border overflow-hidden group relative ${
+                    outOfStock ? 'opacity-60 border-zinc-100' :
+                    onSale ? 'border-orange-200 hover:border-orange-400 ring-1 ring-orange-100' :
+                    'border-zinc-100 hover:border-zinc-300'
+                  } transition-all`}
                 >
                   {/* Image */}
                   {item.image_url ? (
@@ -207,14 +249,26 @@ export default function MenuBrowser({ items, orderPath, orderingEnabled, showSta
                         loading="lazy"
                       />
                       {/* Badges */}
-                      <div className="absolute top-2 left-2 flex gap-1.5">
+                      <div className="absolute top-2 left-2 flex gap-1.5 flex-wrap">
+                        {onSale && (
+                          <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🔥 Flash Sale</span>
+                        )}
                         {item.isSpicy && (
                           <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🌶 Spicy</span>
                         )}
                         {item.popular && (
                           <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">⭐ Popular</span>
                         )}
+                        {item.isLimitedRun && (
+                          <span className="bg-purple-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Limited</span>
+                        )}
                       </div>
+                      {/* Countdown */}
+                      {onSale && item.saleEndTime && (
+                        <div className="absolute top-2 right-2">
+                          <FlashCountdown endTime={item.saleEndTime} />
+                        </div>
+                      )}
                       {outOfStock && (
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                           <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">Sold Out</span>
@@ -228,8 +282,10 @@ export default function MenuBrowser({ items, orderPath, orderingEnabled, showSta
                       )}
                     </div>
                   ) : (
-                    <div className="h-20 bg-gradient-to-br from-zinc-50 to-zinc-100 flex items-center justify-center">
-                      <span className="text-3xl">🍽️</span>
+                    <div className={`h-20 flex items-center justify-center ${
+                      onSale ? 'bg-gradient-to-br from-orange-50 to-red-50' : 'bg-gradient-to-br from-zinc-50 to-zinc-100'
+                    }`}>
+                      <span className="text-3xl">{onSale ? '🔥' : '🍽️'}</span>
                     </div>
                   )}
 
@@ -241,9 +297,16 @@ export default function MenuBrowser({ items, orderPath, orderingEnabled, showSta
                         <p className="text-xs text-zinc-400 mt-1 line-clamp-2">{item.description}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="font-black text-black text-sm">
-                          {hasSizes ? `$${lowestPrice.toFixed(2)}+` : `$${lowestPrice.toFixed(2)}`}
-                        </p>
+                        {onSale ? (
+                          <div>
+                            <p className="font-black text-orange-600 text-sm">${item.flashSalePrice!.toFixed(2)}</p>
+                            <p className="text-[10px] text-zinc-400 line-through">${lowestPrice.toFixed(2)}</p>
+                          </div>
+                        ) : (
+                          <p className="font-black text-black text-sm">
+                            {hasSizes ? `$${lowestPrice.toFixed(2)}+` : `$${lowestPrice.toFixed(2)}`}
+                          </p>
+                        )}
                       </div>
                     </div>
 

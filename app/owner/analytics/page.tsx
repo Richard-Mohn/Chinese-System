@@ -457,7 +457,7 @@ function OverviewTab({
               {Object.entries(ordersByStatus).sort((a, b) => b[1] - a[1]).map(([status, count]) => {
                 const colorMap: Record<string, string> = {
                   pending: 'bg-amber-500', confirmed: 'bg-blue-500', preparing: 'bg-orange-500',
-                  ready: 'bg-indigo-500', 'out-for-delivery': 'bg-purple-500', delivered: 'bg-emerald-500',
+                  ready: 'bg-indigo-500', out_for_delivery: 'bg-purple-500', delivered: 'bg-emerald-500',
                   completed: 'bg-emerald-500', cancelled: 'bg-red-500',
                 };
                 return (

@@ -23,6 +23,13 @@ export default function OwnerSettingsPage() {
     useMarketplaceDrivers: currentBusiness?.settings?.useMarketplaceDrivers ?? false,
     showMenuStats: currentBusiness?.settings?.showMenuStats ?? false,
     inventoryEnabled: currentBusiness?.settings?.inventoryEnabled ?? false,
+    flashSalesEnabled: currentBusiness?.settings?.flashSalesEnabled ?? false,
+  });
+
+  const [courierDelivery, setCourierDelivery] = useState({
+    enabled: currentBusiness?.settings?.courierDelivery?.enabled ?? false,
+    radiusMiles: currentBusiness?.settings?.courierDelivery?.radiusMiles ?? 2,
+    maxRadiusMiles: currentBusiness?.settings?.courierDelivery?.maxRadiusMiles ?? 3,
   });
 
   const [thirdPartyDelivery, setThirdPartyDelivery] = useState({
@@ -81,6 +88,12 @@ export default function OwnerSettingsPage() {
           useMarketplaceDrivers: settings.useMarketplaceDrivers,
           showMenuStats: settings.showMenuStats,
           inventoryEnabled: settings.inventoryEnabled,
+          flashSalesEnabled: settings.flashSalesEnabled,
+          courierDelivery: {
+            enabled: courierDelivery.enabled,
+            radiusMiles: courierDelivery.radiusMiles,
+            maxRadiusMiles: courierDelivery.maxRadiusMiles,
+          },
           thirdPartyDelivery: {
             enabled: thirdPartyDelivery.enabled,
             uberEatsUrl: thirdPartyDelivery.uberEatsUrl || null,
@@ -469,6 +482,84 @@ export default function OwnerSettingsPage() {
                 placeholder="https://www.grubhub.com/restaurant/your-restaurant/..."
               />
             </div>
+          </div>
+        )}
+      </section>
+
+      {/* ── Community Courier Delivery ──────────────────────── */}
+      <section className="bg-white rounded-2xl border border-emerald-100 p-6 space-y-5">
+        <h2 className="text-xs font-black uppercase tracking-widest text-emerald-600">
+          🚴 Community Courier Delivery
+        </h2>
+        <p className="text-xs text-zinc-400">
+          Enable community couriers — independent walkers, bikers, and scooter riders — to deliver your orders within a short radius. MohnMenu takes just $0.25 per order. No contracts, no minimum volume.
+        </p>
+
+        <label className="flex items-center justify-between cursor-pointer">
+          <div>
+            <span className="font-bold text-black text-sm">Enable Community Couriers</span>
+            <p className="text-xs text-zinc-400">Allow nearby couriers to pick up and deliver your orders</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCourierDelivery(p => ({ ...p, enabled: !p.enabled }))}
+            className={`w-12 h-7 rounded-full transition-colors relative ${
+              courierDelivery.enabled ? 'bg-emerald-500' : 'bg-zinc-200'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
+                courierDelivery.enabled ? 'translate-x-5.5' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </label>
+
+        {courierDelivery.enabled && (
+          <div className="space-y-4 pt-2">
+            <div>
+              <label className="block text-xs font-bold text-zinc-500 mb-2">Delivery Radius: {courierDelivery.radiusMiles} miles</label>
+              <input
+                type="range"
+                min="0.5"
+                max="5"
+                step="0.5"
+                value={courierDelivery.radiusMiles}
+                onChange={e => setCourierDelivery(p => ({ ...p, radiusMiles: parseFloat(e.target.value) }))}
+                className="w-full accent-emerald-500"
+              />
+              <div className="flex justify-between text-[10px] text-zinc-400 mt-1">
+                <span>0.5 mi</span>
+                <span>2 mi (recommended)</span>
+                <span>5 mi</span>
+              </div>
+            </div>
+
+            <div className="bg-emerald-50 rounded-xl p-4">
+              <p className="text-xs text-emerald-700 font-medium">
+                🚴 Couriers within {courierDelivery.radiusMiles} miles of your business will see your delivery orders. The platform fee is just <strong>$0.25 per delivery</strong> — far less than DoorDash or Uber Eats. Couriers sign up at <strong>/signup/courier</strong>.
+              </p>
+            </div>
+
+            <label className="flex items-center justify-between cursor-pointer">
+              <div>
+                <span className="font-bold text-black text-sm">Enable Flash Sales</span>
+                <p className="text-xs text-zinc-400">Allow time-limited sale prices on menu items</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSettings(p => ({ ...p, flashSalesEnabled: !p.flashSalesEnabled }))}
+                className={`w-12 h-7 rounded-full transition-colors relative ${
+                  settings.flashSalesEnabled ? 'bg-orange-500' : 'bg-zinc-200'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
+                    settings.flashSalesEnabled ? 'translate-x-5.5' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
+            </label>
           </div>
         )}
       </section>

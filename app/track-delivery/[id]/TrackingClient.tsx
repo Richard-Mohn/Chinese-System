@@ -42,7 +42,7 @@ const STATUS_STEPS = [
   { key: 'confirmed', label: 'Order Confirmed', icon: '✓' },
   { key: 'preparing', label: 'Preparing', icon: '👨‍🍳' },
   { key: 'ready', label: 'Ready for Pickup', icon: '📦' },
-  { key: 'out-for-delivery', label: 'Out for Delivery', icon: '🚗' },
+  { key: 'out_for_delivery', label: 'Out for Delivery', icon: '🚗' },
   { key: 'delivered', label: 'Delivered', icon: '🎉' },
 ];
 

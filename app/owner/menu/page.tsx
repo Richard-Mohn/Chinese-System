@@ -69,6 +69,10 @@ export default function OwnerMenuPage() {
     trackStock: false,
     stock: '',
     lowStockThreshold: '5',
+    flashSalePrice: '',
+    saleStartTime: '',
+    saleEndTime: '',
+    isLimitedRun: false,
   });
 
   const fetchItems = useCallback(async () => {
@@ -111,6 +115,10 @@ export default function OwnerMenuPage() {
         trackStock: item.trackStock || false,
         stock: item.stock?.toString() || '',
         lowStockThreshold: (item.lowStockThreshold || 5).toString(),
+        flashSalePrice: (item as any).flashSalePrice?.toString() || '',
+        saleStartTime: (item as any).saleStartTime || '',
+        saleEndTime: (item as any).saleEndTime || '',
+        isLimitedRun: (item as any).isLimitedRun || false,
       });
     } else {
       setEditingItem(null);
@@ -126,6 +134,10 @@ export default function OwnerMenuPage() {
         trackStock: false,
         stock: '',
         lowStockThreshold: '5',
+        flashSalePrice: '',
+        saleStartTime: '',
+        saleEndTime: '',
+        isLimitedRun: false,
       });
     }
     setShowEditor(true);
@@ -158,6 +170,10 @@ export default function OwnerMenuPage() {
         trackStock: form.trackStock,
         stock: form.trackStock ? (form.stock ? parseInt(form.stock) : 0) : null,
         lowStockThreshold: form.trackStock ? parseInt(form.lowStockThreshold) || 5 : null,
+        flashSalePrice: form.flashSalePrice ? parseFloat(form.flashSalePrice) : null,
+        saleStartTime: form.saleStartTime || null,
+        saleEndTime: form.saleEndTime || null,
+        isLimitedRun: form.isLimitedRun,
         updatedAt: new Date().toISOString(),
       };
 
@@ -524,6 +540,87 @@ export default function OwnerMenuPage() {
                         placeholder="5"
                       />
                     </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Flash Sale / Limited Run ── */}
+              <div className="border border-orange-200 rounded-xl p-4 space-y-3 bg-orange-50/30">
+                <label className="flex items-center justify-between cursor-pointer">
+                  <div>
+                    <span className="font-bold text-black text-sm">Flash Sale</span>
+                    <p className="text-xs text-zinc-400 mt-0.5">Set a temporary sale price with a time window</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm(prev => ({
+                      ...prev,
+                      flashSalePrice: prev.flashSalePrice ? '' : prev.price ? (parseFloat(prev.price) * 0.8).toFixed(2) : '',
+                    }))}
+                    className={`w-11 h-6 rounded-full transition-colors relative ${
+                      form.flashSalePrice ? 'bg-orange-500' : 'bg-zinc-200'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                      form.flashSalePrice ? 'translate-x-5.5' : 'translate-x-0.5'
+                    }`} />
+                  </button>
+                </label>
+
+                {form.flashSalePrice && (
+                  <div className="space-y-3 pt-2">
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-widest text-zinc-400 mb-1.5">
+                        Sale Price ($)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={form.flashSalePrice}
+                        onChange={e => setForm(prev => ({ ...prev, flashSalePrice: e.target.value }))}
+                        className="w-full px-3 py-2.5 border border-orange-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                        placeholder="9.99"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-black uppercase tracking-widest text-zinc-400 mb-1.5">
+                          Starts
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={form.saleStartTime}
+                          onChange={e => setForm(prev => ({ ...prev, saleStartTime: e.target.value }))}
+                          className="w-full px-3 py-2.5 border border-orange-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black uppercase tracking-widest text-zinc-400 mb-1.5">
+                          Ends
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={form.saleEndTime}
+                          onChange={e => setForm(prev => ({ ...prev, saleEndTime: e.target.value }))}
+                          className="w-full px-3 py-2.5 border border-orange-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                        />
+                      </div>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <button
+                        type="button"
+                        onClick={() => setForm(prev => ({ ...prev, isLimitedRun: !prev.isLimitedRun }))}
+                        className={`w-8 h-5 rounded-full transition-colors relative ${
+                          form.isLimitedRun ? 'bg-orange-500' : 'bg-zinc-200'
+                        }`}
+                      >
+                        <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${
+                          form.isLimitedRun ? 'translate-x-3.5' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                      <span className="text-sm font-medium text-zinc-600">Limited run (disappears when sold out)</span>
+                    </label>
                   </div>
                 )}
               </div>
