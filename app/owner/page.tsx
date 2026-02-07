@@ -17,6 +17,7 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
   FaCreditCard,
+  FaLink,
 } from 'react-icons/fa';
 
 interface RecentOrder {
@@ -204,6 +205,31 @@ export default function OwnerDashboard() {
             className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-orange-500/20 transition-all whitespace-nowrap"
           >
             Connect Stripe →
+          </Link>
+        </motion.div>
+      )}
+
+      {/* ── Custom Domain Banner ───────────────────────────── */}
+      {!currentBusiness.website?.domainPurchased && websiteLive && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl p-6 border bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-4">
+            <FaLink className="text-blue-500 text-xl shrink-0" />
+            <div>
+              <p className="font-bold text-blue-800">Get a Custom Domain</p>
+              <p className="text-sm text-blue-600">
+                Make your business stand out with your own domain like <strong>{currentBusiness.name?.toLowerCase().replace(/[^a-z0-9]/g, '')}.com</strong>. Starting at ~$17/yr with automatic DNS &amp; SSL setup.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/owner/domain"
+            className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-blue-500/20 transition-all whitespace-nowrap"
+          >
+            Search Domains →
           </Link>
         </motion.div>
       )}

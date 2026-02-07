@@ -229,6 +229,15 @@ export interface BusinessWebsite {
   // Custom domain
   customDomain?: string;
   customDomainEnabled: boolean;
+  domainPurchased?: boolean;
+  domainPurchaseDate?: string;
+  domainExpiry?: string;
+  domainOrderId?: number;
+  domainAutoRenew?: boolean;
+  dnsConfigured?: boolean;
+  domainStatus?: 'active' | 'pending_dns' | 'expired';
+  domainRegistrar?: string;
+  stripePaymentIntentId?: string;
   
   // Selected verticals for SEO pages
   selectedServices: string[]; // e.g., ["dine-in", "takeout", "delivery", "catering", "meal-prep"]

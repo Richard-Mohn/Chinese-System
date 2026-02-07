@@ -19,6 +19,7 @@ import {
   FaDesktop,
   FaVideo,
   FaGavel,
+  FaLink,
 } from 'react-icons/fa';
 
 const NAV_ITEMS = [
@@ -31,6 +32,7 @@ const NAV_ITEMS = [
   { href: '/owner/auctions', label: 'Auctions', icon: FaGavel, beta: true },
   { href: '/owner/drivers', label: 'Drivers', icon: FaTruck },
   { href: '/owner/dispatch', label: 'Dispatch', icon: FaMapMarkerAlt },
+  { href: '/owner/domain', label: 'Custom Domain', icon: FaLink },
   { href: '/owner/analytics', label: 'Analytics', icon: FaChartLine },
   { href: '/owner/settings', label: 'Settings', icon: FaCog },
 ];
