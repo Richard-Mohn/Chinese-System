@@ -1,6 +1,6 @@
 # MohnMenu Platform Blueprint
 
-> **Last Updated:** February 6, 2026  
+> **Last Updated:** February 7, 2026  
 > **Live URL:** https://mohnmenu.com  
 > **Hosting:** Firebase App Hosting (us-east4)  
 > **Repo:** Richard-Mohn/Mohn-Menu (auto-deploys from `main`)
@@ -16,11 +16,14 @@ The core principle is **100% Profit for the Business**. MohnMenu offers a superi
 *   **Commission-Free Ordering:** Unlimited menu items, professional digital storefront, zero per-order fees.
 *   **White-Label Website Builder:** Wizard-driven auto-generation of SEO-optimized business websites.
 *   **GPS Fleet Tracking:** Real-time GPS tracking for in-house delivery fleets.
-*   **"Chef's Eye" Live Cam:** Live-stream kitchen preparation to customers.
+*   **"Chef's Eye" Live Cam:** Multi-source live streaming — IP cameras (MJPEG/HLS), phone cameras, Surface Pro, webcams.
 *   **Kitchen Display System (KDS):** Real-time order management for kitchen staff.
 *   **Multi-Payment:** Stripe (Apple Pay, Google Pay, cards) + cryptocurrency (NOWPayments).
 *   **Fraud & Chargeback Protection:** Enterprise-grade security and revenue protection.
 *   **Owner Dashboard:** Business intelligence, analytics, menu management, staff management.
+*   **Tenant Analytics Dashboard:** Google Search Console + GA4 traffic analytics (Growth+ tiers).
+*   **Real-Time Visitor Dashboard:** Live visitor count, active pages, devices (Professional tier).
+*   **Auction & Bidding Platform:** Real-time bidding for antique shops, collectibles, and specialty stores.
 *   **Driver Dashboard:** Mobile-first delivery management with real-time tracking.
 *   **Customer Order Tracking:** Real-time status updates and delivery maps.
 *   **Quick Order Modal:** Streamlined ordering for returning customers.
@@ -39,6 +42,7 @@ The core principle is **100% Profit for the Business**. MohnMenu offers a superi
     *   **Payments:** Stripe JS (Elements, Apple/Google Pay) + NOWPayments (crypto)
     *   **Maps:** Leaflet + OpenStreetMap
     *   **Analytics:** GTM (`GTM-P4KZDZQP`) → GA4 (`G-LQC1CSJGP6`)
+    *   **Server Analytics:** Google APIs (`googleapis@144`) — Search Console API, Analytics Data API, URL Inspection API
 *   **Backend (API & Cloud Functions):**
     *   **Framework:** Node.js 22 runtime
     *   **Serverless:** Firebase Cloud Functions (Gen 2)
@@ -81,15 +85,18 @@ All plans include 14-day free trial. Zero per-order commissions.
     *   SEO Impressions & Clicks Dashboard
     *   Top Search Queries
     *   Traffic Source Breakdown
+    *   Device & Geography Analytics
+    *   Daily Traffic Charts
     *   Custom Domain Support
 3.  **Professional ($99.99/mo):**
     *   Everything in Growth, plus:
     *   GPS Fleet Tracking
-    *   "Chef's Eye" Live Cam
+    *   "Chef's Eye" Live Cam (multi-source: IP camera, phone, webcam)
     *   Driver Dispatch System
     *   Dedicated GA4 Property
-    *   Real-Time Visitor Dashboard
+    *   Real-Time Visitor Dashboard (live active users, pages, sources)
     *   Full Search Console Data
+    *   Auction & Bidding Platform (Beta)
     *   Export Reports (CSV/PDF)
     *   Advanced Reporting
     *   Priority Support
@@ -141,7 +148,11 @@ All plans include 14-day free trial. Zero per-order commissions.
 - [x] Kitchen Display System (KDS) with real-time order queue
 - [x] Driver assignment UI
 - [x] GPS tracking with Leaflet maps
-- [x] Chef Camera streaming component
+- [x] Chef Camera streaming component (multi-source: HLS, browser webcam, MJPEG IP cam, snapshot)
+- [x] Chef Cam setup page with multi-camera management, device detection, IP camera guides
+- [x] Auction & Bidding system (real-time Firestore, bid history, countdown, buy-now, reserve price)
+- [x] Owner auction management (create/edit/end auctions, stats dashboard)
+- [x] Public auction browser on tenant storefront (`/{slug}/auctions`)
 
 **Marketing Pages (7 industry landing pages):**
 - [x] `/for-restaurants/`
@@ -182,22 +193,32 @@ All plans include 14-day free trial. Zero per-order commissions.
 
 ### In Progress 🔄
 
-- [ ] Google Search Console verification & API integration
-- [ ] Google Analytics Data API for tenant dashboards
-- [ ] Tenant analytics dashboard (Growth/Pro tiers)
+- [x] Google Search Console API integration (server lib + API endpoint)
+- [x] Google Analytics Data API for tenant dashboards (server lib + API endpoint)
+- [x] Tenant analytics dashboard (4-tab: Overview/SEO/Traffic/Live, tier-gated)
+- [x] Real-time visitor dashboard (Professional tier — auto-refreshes every 30s)
+- [x] Beta badges on new features (auctions, analytics tabs, chef cam)
 - [ ] Custom domain support via Cloudflare
 - [ ] OG image creation (`/public/og-image.png` — 1200x630)
+- [ ] GA4 property ID configuration (env var `GA4_PROPERTY_ID`)
+- [ ] Google Search Console site verification for mohnmenu.com
 
 ### Planned 📋
 
 - [ ] Blog infrastructure for SEO content marketing
-- [ ] Real-time visitor dashboard (Professional tier)
-- [ ] Search Console data in owner dashboard
+- [ ] Search Console site verification automation
 - [ ] Export reports (CSV/PDF)
 - [ ] Domain registration wizard
 - [ ] "Order with Google" integration
 - [ ] SMS/Email marketing automation
 - [ ] Multi-location management
+- [ ] Auction payment processing (Stripe integration for winning bids)
+- [ ] Auto-bid / proxy bidding system
+- [ ] Real-time push notifications for outbid alerts
+- [ ] Chef Cam RTSP→HLS relay (nginx-rtmp proxy for IP cameras)
+- [ ] Chef Cam recording & replay (VOD from live streams)
+- [ ] AI-powered antique item identification (photo→description)
+- [ ] Batch auction import (CSV upload for estate sales)
 
 ---
 
@@ -217,6 +238,7 @@ All plans include 14-day free trial. Zero per-order commissions.
 | `lib/seo-data.ts` | City/service/cuisine content generators |
 | `lib/firebase.ts` | Firebase client SDK init |
 | `lib/firebaseConfig.ts` | Firebase config |
+| `lib/google-analytics.ts` | Server-side Google Analytics + Search Console API client |
 | `lib/realtimeDb.ts` | RTDB helpers |
 | `lib/nowpayments.ts` | Crypto payment helpers |
 | `lib/gtag.ts` | GA4 event helpers |
@@ -224,8 +246,15 @@ All plans include 14-day free trial. Zero per-order commissions.
 | `context/AuthModalContext.tsx` | Global auth modal state |
 | `context/CartContext.tsx` | Shopping cart state |
 | `components/GoogleAnalytics.tsx` | GTM script injection |
+| `components/ChefCameraStream.tsx` | Multi-source live camera (HLS, browser, MJPEG, snapshot) |
+| `components/AuctionBidding.tsx` | Auction cards, detail modal, browser, bidding UI |
 | `components/WebsiteBuilder.tsx` | Multi-step business onboarding wizard |
 | `components/Header.tsx` | Platform header with role-based nav |
+| `app/owner/analytics/page.tsx` | 4-tab analytics dashboard (Overview/SEO/Traffic/Live) |
+| `app/owner/auctions/page.tsx` | Owner auction management |
+| `app/owner/chef-cam/page.tsx` | Multi-camera setup (browser, IP, HLS) |
+| `app/[businessSlug]/auctions/page.tsx` | Public auction browser |
+| `app/api/tenant-seo/` | API routes for Search Console, GA4, Realtime, Index Status |
 | `data/us-cities.json` | 135,135 US places (OpenStreetMap) |
 | `data/starterMenus.ts` | Starter menu templates for all business types |
 

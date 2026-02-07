@@ -1,499 +1,492 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { ChefCameraStream, CameraSource } from '@/components/ChefCameraStream';
 import {
-  FaVideo,
-  FaToggleOn,
-  FaToggleOff,
-  FaCog,
-  FaExclamationTriangle,
-  FaCheckCircle,
-  FaArrowRight,
+  FaVideo, FaToggleOn, FaToggleOff, FaPlus, FaTrash,
+  FaMobileAlt, FaCamera, FaDesktop, FaWifi, FaSave,
+  FaCheckCircle, FaExclamationTriangle, FaEye, FaArrowRight,
 } from 'react-icons/fa';
 
-interface ChefCamConfig {
+type CamType = 'browser' | 'hls' | 'mjpeg' | 'image';
+
+interface CameraConfig {
+  id: string;
+  label: string;
+  type: CamType;
+  url: string;
+  deviceId?: string;
+  facingMode?: 'user' | 'environment';
   enabled: boolean;
-  streamUrl: string;
-  rtmpIngestUrl: string;
-  streamKey: string;
-  autoStartOnOrder: boolean;
-  videoQuality: 'auto' | '720p' | '1080p';
-  bitrate: number;
 }
 
+interface ChefCamSettings {
+  enabled: boolean;
+  cameras: CameraConfig[];
+  autoStartOnOrder: boolean;
+  showOnStorefront: boolean;
+}
+
+const DEFAULT_SETTINGS: ChefCamSettings = {
+  enabled: false,
+  cameras: [],
+  autoStartOnOrder: true,
+  showOnStorefront: true,
+};
+
+const CAMERA_TYPES: { value: CamType; label: string; icon: typeof FaCamera; desc: string }[] = [
+  { value: 'browser', label: 'Phone / Laptop Camera', icon: FaMobileAlt, desc: 'Use this device\'s camera directly — phones, tablets, Surface Pro, webcams' },
+  { value: 'hls', label: 'Streaming Software (OBS)', icon: FaDesktop, desc: 'Stream from OBS, Streamlabs, or other RTMP→HLS software' },
+  { value: 'mjpeg', label: 'IP Camera (MJPEG)', icon: FaWifi, desc: 'Axis, Hikvision, Dahua, Reolink — use MJPEG stream URL' },
+  { value: 'image', label: 'IP Camera (Snapshot)', icon: FaCamera, desc: 'Simple cameras that provide a snapshot URL — refreshes every 2s' },
+];
+
 export default function ChefCamSetup() {
-  const { user, MohnMenuUser, loading, isOwner, logout } = useAuth();
+  const { user, currentBusiness, loading, isOwner } = useAuth();
   const router = useRouter();
-  const [config, setConfig] = useState<ChefCamConfig>({
-    enabled: false,
-    streamUrl: '',
-    rtmpIngestUrl: 'rtmp://ingest.mohnmenu.com/live',
-    streamKey: '',
-    autoStartOnOrder: true,
-    videoQuality: '1080p',
-    bitrate: 5000,
-  });
-  const [savedMessage, setSavedMessage] = useState('');
-  const [setupStep, setSetupStep] = useState<'welcome' | 'software' | 'config' | 'test' | 'complete'>(
-    'welcome'
-  );
+  const [settings, setSettings] = useState<ChefCamSettings>(DEFAULT_SETTINGS);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [previewCam, setPreviewCam] = useState<number | null>(null);
+  const [addingCamera, setAddingCamera] = useState(false);
+  const [newCamType, setNewCamType] = useState<CamType | null>(null);
+  const [newCamLabel, setNewCamLabel] = useState('');
+  const [newCamUrl, setNewCamUrl] = useState('');
+  const [newCamFacing, setNewCamFacing] = useState<'user' | 'environment'>('environment');
+  const [availableDevices, setAvailableDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState('');
 
   useEffect(() => {
-    if (!loading && (!user || !isOwner())) {
-      router.push('/login');
-    }
+    if (!loading && (!user || !isOwner())) router.push('/login');
   }, [user, loading, isOwner, router]);
+
+  // Load settings from Firestore
+  useEffect(() => {
+    if (!currentBusiness) return;
+    const load = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'businesses', currentBusiness.businessId, 'config', 'chefCam'));
+        if (snap.exists()) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() as ChefCamSettings });
+      } catch { /* */ }
+    };
+    load();
+  }, [currentBusiness]);
+
+  // Enumerate browser cameras
+  const detectDevices = useCallback(async () => {
+    try {
+      // Request permission first so labels are populated
+      const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      tempStream.getTracks().forEach(t => t.stop());
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      setAvailableDevices(devices.filter(d => d.kind === 'videoinput'));
+    } catch { /* */ }
+  }, []);
+
+  const saveSettings = async () => {
+    if (!currentBusiness) return;
+    setSaving(true);
+    try {
+      await setDoc(doc(db, 'businesses', currentBusiness.businessId, 'config', 'chefCam'), settings);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch { /* */ }
+    finally { setSaving(false); }
+  };
+
+  const addCamera = () => {
+    if (!newCamType) return;
+    const cam: CameraConfig = {
+      id: `cam-${Date.now()}`,
+      label: newCamLabel || `Camera ${settings.cameras.length + 1}`,
+      type: newCamType,
+      url: newCamUrl,
+      deviceId: newCamType === 'browser' ? selectedDeviceId : undefined,
+      facingMode: newCamType === 'browser' ? newCamFacing : undefined,
+      enabled: true,
+    };
+    setSettings(s => ({ ...s, cameras: [...s.cameras, cam] }));
+    setAddingCamera(false);
+    setNewCamType(null);
+    setNewCamLabel('');
+    setNewCamUrl('');
+    setSelectedDeviceId('');
+  };
+
+  const removeCamera = (id: string) => {
+    setSettings(s => ({ ...s, cameras: s.cameras.filter(c => c.id !== id) }));
+    if (previewCam !== null && settings.cameras[previewCam]?.id === id) setPreviewCam(null);
+  };
+
+  const toggleCamera = (id: string) => {
+    setSettings(s => ({
+      ...s,
+      cameras: s.cameras.map(c => c.id === id ? { ...c, enabled: !c.enabled } : c),
+    }));
+  };
+
+  const camToSource = (cam: CameraConfig): CameraSource => {
+    if (cam.type === 'browser') return { type: 'browser', deviceId: cam.deviceId, label: cam.label, facingMode: cam.facingMode };
+    if (cam.type === 'mjpeg') return { type: 'mjpeg', url: cam.url, label: cam.label };
+    if (cam.type === 'image') return { type: 'image', url: cam.url, label: cam.label };
+    return { type: 'hls', url: cam.url, label: cam.label };
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white/90">
-        <div className="text-lg font-bold text-zinc-400 animate-pulse">
-          Loading Chef Cam Setup...
-        </div>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-lg font-bold text-zinc-400 animate-pulse">Loading…</div>
       </div>
     );
   }
 
-  const handleToggle = (field: keyof ChefCamConfig) => {
-    setConfig((prev) => ({
-      ...prev,
-      [field]: typeof prev[field] === 'boolean' ? !prev[field] : prev[field],
-    }));
-  };
-
-  const handleInputChange = (field: keyof ChefCamConfig, value: any) => {
-    setConfig((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSaveConfig = () => {
-    // Save to Firebase
-    setSavedMessage('Configuration saved successfully!');
-    setTimeout(() => setSavedMessage(''), 3000);
-  };
-
-  const stepVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-50 pt-32 pb-20 px-4">
-      <div className="container mx-auto max-w-4xl">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <FaVideo className="text-5xl text-orange-600" />
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-3xl font-black tracking-tight text-black">Chef&apos;s Eye</h1>
+            <span className="bg-orange-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase">Beta</span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-black mb-4">
-            Chef<span className="text-orange-600">'</span>s Eye Setup
-          </h1>
-          <p className="text-lg text-zinc-500 max-w-2xl mx-auto">
-            Go live with your kitchen. Stream to your customers and increase order retention by 40%.
-          </p>
-        </motion.div>
+          <p className="text-zinc-400 font-medium">Live camera feeds for your kitchen, workshop, bakery, or storefront.</p>
+        </div>
+        <button
+          onClick={saveSettings}
+          disabled={saving}
+          className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full font-bold hover:bg-zinc-800 transition-colors disabled:opacity-50"
+        >
+          {saving ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : saved ? (
+            <FaCheckCircle className="text-emerald-400" />
+          ) : (
+            <FaSave />
+          )}
+          {saved ? 'Saved!' : 'Save Settings'}
+        </button>
+      </div>
 
-        {/* Progress Steps */}
-        <div className="mb-12 grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-4">
-          {[
-            { key: 'welcome' as const, label: 'Welcome', icon: '👋' },
-            { key: 'software' as const, label: 'Setup Software', icon: '⚙️' },
-            { key: 'config' as const, label: 'Configuration', icon: '🎛️' },
-            { key: 'test' as const, label: 'Test Stream', icon: '✓' },
-            { key: 'complete' as const, label: 'Go Live', icon: '🎬' },
-          ].map((step, idx) => (
-            <motion.button
-              key={step.key}
-              onClick={() => setSetupStep(step.key)}
-              className={`relative p-4 rounded-xl font-bold text-center transition-all ${
-                setupStep === step.key
-                  ? 'bg-orange-600 text-white shadow-lg'
-                  : 'bg-white border-2 border-zinc-200 text-zinc-700 hover:border-orange-600'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <div className="text-2xl mb-1">{step.icon}</div>
-              <div className="text-xs">{step.label}</div>
-            </motion.button>
-          ))}
+      {/* Master Toggle */}
+      <div className="bg-white rounded-2xl border border-zinc-100 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-black text-black text-lg">Enable Chef&apos;s Eye</h2>
+            <p className="text-sm text-zinc-400 mt-1">When enabled, customers can watch live feeds on your storefront.</p>
+          </div>
+          <button onClick={() => setSettings(s => ({ ...s, enabled: !s.enabled }))} className="text-4xl">
+            {settings.enabled ? <FaToggleOn className="text-orange-600" /> : <FaToggleOff className="text-zinc-300" />}
+          </button>
         </div>
 
-        {/* Step Content */}
-        {setupStep === 'welcome' && (
-          <motion.div
-            className="bg-white rounded-3xl border border-zinc-100 p-12 mb-8 shadow-sm"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-4xl font-black mb-6 text-black">Why Stream Your Kitchen?</h2>
-                <ul className="space-y-4">
-                  {[
-                    '👁️ Full transparency builds customer trust',
-                    '📱 Customers watch while they wait',
-                    '📈 Increases repeat orders by 40%',
-                    '💬 Reduces support complaints',
-                    '🎯 Differentiates from competitors',
-                  ].map((item) => (
-                    <li key={item} className="text-lg text-zinc-700 font-medium flex items-center gap-3">
-                      <span className="text-2xl">{item.slice(0, 2)}</span>
-                      <span>{item.slice(3)}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <motion.button
-                  onClick={() => setSetupStep('software')}
-                  className="mt-10 px-8 py-4 bg-orange-600 text-white rounded-full font-bold flex items-center gap-3 hover:bg-orange-700 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Get Started <FaArrowRight />
-                </motion.button>
-              </div>
-              <motion.div
-                className="bg-gradient-to-br from-orange-100 to-red-100 rounded-3xl p-12 flex items-center justify-center aspect-square"
-                initial={{ rotate: -10, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className="text-7xl">📹</div>
-              </motion.div>
+        {/* Sub-toggles */}
+        <div className="mt-4 pt-4 border-t border-zinc-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between bg-zinc-50 rounded-xl p-4">
+            <div>
+              <p className="font-bold text-black text-sm">Auto-start on order</p>
+              <p className="text-xs text-zinc-400">Start stream when a customer orders</p>
             </div>
-          </motion.div>
-        )}
-
-        {setupStep === 'software' && (
-          <motion.div
-            className="bg-white rounded-3xl border border-zinc-100 p-12 shadow-sm"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <h2 className="text-3xl font-black mb-8 text-black">Recommended Streaming Software</h2>
-
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              {[
-                {
-                  name: 'OBS Studio',
-                  desc: 'Free, open-source, professional',
-                  url: 'https://obsproject.com',
-                  icon: '🎥',
-                },
-                {
-                  name: 'Streamlabs OBS',
-                  desc: 'Beginner-friendly with templates',
-                  url: 'https://streamlabs.com',
-                  icon: '🌟',
-                },
-                {
-                  name: 'Restream',
-                  desc: 'Multi-platform streaming',
-                  url: 'https://restream.io',
-                  icon: '📡',
-                },
-                {
-                  name: 'Wirecast',
-                  desc: 'Professional live production',
-                  url: 'https://telestream.net',
-                  icon: '🎬',
-                },
-              ].map((software) => (
-                <a
-                  key={software.name}
-                  href={software.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-6 border-2 border-zinc-200 rounded-2xl hover:border-orange-600 hover:bg-orange-50 transition-all group"
-                >
-                  <div className="text-5xl mb-3">{software.icon}</div>
-                  <h3 className="font-black text-lg mb-1">{software.name}</h3>
-                  <p className="text-sm text-zinc-600 mb-4">{software.desc}</p>
-                  <span className="text-orange-600 font-bold text-sm group-hover:gap-2 transition-all">
-                    Download →
-                  </span>
-                </a>
-              ))}
+            <button onClick={() => setSettings(s => ({ ...s, autoStartOnOrder: !s.autoStartOnOrder }))} className="text-2xl">
+              {settings.autoStartOnOrder ? <FaToggleOn className="text-orange-600" /> : <FaToggleOff className="text-zinc-300" />}
+            </button>
+          </div>
+          <div className="flex items-center justify-between bg-zinc-50 rounded-xl p-4">
+            <div>
+              <p className="font-bold text-black text-sm">Show on storefront</p>
+              <p className="text-xs text-zinc-400">Display camera feed to customers</p>
             </div>
+            <button onClick={() => setSettings(s => ({ ...s, showOnStorefront: !s.showOnStorefront }))} className="text-2xl">
+              {settings.showOnStorefront ? <FaToggleOn className="text-orange-600" /> : <FaToggleOff className="text-zinc-300" />}
+            </button>
+          </div>
+        </div>
+      </div>
 
-            <motion.div
-              className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-8"
-              initial={{ x: -10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <p className="text-blue-900 flex items-start gap-3">
-                <span className="text-2xl">ℹ️</span>
-                <span>
-                  <strong>Pro Tip:</strong> We recommend OBS Studio—it's free, works on all platforms,
-                  and integrates seamlessly with Chef's Eye. Follow our{' '}
-                  <a href="#" className="underline font-bold hover:text-blue-600">
-                    OBS setup guide
-                  </a>
-                  .
-                </span>
-              </p>
-            </motion.div>
-
-            <motion.button
-              onClick={() => setSetupStep('config')}
-              className="px-8 py-4 bg-orange-600 text-white rounded-full font-bold flex items-center gap-3 hover:bg-orange-700 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Continue <FaArrowRight />
-            </motion.button>
-          </motion.div>
-        )}
-
-        {setupStep === 'config' && (
-          <motion.div
-            className="bg-white rounded-3xl border border-zinc-100 p-12 shadow-sm"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
+      {/* Camera List */}
+      <div className="bg-white rounded-2xl border border-zinc-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-black text-black text-lg">Cameras ({settings.cameras.length})</h2>
+          <button
+            onClick={() => { setAddingCamera(true); setNewCamType(null); }}
+            className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-full text-sm font-bold hover:bg-orange-700 transition-colors"
           >
-            <h2 className="text-3xl font-black mb-8 text-black">Configuration</h2>
+            <FaPlus className="text-xs" /> Add Camera
+          </button>
+        </div>
 
-            <div className="space-y-8">
-              {/* RTMP Ingest URL */}
-              <div>
-                <label className="block text-sm font-black uppercase tracking-widest text-zinc-700 mb-3">
-                  RTMP Ingest URL
-                </label>
-                <input
-                  type="text"
-                  value={config.rtmpIngestUrl}
-                  onChange={(e) => handleInputChange('rtmpIngestUrl', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-zinc-300 rounded-xl font-mono text-sm focus:border-orange-600 focus:outline-none"
-                  readOnly
-                />
-                <p className="text-xs text-zinc-500 mt-2">Use this in your streaming software</p>
-              </div>
-
-              {/* Stream Key */}
-              <div>
-                <label className="block text-sm font-black uppercase tracking-widest text-zinc-700 mb-3">
-                  Stream Key
-                </label>
-                <div className="flex gap-3">
-                  <input
-                    type="password"
-                    value={config.streamKey}
-                    onChange={(e) => handleInputChange('streamKey', e.target.value)}
-                    placeholder="Your unique stream key"
-                    className="flex-1 px-4 py-3 border-2 border-zinc-300 rounded-xl font-mono text-sm focus:border-orange-600 focus:outline-none"
-                  />
-                  <button className="px-6 py-3 bg-zinc-100 text-zinc-700 rounded-xl font-bold hover:bg-zinc-200 transition-colors">
-                    Generate
-                  </button>
-                </div>
-              </div>
-
-              {/* Video Quality */}
-              <div>
-                <label className="block text-sm font-black uppercase tracking-widest text-zinc-700 mb-3">
-                  Video Quality
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {['720p', '1080p'].map((quality) => (
-                    <button
-                      key={quality}
-                      onClick={() => handleInputChange('videoQuality', quality as 'auto' | '720p' | '1080p')}
-                      className={`py-3 rounded-xl font-bold transition-all ${
-                        config.videoQuality === quality
-                          ? 'bg-orange-600 text-white'
-                          : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
-                      }`}
-                    >
-                      {quality}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bitrate */}
-              <div>
-                <label className="block text-sm font-black uppercase tracking-widest text-zinc-700 mb-3">
-                  Bitrate: {config.bitrate} kbps
-                </label>
-                <input
-                  type="range"
-                  min="2500"
-                  max="8000"
-                  step="500"
-                  value={config.bitrate}
-                  onChange={(e) => handleInputChange('bitrate', parseInt(e.target.value))}
-                  className="w-full accent-orange-600"
-                />
-                <p className="text-xs text-zinc-500 mt-2">
-                  Higher bitrate = better quality but requires faster connection
-                </p>
-              </div>
-
-              {/* Auto-Start Toggle */}
-              <div className="flex items-center justify-between p-6 bg-zinc-50 rounded-2xl">
-                <div>
-                  <h3 className="font-bold text-black">Auto-Start on Order</h3>
-                  <p className="text-sm text-zinc-600">
-                    Automatically start streaming when customers order
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleToggle('autoStartOnOrder')}
-                  className="text-4xl hover:scale-110 transition-transform"
-                >
-                  {config.autoStartOnOrder ? (
-                    <FaToggleOn className="text-orange-600" />
-                  ) : (
-                    <FaToggleOff className="text-zinc-400" />
-                  )}
-                </button>
-              </div>
-
-              {savedMessage && (
+        {settings.cameras.length === 0 ? (
+          <div className="text-center py-12 text-zinc-400">
+            <FaVideo className="text-4xl mx-auto mb-3 text-zinc-300" />
+            <p className="font-bold mb-1">No cameras configured</p>
+            <p className="text-sm">Add a camera to get started — use your phone, laptop webcam, or IP camera.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {settings.cameras.map((cam, i) => {
+              const typeInfo = CAMERA_TYPES.find(t => t.value === cam.type);
+              const Icon = typeInfo?.icon || FaCamera;
+              return (
                 <motion.div
-                  className="p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-center gap-3 text-green-900"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  key={cam.id}
+                  className={`flex items-center gap-4 p-4 rounded-xl border transition-colors ${
+                    cam.enabled ? 'bg-white border-zinc-200' : 'bg-zinc-50 border-zinc-100 opacity-60'
+                  }`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
                 >
-                  <FaCheckCircle className="text-xl" />
-                  {savedMessage}
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
+                    <Icon className="text-orange-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-black text-sm truncate">{cam.label}</p>
+                    <p className="text-xs text-zinc-400 truncate">
+                      {cam.type === 'browser' ? `Device camera · ${cam.facingMode === 'user' ? 'Front' : 'Rear'}` : cam.url || 'No URL'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={() => setPreviewCam(previewCam === i ? null : i)} className="p-2 text-zinc-400 hover:text-black transition-colors" title="Preview">
+                      <FaEye />
+                    </button>
+                    <button onClick={() => toggleCamera(cam.id)} className="text-xl">
+                      {cam.enabled ? <FaToggleOn className="text-emerald-500" /> : <FaToggleOff className="text-zinc-300" />}
+                    </button>
+                    <button onClick={() => removeCamera(cam.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors" title="Remove">
+                      <FaTrash className="text-xs" />
+                    </button>
+                  </div>
                 </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Camera Preview */}
+      <AnimatePresence>
+        {previewCam !== null && settings.cameras[previewCam] && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-white rounded-2xl border border-zinc-100 p-6">
+              <h2 className="font-black text-black text-lg mb-4">
+                Preview: {settings.cameras[previewCam].label}
+              </h2>
+              <ChefCameraStream
+                source={camToSource(settings.cameras[previewCam])}
+                businessId={currentBusiness?.businessId || ''}
+                isLive
+                autoPlay
+                muted
+                className="max-w-2xl mx-auto"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add Camera Modal */}
+      <AnimatePresence>
+        {addingCamera && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setAddingCamera(false)}
+          >
+            <motion.div
+              className="bg-white rounded-3xl p-8 max-w-lg w-full max-h-[80vh] overflow-y-auto"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-black text-black mb-6">Add Camera</h2>
+
+              {/* Step 1: Choose type */}
+              {!newCamType && (
+                <div className="space-y-3">
+                  <p className="text-sm text-zinc-500 mb-4">What kind of camera are you connecting?</p>
+                  {CAMERA_TYPES.map(ct => {
+                    const CTIcon = ct.icon;
+                    return (
+                      <button
+                        key={ct.value}
+                        onClick={() => {
+                          setNewCamType(ct.value);
+                          if (ct.value === 'browser') detectDevices();
+                        }}
+                        className="w-full flex items-center gap-4 p-4 border-2 border-zinc-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
+                      >
+                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
+                          <CTIcon className="text-orange-600" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-black">{ct.label}</p>
+                          <p className="text-xs text-zinc-400">{ct.desc}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
 
-              <div className="flex gap-4 pt-4">
-                <button
-                  onClick={() => setSetupStep('software')}
-                  className="px-8 py-4 border-2 border-zinc-300 text-zinc-700 rounded-full font-bold hover:border-zinc-400 transition-colors"
-                >
-                  Back
-                </button>
-                <motion.button
-                  onClick={() => {
-                    handleSaveConfig();
-                    setSetupStep('test');
-                  }}
-                  className="flex-1 px-8 py-4 bg-orange-600 text-white rounded-full font-bold flex items-center justify-center gap-3 hover:bg-orange-700 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Save & Continue <FaArrowRight />
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        )}
+              {/* Step 2: Configure */}
+              {newCamType && (
+                <div className="space-y-5">
+                  <button onClick={() => setNewCamType(null)} className="text-sm text-zinc-500 hover:text-black font-bold">
+                    ← Change camera type
+                  </button>
 
-        {setupStep === 'test' && (
-          <motion.div
-            className="bg-white rounded-3xl border border-zinc-100 p-12 shadow-sm"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <h2 className="text-3xl font-black mb-8 text-black">Test Your Stream</h2>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2">Camera Name</label>
+                    <input
+                      type="text"
+                      value={newCamLabel}
+                      onChange={e => setNewCamLabel(e.target.value)}
+                      placeholder={`e.g. Kitchen Cam, Front Counter, Workshop`}
+                      className="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:border-orange-500 focus:outline-none font-medium"
+                    />
+                  </div>
 
-            <motion.div
-              className="bg-black rounded-3xl aspect-video flex items-center justify-center mb-8 relative overflow-hidden"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="text-7xl animate-pulse">📹</div>
-              <div className="absolute top-4 left-4 px-4 py-2 bg-red-600 rounded-full flex items-center gap-2">
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                <span className="text-white text-xs font-black">LIVE</span>
-              </div>
-            </motion.div>
+                  {newCamType === 'browser' && (
+                    <>
+                      {availableDevices.length > 0 && (
+                        <div>
+                          <label className="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2">Select Camera</label>
+                          <select
+                            value={selectedDeviceId}
+                            onChange={e => setSelectedDeviceId(e.target.value)}
+                            className="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:border-orange-500 focus:outline-none font-medium"
+                          >
+                            <option value="">Auto-detect best camera</option>
+                            {availableDevices.map(d => (
+                              <option key={d.deviceId} value={d.deviceId}>{d.label || `Camera ${d.deviceId.slice(0, 8)}`}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
-            <motion.div
-              className="space-y-4 mb-8"
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-center gap-3">
-                <FaCheckCircle className="text-green-600 text-xl" />
-                <span className="text-green-900 font-bold">Stream is online</span>
-              </div>
-              <div className="p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-center gap-3">
-                <FaCheckCircle className="text-green-600 text-xl" />
-                <span className="text-green-900 font-bold">1080p resolution detected</span>
-              </div>
-              <div className="p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-center gap-3">
-                <FaCheckCircle className="text-green-600 text-xl" />
-                <span className="text-green-900 font-bold">Bitrate is optimal (5000 kbps)</span>
-              </div>
-            </motion.div>
+                      <div>
+                        <label className="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2">Camera Direction</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { value: 'environment' as const, label: 'Rear Camera', desc: 'Points outward' },
+                            { value: 'user' as const, label: 'Front Camera', desc: 'Selfie / face camera' },
+                          ].map(opt => (
+                            <button
+                              key={opt.value}
+                              onClick={() => setNewCamFacing(opt.value)}
+                              className={`p-3 rounded-xl border-2 font-bold text-sm transition-all ${
+                                newCamFacing === opt.value ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-zinc-200 text-zinc-600 hover:border-zinc-300'
+                              }`}
+                            >
+                              {opt.label}
+                              <p className="text-[10px] font-normal text-zinc-400">{opt.desc}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
-            <motion.button
-              onClick={() => setSetupStep('complete')}
-              className="w-full px-8 py-4 bg-orange-600 text-white rounded-full font-bold flex items-center justify-center gap-3 hover:bg-orange-700 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Go Live <FaArrowRight />
-            </motion.button>
-          </motion.div>
-        )}
+                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <p className="text-blue-800 text-sm">
+                          <strong>💡 Tip:</strong> Open this page on your phone or Surface Pro and add the camera.
+                          The device&apos;s camera will be used directly — no extra software needed!
+                        </p>
+                      </div>
+                    </>
+                  )}
 
-        {setupStep === 'complete' && (
-          <motion.div
-            className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl border-2 border-orange-200 p-12 shadow-sm text-center"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div
-              className="text-8xl mb-6"
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 0.6, repeat: Infinity }}
-            >
-              🎉
-            </motion.div>
-            <h2 className="text-4xl font-black mb-4 text-black">You're Live!</h2>
-            <p className="text-lg text-zinc-600 mb-12 max-w-xl mx-auto">
-              Your kitchen is now streaming to customers. They'll see the live feed when they place orders.
-            </p>
+                  {(newCamType === 'hls' || newCamType === 'mjpeg' || newCamType === 'image') && (
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2">
+                        {newCamType === 'hls' ? 'HLS Stream URL (.m3u8)' : newCamType === 'mjpeg' ? 'MJPEG Stream URL' : 'Snapshot URL'}
+                      </label>
+                      <input
+                        type="url"
+                        value={newCamUrl}
+                        onChange={e => setNewCamUrl(e.target.value)}
+                        placeholder={
+                          newCamType === 'hls' ? 'https://stream.example.com/live/kitchen.m3u8'
+                          : newCamType === 'mjpeg' ? 'http://192.168.1.100/video.mjpeg'
+                          : 'http://192.168.1.100/snapshot.jpg'
+                        }
+                        className="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl font-mono text-sm focus:border-orange-500 focus:outline-none"
+                      />
 
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              {[
-                { icon: '👥', label: 'Viewers', value: '0' },
-                { icon: '⏱️', label: 'Duration', value: 'Fresh' },
-                { icon: '📊', label: 'Quality', value: '1080p' },
-              ].map((stat) => (
-                <div key={stat.label} className="bg-white rounded-2xl p-6 border border-zinc-200">
-                  <div className="text-4xl mb-2">{stat.icon}</div>
-                  <div className="text-sm text-zinc-600">{stat.label}</div>
-                  <div className="text-2xl font-black">{stat.value}</div>
+                      {newCamType === 'mjpeg' && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-3">
+                          <p className="text-amber-800 text-sm">
+                            <strong>IP Camera URLs:</strong><br />
+                            Axis: <code className="bg-amber-100 px-1 rounded">http://IP/axis-cgi/mjpg/video.cgi</code><br />
+                            Hikvision: <code className="bg-amber-100 px-1 rounded">http://IP/ISAPI/Streaming/channels/1/httpPreview</code><br />
+                            Dahua: <code className="bg-amber-100 px-1 rounded">http://IP/cgi-bin/mjpg/video.cgi</code><br />
+                            Reolink: <code className="bg-amber-100 px-1 rounded">http://IP/cgi-bin/api.cgi?cmd=Snap</code>
+                          </p>
+                        </div>
+                      )}
+
+                      {newCamType === 'hls' && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-3">
+                          <p className="text-blue-800 text-sm">
+                            <strong>OBS Studio setup:</strong> Settings → Stream → Server: your RTMP ingest URL.
+                            Use an RTMP→HLS relay (e.g., nginx-rtmp) to convert the stream to an HLS URL.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={() => setAddingCamera(false)}
+                      className="flex-1 px-6 py-3 border-2 border-zinc-200 text-zinc-600 rounded-full font-bold hover:border-zinc-300 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={addCamera}
+                      disabled={newCamType !== 'browser' && !newCamUrl}
+                      className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-full font-bold hover:bg-orange-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      <FaPlus className="text-xs" /> Add Camera
+                    </button>
+                  </div>
                 </div>
-              ))}
-            </div>
-
-            <motion.button
-              onClick={() => router.push('/owner')}
-              className="px-10 py-4 bg-orange-600 text-white rounded-full font-bold flex items-center justify-center gap-3 hover:bg-orange-700 transition-all mx-auto"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Back to Dashboard <FaArrowRight />
-            </motion.button>
+              )}
+            </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* Setup Guide */}
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-6">
+        <h2 className="font-black text-orange-800 mb-3 flex items-center gap-2">
+          <FaVideo /> Quick Setup Guide
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="bg-white/60 rounded-xl p-4">
+            <p className="font-black text-black mb-1">📱 Phone / Tablet</p>
+            <p className="text-zinc-600">Open this page on your phone, add a &quot;Browser Camera&quot;, and mount the phone where you want video. Works instantly!</p>
+          </div>
+          <div className="bg-white/60 rounded-xl p-4">
+            <p className="font-black text-black mb-1">📡 IP Camera</p>
+            <p className="text-zinc-600">Get the MJPEG stream URL from your camera&apos;s web interface. Most cameras show it under &quot;Live View&quot; or &quot;Streaming&quot; settings.</p>
+          </div>
+          <div className="bg-white/60 rounded-xl p-4">
+            <p className="font-black text-black mb-1">💻 Surface Pro / Laptop</p>
+            <p className="text-zinc-600">Add a &quot;Browser Camera&quot; and select your built-in webcam or external USB camera. Great for demonstrations!</p>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -18,6 +18,7 @@ import {
   FaMapMarkerAlt,
   FaDesktop,
   FaVideo,
+  FaGavel,
 } from 'react-icons/fa';
 
 const NAV_ITEMS = [
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: '/owner/kds', label: 'Kitchen Display', icon: FaDesktop },
   { href: '/owner/menu', label: 'Menu', icon: FaUtensils },
   { href: '/owner/chef-cam', label: 'Chef Cam', icon: FaVideo },
+  { href: '/owner/auctions', label: 'Auctions', icon: FaGavel, beta: true },
   { href: '/owner/drivers', label: 'Drivers', icon: FaTruck },
   { href: '/owner/dispatch', label: 'Dispatch', icon: FaMapMarkerAlt },
   { href: '/owner/analytics', label: 'Analytics', icon: FaChartLine },
@@ -94,7 +96,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative ${
                   active
                     ? 'bg-black text-white'
                     : 'text-zinc-500 hover:bg-zinc-50 hover:text-black'
@@ -102,6 +104,11 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               >
                 <Icon className="text-base shrink-0" />
                 {item.label}
+                {'beta' in item && item.beta && (
+                  <span className="absolute right-2 bg-orange-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase leading-none">
+                    Beta
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -169,7 +176,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative ${
                       active
                         ? 'bg-black text-white'
                         : 'text-zinc-500 hover:bg-zinc-50 hover:text-black'
@@ -177,6 +184,11 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
                   >
                     <Icon className="text-base shrink-0" />
                     {item.label}
+                    {'beta' in item && item.beta && (
+                      <span className="absolute right-2 bg-orange-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase leading-none">
+                        Beta
+                      </span>
+                    )}
                   </Link>
                 );
               })}
