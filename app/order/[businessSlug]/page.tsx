@@ -24,6 +24,10 @@ import {
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { QRCodeSVG } from 'qrcode.react';
+import {
+  addToCartEvent, removeFromCartEvent, beginCheckout, purchase,
+  viewItem, makeGtagItem, event as gtagEvent,
+} from '@/lib/gtag';
 
 // ─── Stripe setup ──────────────────────────────────────────
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
@@ -349,6 +353,8 @@ export default function OrderPage({
     setItemQty(1);
     setSelectedSize('');
     setSpecialInstructions('');
+    // GA4: add_to_cart
+    addToCartEvent(makeGtagItem(cartItem.id, cartItem.name, cartItem.price, cartItem.quantity, businessSlug, cartItem.options));
     // Show "Added!" confirmation instead of auto-opening cart
     setShowAddedConfirm(cartItem.name);
     setTimeout(() => setShowAddedConfirm(null), 3000);
@@ -505,6 +511,14 @@ export default function OrderPage({
 
       setOrderId(docRef.id);
       setOrderPlaced(true);
+      // GA4: purchase (cash)
+      purchase(
+        docRef.id,
+        cart.map(i => makeGtagItem(i.id, i.name, i.price, i.quantity, businessSlug, i.options)),
+        total,
+        'USD',
+        { payment_type: 'cash' },
+      );
       clearCart();
     } catch (err) {
       console.error('Order error:', err);
@@ -528,6 +542,14 @@ export default function OrderPage({
       setOrderId(pendingOrderId);
       setOrderPlaced(true);
       setShowStripeForm(false);
+      // GA4: purchase (card)
+      purchase(
+        pendingOrderId,
+        cart.map(i => makeGtagItem(i.id, i.name, i.price, i.quantity, businessSlug, i.options)),
+        total,
+        'USD',
+        { payment_type: 'card' },
+      );
       clearCart();
     } catch (err) {
       console.error('Failed to update order after payment:', err);
@@ -535,6 +557,14 @@ export default function OrderPage({
       setOrderId(pendingOrderId);
       setOrderPlaced(true);
       setShowStripeForm(false);
+      // GA4: purchase (card — order update failed but payment succeeded)
+      purchase(
+        pendingOrderId,
+        cart.map(i => makeGtagItem(i.id, i.name, i.price, i.quantity, businessSlug, i.options)),
+        total,
+        'USD',
+        { payment_type: 'card' },
+      );
       clearCart();
     }
   };
@@ -560,6 +590,14 @@ export default function OrderPage({
     setShowCryptoModal(false);
     setCryptoPayment(null);
     setCryptoStatus('');
+    // GA4: purchase (crypto)
+    purchase(
+      pendingOrderId,
+      cart.map(i => makeGtagItem(i.id, i.name, i.price, i.quantity, businessSlug, i.options)),
+      total,
+      'USD',
+      { payment_type: 'crypto' },
+    );
     clearCart();
   };
 
@@ -801,6 +839,8 @@ export default function OrderPage({
                     setSelectedSize(getDefaultPriceKey(item.prices));
                     setItemQty(1);
                     setSpecialInstructions('');
+                    // GA4: view_item
+                    viewItem(makeGtagItem(item.id, item.name, lowestPrice, 1, businessSlug));
                   }}
                   className={`bg-white rounded-2xl border border-zinc-200 hover:border-zinc-400 transition-all text-left overflow-hidden group ${
                     isSoldOut ? 'opacity-60 cursor-not-allowed' : ''
@@ -1086,7 +1126,10 @@ export default function OrderPage({
                           <p className="text-sm font-black text-indigo-600 mt-1">${(item.price * item.quantity).toFixed(2)}</p>
                         </div>
                         <div className="flex flex-col items-end justify-between">
-                          <button onClick={() => removeFromCart(item.id)} className="text-zinc-300 hover:text-red-500 transition-colors" aria-label={`Remove ${item.name}`}>
+                          <button onClick={() => {
+                            removeFromCartEvent(makeGtagItem(item.id, item.name, item.price, item.quantity, businessSlug, item.options));
+                            removeFromCart(item.id);
+                          }} className="text-zinc-300 hover:text-red-500 transition-colors" aria-label={`Remove ${item.name}`}>
                             <FaTrash className="text-xs" />
                           </button>
                           <div className="flex items-center border border-zinc-200 rounded-lg overflow-hidden">
@@ -1123,7 +1166,15 @@ export default function OrderPage({
                     </div>
                   </div>
                   <button
-                    onClick={() => { setCartOpen(false); setCheckoutOpen(true); }}
+                    onClick={() => {
+                      setCartOpen(false);
+                      setCheckoutOpen(true);
+                      // GA4: begin_checkout
+                      beginCheckout(
+                        cart.map(i => makeGtagItem(i.id, i.name, i.price, i.quantity, businessSlug, i.options)),
+                        subtotal,
+                      );
+                    }}
                     className="w-full py-4 bg-black text-white rounded-2xl font-bold text-sm hover:bg-zinc-800 transition-all"
                   >
                     Proceed to Checkout — ${subtotal.toFixed(2)}

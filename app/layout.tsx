@@ -7,6 +7,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AnimatedBackground from "@/components/AnimatedBackground";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AnimatedBackground />
         <AuthProvider>
+          <GoogleAnalytics />
           <CartProvider>
             <Header />
             <main>

@@ -13,6 +13,7 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import type { MohnMenuUser, MohnMenuBusiness } from '@/lib/types';
+import { loginEvent, signUpEvent, setUserId } from '@/lib/gtag';
 
 interface AuthContextType {
   user: User | null;
@@ -120,7 +121,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithEmail = async (email: string, password: string) => {
     try {
       setError(null);
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      // GA4: login
+      loginEvent('email');
+      setUserId(result.user.uid);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Login failed';
       setError(message);
@@ -150,6 +154,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Save to Firestore
       const userDocRef = doc(db, 'users', result.user.uid);
       await setDoc(userDocRef, MohnMenuUserData);
+      // GA4: sign_up
+      signUpEvent('email');
+      setUserId(result.user.uid);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Signup failed';
       setError(message);
