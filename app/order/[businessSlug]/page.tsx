@@ -1362,49 +1362,33 @@ export default function OrderPage({
                       </button>
 
                       {(business.settings.thirdPartyDelivery.providers || []).includes('doordash') && (
-                        <button
-                          type="button"
-                          onClick={() => setDeliveryProvider('doordash')}
-                          className={`w-full px-4 py-3 rounded-xl text-left flex items-center justify-between transition-all ${
-                            deliveryProvider === 'doordash' ? 'bg-black text-white ring-2 ring-black' : 'bg-zinc-50 hover:bg-zinc-100 border border-zinc-200'
-                          }`}
+                        <div
+                          className="w-full px-4 py-3 rounded-xl text-left flex items-center justify-between bg-zinc-50 border border-zinc-200 opacity-60 cursor-not-allowed"
                         >
                           <div className="flex items-center gap-3">
                             <span className="text-lg">🔴</span>
                             <div>
-                              <div className="text-sm font-bold">Express Delivery</div>
-                              <div className={`text-[11px] ${deliveryProvider === 'doordash' ? 'text-zinc-300' : 'text-zinc-400'}`}>Professional driver • ~25-40 min</div>
+                              <div className="text-sm font-bold text-zinc-400">Express Delivery</div>
+                              <div className="text-[11px] text-zinc-400">Professional driver • ~25-40 min</div>
                             </div>
                           </div>
-                          {deliveryQuotes.find(q => q.provider === 'doordash') ? (
-                            <div className="text-sm font-black">${(deliveryQuotes.find(q => q.provider === 'doordash')!.fee / 100).toFixed(2)}</div>
-                          ) : (
-                            <div className="text-xs text-zinc-400">Get quote</div>
-                          )}
-                        </button>
+                          <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full border border-amber-200">Coming Soon</span>
+                        </div>
                       )}
 
                       {(business.settings.thirdPartyDelivery.providers || []).includes('uber') && (
-                        <button
-                          type="button"
-                          onClick={() => setDeliveryProvider('uber')}
-                          className={`w-full px-4 py-3 rounded-xl text-left flex items-center justify-between transition-all ${
-                            deliveryProvider === 'uber' ? 'bg-black text-white ring-2 ring-black' : 'bg-zinc-50 hover:bg-zinc-100 border border-zinc-200'
-                          }`}
+                        <div
+                          className="w-full px-4 py-3 rounded-xl text-left flex items-center justify-between bg-zinc-50 border border-zinc-200 opacity-60 cursor-not-allowed"
                         >
                           <div className="flex items-center gap-3">
                             <span className="text-lg">⬛</span>
                             <div>
-                              <div className="text-sm font-bold">Premium Delivery</div>
-                              <div className={`text-[11px] ${deliveryProvider === 'uber' ? 'text-zinc-300' : 'text-zinc-400'}`}>Professional driver • ~20-35 min</div>
+                              <div className="text-sm font-bold text-zinc-400">Premium Delivery</div>
+                              <div className="text-[11px] text-zinc-400">Professional driver • ~20-35 min</div>
                             </div>
                           </div>
-                          {deliveryQuotes.find(q => q.provider === 'uber') ? (
-                            <div className="text-sm font-black">${(deliveryQuotes.find(q => q.provider === 'uber')!.fee / 100).toFixed(2)}</div>
-                          ) : (
-                            <div className="text-xs text-zinc-400">Get quote</div>
-                          )}
-                        </button>
+                          <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full border border-amber-200">Coming Soon</span>
+                        </div>
                       )}
                     </div>
                     {quotesLoading && (

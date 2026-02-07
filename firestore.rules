@@ -114,11 +114,12 @@ service cloud.firestore {
 
     // ─── Couriers Collection ──────────────────────────────────
     // Couriers can read/write their own document
+    // Admins can update courier documents (approve/reject applications)
     // Business owners can read couriers
     match /couriers/{courierId} {
       allow read: if isAuthenticated();
       allow create: if isUser(courierId);
-      allow update: if isUser(courierId);
+      allow update: if isUser(courierId) || getUserData().role == 'admin';
       allow delete: if false;
     }
 
@@ -128,6 +129,22 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAuthenticated();
       allow update: if false;
+      allow delete: if false;
+    }
+
+    // ─── Quick Deliveries Collection ──────────────────────────
+    // Anyone can create a quick delivery request
+    // Authenticated users can read their own or assigned deliveries
+    // Couriers can update (accept/complete) and admins can manage
+    match /quickDeliveries/{deliveryId} {
+      allow create: if true;
+      allow read: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.customerId == request.auth.uid ||
+        resource.data.assignedCourierId == request.auth.uid ||
+        getUserData().role == 'admin' ||
+        getUserData().role == 'driver_marketplace'
+      );
       allow delete: if false;
     }
 

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     if (auth.error) return auth.error;
 
     const body = await request.json();
-    const { amount, orderId, businessId, ownerStripeAccountId, customerEmail } = body;
+    const { amount, orderId, businessId, ownerStripeAccountId, customerEmail, deliveryProvider } = body;
 
     if (!amount || !orderId || !businessId) {
       return NextResponse.json(
@@ -47,12 +47,15 @@ export async function POST(request: NextRequest) {
     // If the business owner has a Stripe connected account, use destination charges.
     // Otherwise fall back to a direct charge (money stays in platform account).
     if (ownerStripeAccountId) {
+      // For courier deliveries, use the flat $0.25 platform fee instead of the percentage
+      const isCourierDelivery = deliveryProvider === 'community';
       const result = await createDestinationCharge({
         amountCents: amount,
         ownerStripeAccountId,
         orderId,
         businessId,
         customerEmail,
+        isCourierDelivery,
       });
       return NextResponse.json(result);
     }

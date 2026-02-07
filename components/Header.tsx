@@ -151,6 +151,7 @@ const Header = () => {
 
           <Link href="/pricing" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Pricing</Link>
           <Link href="/comparison" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Compare</Link>
+          <Link href="/quick-delivery" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">📦 Send</Link>
           <Link href="/about" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">About</Link>
           <Link href="/contact" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Contact</Link>
         </nav>

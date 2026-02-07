@@ -41,6 +41,7 @@ interface CourierProfile {
   totalEarnings: number;
   rating: number;
   stripeAccountId?: string;
+  backgroundCheckStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 export default function DriverDashboard() {
@@ -82,6 +83,7 @@ export default function DriverDashboard() {
           totalEarnings: data.totalEarnings || 0,
           rating: data.rating || 5.0,
           stripeAccountId: data.stripeAccountId,
+          backgroundCheckStatus: data.backgroundCheckStatus || 'pending',
         });
         return;
       }
@@ -150,6 +152,7 @@ export default function DriverDashboard() {
       return () => unsub();
     } else {
       // Community courier — discover orders across businesses with courier delivery enabled
+      // ALSO discover quick deliveries (letters, packages)
       let cancelled = false;
 
       const discoverOrders = async () => {
@@ -161,11 +164,6 @@ export default function DriverDashboard() {
           if (cancelled) return;
 
           const bizIds = bizSnap.docs.map(d => ({ id: d.id, name: d.data().name || 'Business' }));
-          if (bizIds.length === 0) {
-            setAvailableOrders([]);
-            setLoadingOrders(false);
-            return;
-          }
 
           // Step 2: For each business, listen for ready delivery orders
           const unsubs: (() => void)[] = [];
@@ -195,11 +193,45 @@ export default function DriverDashboard() {
                     status: data.status,
                   };
                 });
-              // Merge all business orders into one list
-              setAvailableOrders(Object.values(ordersByBiz).flat());
+              // Merge all business orders + quick deliveries
+              const bizOrders = Object.values(ordersByBiz).flat();
+              const quickOrders = ordersByBiz['__quickDeliveries'] || [];
+              setAvailableOrders([...bizOrders, ...quickOrders]);
               setLoadingOrders(false);
             });
             unsubs.push(unsub);
+          }
+
+          // Step 3: Also listen for quick deliveries (letters/packages)
+          const quickRef = collection(db, 'quickDeliveries');
+          const quickQ = query(quickRef, where('status', '==', 'pending'));
+          const quickUnsub = onSnapshot(quickQ, (snap) => {
+            if (cancelled) return;
+            ordersByBiz['__quickDeliveries'] = snap.docs
+              .filter(d => !d.data().assignedCourierId)
+              .map(d => {
+                const data = d.data();
+                return {
+                  orderId: d.id,
+                  businessId: '__quickDelivery',
+                  businessName: `📦 Quick Delivery`,
+                  customerName: data.senderName || 'Sender',
+                  deliveryAddress: data.dropoffAddress || 'Address TBD',
+                  items: [{ name: data.description || data.packageSize || 'Package', quantity: 1 }],
+                  total: data.deliveryFee || 3.99,
+                  status: data.status,
+                };
+              });
+            const bizOrders = Object.values(ordersByBiz).flat().filter(o => o.businessId !== '__quickDeliveries');
+            const quickOrders = ordersByBiz['__quickDeliveries'] || [];
+            setAvailableOrders([...bizOrders, ...quickOrders]);
+            setLoadingOrders(false);
+          });
+          unsubs.push(quickUnsub);
+
+          // If no businesses found, still show quick deliveries
+          if (bizIds.length === 0) {
+            setLoadingOrders(false);
           }
 
           return () => { unsubs.forEach(u => u()); };
@@ -262,14 +294,24 @@ export default function DriverDashboard() {
   const acceptDelivery = useCallback(async (order: ActiveDelivery) => {
     if (!user) return;
     try {
-      // Update Firestore order
-      const orderRef = doc(db, 'businesses', order.businessId, 'orders', order.orderId);
-      await updateDoc(orderRef, {
-        assignedDriverId: user.uid,
-        assignedDriverType: isCourier ? 'courier' : 'inhouse',
-        status: 'out_for_delivery',
-        updatedAt: new Date().toISOString(),
-      });
+      if (order.businessId === '__quickDelivery') {
+        // Quick delivery — update quickDeliveries collection
+        const deliveryRef = doc(db, 'quickDeliveries', order.orderId);
+        await updateDoc(deliveryRef, {
+          assignedCourierId: user.uid,
+          status: 'picked_up',
+          updatedAt: new Date().toISOString(),
+        });
+      } else {
+        // Restaurant order — update business orders collection
+        const orderRef = doc(db, 'businesses', order.businessId, 'orders', order.orderId);
+        await updateDoc(orderRef, {
+          assignedDriverId: user.uid,
+          assignedDriverType: isCourier ? 'courier' : 'inhouse',
+          status: 'out_for_delivery',
+          updatedAt: new Date().toISOString(),
+        });
+      }
       // Update RTDB status
       if (isCourier) {
         await updateCourierStatus(user.uid, 'in_transit');
@@ -288,23 +330,45 @@ export default function DriverDashboard() {
   const handleCompleteDelivery = useCallback(async () => {
     if (!user || !activeDelivery) return;
     try {
-      // Update Firestore order status
-      const orderRef = doc(db, 'businesses', activeDelivery.businessId, 'orders', activeDelivery.orderId);
-      await updateDoc(orderRef, {
-        status: 'delivered',
-        updatedAt: new Date().toISOString(),
-      });
+      if (activeDelivery.businessId === '__quickDelivery') {
+        // Quick delivery — update quickDeliveries collection
+        const deliveryRef = doc(db, 'quickDeliveries', activeDelivery.orderId);
+        await updateDoc(deliveryRef, {
+          status: 'delivered',
+          updatedAt: new Date().toISOString(),
+        });
+      } else {
+        // Restaurant order — update business orders collection
+        const orderRef = doc(db, 'businesses', activeDelivery.businessId, 'orders', activeDelivery.orderId);
+        await updateDoc(orderRef, {
+          status: 'delivered',
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
       // Update RTDB
       if (isCourier) {
         await completeCourierDelivery(user.uid);
-        // Update courier stats in Firestore
+        // Update courier stats in Firestore — courier earns deliveryFee minus platform fee ($0.25)
         const courierRef = doc(db, 'couriers', user.uid);
         const courierSnap = await getDoc(courierRef);
         if (courierSnap.exists()) {
           const prev = courierSnap.data();
+          let deliveryFee = 3.99; // default
+          if (activeDelivery.businessId === '__quickDelivery') {
+            // Quick delivery — fee is the order total displayed
+            deliveryFee = activeDelivery.total;
+          } else {
+            // Restaurant order — fetch the business's delivery fee
+            const bizDoc = await getDoc(doc(db, 'businesses', activeDelivery.businessId));
+            deliveryFee = bizDoc.exists()
+              ? (bizDoc.data().settings?.pricing?.deliveryFee ?? 3.99)
+              : 3.99;
+          }
+          const courierEarnings = Math.max(deliveryFee - 0.25, 0); // Courier keeps deliveryFee minus $0.25 platform fee
           await updateDoc(courierRef, {
             totalDeliveries: (prev.totalDeliveries || 0) + 1,
-            totalEarnings: (prev.totalEarnings || 0) + (activeDelivery.total * 0.1), // ~10% of order as tip estimate
+            totalEarnings: (prev.totalEarnings || 0) + courierEarnings,
           });
         }
       } else {
@@ -319,7 +383,7 @@ export default function DriverDashboard() {
     } catch {
       alert('Failed to complete delivery');
     }
-  }, [user, activeDelivery, profile]);
+  }, [user, activeDelivery, profile, isCourier]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -332,6 +396,72 @@ export default function DriverDashboard() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white/90">
         <div className="text-lg font-black text-zinc-400 animate-pulse uppercase tracking-widest">Loading...</div>
+      </div>
+    );
+  }
+
+  // Approval gate — community couriers must be approved before accessing the dashboard
+  if (isCourier && profile && profile.backgroundCheckStatus !== 'approved') {
+    return (
+      <div className="min-h-screen bg-transparent pt-28 pb-20 px-4">
+        <div className="container mx-auto max-w-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-[2.5rem] border border-zinc-100 p-10 text-center shadow-[0_20px_80px_rgba(0,0,0,0.04)]"
+          >
+            {profile.backgroundCheckStatus === 'rejected' ? (
+              <>
+                <div className="text-5xl mb-4">❌</div>
+                <h1 className="text-3xl font-black text-black mb-3">
+                  Application Not Approved
+                </h1>
+                <p className="text-sm text-zinc-500 mb-6">
+                  Unfortunately, your courier application was not approved at this time.
+                  If you believe this is an error, please contact support.
+                </p>
+                <a
+                  href="mailto:support@mohnmenu.com"
+                  className="inline-block px-6 py-3 bg-black text-white rounded-full font-bold text-sm hover:bg-zinc-800 transition-all"
+                >
+                  Contact Support
+                </a>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl mb-4">⏳</div>
+                <h1 className="text-3xl font-black text-black mb-3">
+                  Application Under Review
+                </h1>
+                <p className="text-sm text-zinc-500 mb-4">
+                  Your courier application has been received! Our team is reviewing your
+                  information. This typically takes 1-2 business days.
+                </p>
+                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 mb-6 text-left">
+                  <p className="text-xs font-black uppercase tracking-widest text-emerald-600 mb-2">What happens next?</p>
+                  <ul className="space-y-2">
+                    {[
+                      'We review your application',
+                      'You get approved and can go online',
+                      'Start earning $3+ per delivery!',
+                    ].map((step, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm text-zinc-600">
+                        <span className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xs font-black shrink-0">{i + 1}</span>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  onClick={() => logout()}
+                  className="px-6 py-3 bg-zinc-100 text-zinc-600 rounded-full font-bold text-sm hover:bg-zinc-200 transition-all"
+                >
+                  Sign Out
+                </button>
+              </>
+            )}
+          </motion.div>
+        </div>
       </div>
     );
   }
@@ -373,7 +503,7 @@ export default function DriverDashboard() {
 
         {/* Stats */}
         <motion.div
-          className="grid grid-cols-3 gap-3 mb-6"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -382,14 +512,53 @@ export default function DriverDashboard() {
             <p className="text-3xl font-black text-black">{profile?.totalDeliveries || 0}</p>
           </div>
           <div className="bg-white p-5 rounded-2xl border border-zinc-100">
-            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Earnings</p>
-            <p className="text-3xl font-black text-emerald-600">${(profile?.totalEarnings || 0).toFixed(0)}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Total Earned</p>
+            <p className="text-3xl font-black text-emerald-600">${(profile?.totalEarnings || 0).toFixed(2)}</p>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-zinc-100">
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Per Delivery</p>
+            <p className="text-3xl font-black text-blue-600">
+              ${(profile?.totalDeliveries && profile.totalDeliveries > 0
+                ? (profile.totalEarnings / profile.totalDeliveries).toFixed(2)
+                : '3.74')}
+            </p>
           </div>
           <div className="bg-white p-5 rounded-2xl border border-zinc-100">
             <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Rating</p>
             <p className="text-3xl font-black text-indigo-600">{(profile?.rating || 5.0).toFixed(1)}</p>
           </div>
         </motion.div>
+
+        {/* Earnings breakdown for couriers */}
+        {isCourier && profile && driverStatus === 'offline' && (profile?.totalDeliveries || 0) > 0 && (
+          <motion.div
+            className="bg-gradient-to-r from-emerald-50 to-green-50 p-5 rounded-2xl border border-emerald-100 mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <p className="text-xs font-black uppercase tracking-widest text-emerald-700 mb-3">💰 Earnings Breakdown</p>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-600">Total deliveries completed</span>
+                <span className="font-bold text-black">{profile.totalDeliveries}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-600">Total earned</span>
+                <span className="font-bold text-emerald-700">${profile.totalEarnings.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-600">Average per delivery</span>
+                <span className="font-bold text-blue-600">${(profile.totalEarnings / profile.totalDeliveries).toFixed(2)}</span>
+              </div>
+              <div className="border-t border-emerald-200 pt-2 mt-2">
+                <p className="text-[10px] text-emerald-600">
+                  You keep the delivery fee minus $0.25 platform fee on each delivery. Standard rate: $3.74+ per delivery.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Status Control */}
         <motion.div
@@ -470,7 +639,12 @@ export default function DriverDashboard() {
                   {activeDelivery.businessName}
                 </h2>
               </div>
-              <span className="text-2xl font-black text-emerald-400">${activeDelivery.total.toFixed(2)}</span>
+              <div>
+                <span className="text-xs text-zinc-500 block">You earn</span>
+                <span className="text-2xl font-black text-emerald-400">
+                  ${isCourier ? Math.max(activeDelivery.total - 0.25, 0).toFixed(2) : activeDelivery.total.toFixed(2)}
+                </span>
+              </div>
             </div>
 
             <div className="space-y-3 mb-6">
@@ -535,7 +709,10 @@ export default function DriverDashboard() {
                         <p className="font-bold text-black text-sm">{order.businessName}</p>
                         <p className="text-xs text-zinc-400 mt-0.5">{order.customerName}</p>
                       </div>
-                      <span className="font-black text-emerald-600">${order.total.toFixed(2)}</span>
+                      <div className="text-right">
+                        <span className="font-black text-emerald-600">${isCourier ? Math.max(order.total - 0.25, 0).toFixed(2) : order.total.toFixed(2)}</span>
+                        {isCourier && <p className="text-[10px] text-zinc-400">you earn</p>}
+                      </div>
                     </div>
                     <div className="flex items-center gap-1.5 mb-3">
                       <FaMapMarkerAlt className="text-zinc-300 text-xs" />

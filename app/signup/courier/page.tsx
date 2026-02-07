@@ -77,12 +77,12 @@ export default function CourierSignupPage() {
         licenseVerified: false,
         insuranceVerified: false,
         stripeAccountId: null,
-        isActive: true,
+        isActive: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
 
-      // 4. Redirect to driver dashboard
+      // 4. Redirect to driver dashboard (will show pending approval message)
       router.push('/driver');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Signup failed';
@@ -113,7 +113,7 @@ export default function CourierSignupPage() {
               Start Delivering<span className="text-emerald-600">.</span>
             </h1>
             <p className="text-zinc-500 font-medium text-sm">
-              No invite code needed. Sign up, pick your ride, and start earning $0.25+ per delivery in your neighborhood.
+              No invite code needed. Sign up, pick your ride, and start earning $3+ per delivery in your neighborhood.
             </p>
           </div>
 
@@ -219,8 +219,8 @@ export default function CourierSignupPage() {
             <p className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-3">Why deliver with MohnMenu?</p>
             <ul className="space-y-2">
               {[
-                'No background check — start today',
-                'Earn on every delivery in your area',
+                'Simple signup — no lengthy background check process',
+                'Earn $3+ on every delivery in your area',
                 'Use any vehicle: bike, walk, car, scooter',
                 'Get paid via Stripe — set up anytime',
                 '2-3 mile radius — stay in your neighborhood',

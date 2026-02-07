@@ -15,7 +15,7 @@
  */
 
 import Stripe from 'stripe';
-import { PLATFORM_FEE_PERCENT, CURRENCY } from './config';
+import { PLATFORM_FEE_PERCENT, CURRENCY, calculateCourierFee } from './config';
 
 // ─── Singleton ───────────────────────────────────────────────
 
@@ -186,6 +186,8 @@ export interface CreatePaymentParams {
   businessId: string;
   customerEmail?: string;
   description?: string;
+  /** Whether this is a courier delivery (flat $0.25 fee instead of percentage) */
+  isCourierDelivery?: boolean;
 }
 
 /**
@@ -194,11 +196,17 @@ export interface CreatePaymentParams {
  * Money flows:  Customer → Platform → Owner (minus application fee)
  *
  * The platform (MohnMenu) automatically keeps the application_fee_amount.
+ * For courier deliveries, the platform fee is a flat $0.25.
+ * For regular orders, the platform fee is 1% of the order total.
  * The rest is transferred to the business owner's connected account.
  */
 export async function createDestinationCharge(params: CreatePaymentParams) {
   const stripe = getStripe();
-  const applicationFee = Math.round(params.amountCents * (PLATFORM_FEE_PERCENT / 100));
+
+  // Courier deliveries: flat $0.25 fee. Regular orders: 1% of total.
+  const applicationFee = params.isCourierDelivery
+    ? calculateCourierFee()
+    : Math.round(params.amountCents * (PLATFORM_FEE_PERCENT / 100));
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: params.amountCents,
@@ -211,6 +219,7 @@ export async function createDestinationCharge(params: CreatePaymentParams) {
       mohn_order_id: params.orderId,
       mohn_business_id: params.businessId,
       platform_fee_cents: applicationFee.toString(),
+      delivery_type: params.isCourierDelivery ? 'courier' : 'standard',
     },
     receipt_email: params.customerEmail,
     description: params.description || `MohnMenu Order ${params.orderId}`,

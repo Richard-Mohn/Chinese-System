@@ -479,33 +479,23 @@ export default function OwnerSettingsPage() {
             </label>
 
             {thirdPartyDelivery.whiteLabel && (
-              <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 space-y-3">
-                <p className="text-xs font-bold text-zinc-600">Active Providers:</p>
+              <div className="bg-amber-50/50 rounded-xl p-4 border border-amber-100 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-xs font-bold text-zinc-600">Delivery Providers</p>
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Coming Soon</span>
+                </div>
                 <div className="flex gap-3">
                   {(['doordash', 'uber'] as const).map((p) => (
-                    <button
+                    <div
                       key={p}
-                      type="button"
-                      onClick={() => {
-                        setThirdPartyDelivery(prev => ({
-                          ...prev,
-                          providers: prev.providers.includes(p)
-                            ? prev.providers.filter((x: string) => x !== p)
-                            : [...prev.providers, p],
-                        }));
-                      }}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                        thirdPartyDelivery.providers.includes(p)
-                          ? 'bg-black text-white'
-                          : 'bg-zinc-200 text-zinc-500'
-                      }`}
+                      className="px-4 py-2 rounded-lg text-sm font-bold bg-zinc-200 text-zinc-400 cursor-not-allowed opacity-60"
                     >
                       {p === 'doordash' ? '🔴 DoorDash' : '⬛ Uber'}
-                    </button>
+                    </div>
                   ))}
                 </div>
-                <p className="text-[10px] text-zinc-400">
-                  Platform-level API keys configured by MohnMenu. Delivery fees are passed to customers at checkout.
+                <p className="text-[10px] text-amber-600 font-medium">
+                  ⏳ DoorDash Drive & Uber Direct APIs are awaiting approval. Once approved, professional drivers will be available at checkout. Community Couriers are fully operational now!
                 </p>
               </div>
             )}
