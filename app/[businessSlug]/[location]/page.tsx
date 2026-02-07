@@ -15,6 +15,7 @@ import { parseLocation } from '@/lib/tenant-links';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getServerBasePath, getServerOrderPath } from '@/lib/tenant-links';
+import { generateLocationJsonLd, generateTenantBreadcrumb } from '@/lib/tenant-seo';
 
 // ISR: revalidate location pages every 1 hour
 export const revalidate = 3600;

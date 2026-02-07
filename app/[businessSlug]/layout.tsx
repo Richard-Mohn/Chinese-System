@@ -11,6 +11,7 @@ import { db } from '@/lib/firebase';
 import type { MohnMenuBusiness } from '@/lib/types';
 import { headers } from 'next/headers';
 import TenantNav from '@/components/TenantNav';
+import { generateTenantJsonLd, generateTenantKeywords, generateTenantBreadcrumb } from '@/lib/tenant-seo';
 
 // Fetch business by slug
 async function getBusinessBySlug(slug: string): Promise<(MohnMenuBusiness & { businessId: string }) | null> {
@@ -41,26 +42,33 @@ export async function generateMetadata({
   const seo = business.website?.seo;
   const title = seo?.metaTitle || `${business.name} | Order Online`;
   const description = seo?.metaDescription || business.description || `Order from ${business.name}. ${business.city}, ${business.state}.`;
+  const keywords = generateTenantKeywords(business);
 
   return {
     title,
     description,
-    keywords: seo?.keywords?.join(', '),
+    keywords: keywords.join(', '),
     openGraph: {
       title,
       description,
       type: 'website',
       siteName: business.name,
       locale: 'en_US',
+      url: `https://mohnmenu.com/${businessSlug}`,
+      images: business.logo ? [{ url: business.logo, alt: business.name }] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: business.logo ? [business.logo] : undefined,
     },
     robots: {
       index: true,
       follow: true,
+    },
+    alternates: {
+      canonical: `https://mohnmenu.com/${businessSlug}`,
     },
   };
 }
@@ -92,8 +100,16 @@ export default async function TenantLayout({
   const orderPath = isCustomDomain ? '/order' : `/order/${businessSlug}`;
   const primaryColor = business.settings?.primaryColor || business.brandColors?.primary || '#4F46E5';
 
+  // Generate JSON-LD structured data for this business
+  const baseUrl = `https://mohnmenu.com/${businessSlug}`;
+  const tenantJsonLd = generateTenantJsonLd(business, baseUrl);
+  const breadcrumbJsonLd = generateTenantBreadcrumb(business.name, baseUrl);
+
   return (
     <div className="min-h-screen bg-white" style={{ '--tenant-primary': primaryColor } as React.CSSProperties}>
+      {/* Tenant JSON-LD Structured Data */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(tenantJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {/* Tenant Navigation */}
       <TenantNav business={business} basePath={basePath} orderPath={orderPath} />
 

@@ -14,6 +14,7 @@ import { generateServiceContent, CUISINE_TYPES } from '@/lib/seo-data';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getServerBasePath, getServerOrderPath } from '@/lib/tenant-links';
+import { generateServiceJsonLd, generateServiceFaqJsonLd, generateTenantBreadcrumb } from '@/lib/tenant-seo';
 
 // ISR: revalidate service pages every 1 hour
 export const revalidate = 3600;
@@ -92,8 +93,17 @@ export default async function TenantServicePage({
   const cuisine = CUISINE_TYPES.find(c => c.key === cuisineType);
   const generated = generateServiceContent(business.name, business.city, business.state, service, cuisineType);
 
+  const serviceUrl = `https://mohnmenu.com/${businessSlug}/services/${service}`;
+  const businessUrl = `https://mohnmenu.com/${businessSlug}`;
+  const serviceJsonLd = generateServiceJsonLd(business, service, businessUrl, serviceUrl);
+  const faqJsonLd = generateServiceFaqJsonLd(generated.faq);
+  const breadcrumbJsonLd = generateTenantBreadcrumb(business.name, businessUrl, info.label, serviceUrl);
+
   return (
     <div className="bg-white">
+      {serviceJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {/* Hero */}
       <section className="pt-20 pb-16 px-4">
         <div className="container mx-auto max-w-4xl">

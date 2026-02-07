@@ -69,6 +69,14 @@ export default async function sitemap({
       { url: `${BASE_URL}/for-food-trucks/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
       { url: `${BASE_URL}/for-bars-nightlife/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
       { url: `${BASE_URL}/for-retail-shops/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+      // Feature subpages
+      { url: `${BASE_URL}/features/online-ordering/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/gps-tracking/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/crypto-payments/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/delivery-management/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/kitchen-display/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/real-time-orders/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/white-label-website/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     ];
   }
 
