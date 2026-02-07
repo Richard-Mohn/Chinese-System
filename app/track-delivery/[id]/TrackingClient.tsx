@@ -6,7 +6,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { subscribeToDriverLocation, calculateETA, type DriverLocation } from '@/lib/realTimeTracking';
+import { subscribeToDriverLocation, subscribeToCourierLocation, calculateETA, type DriverLocation } from '@/lib/realTimeTracking';
 
 /**
  * Customer-facing real-time delivery tracking.
@@ -26,6 +26,7 @@ interface OrderInfo {
   businessId: string;
   businessName: string;
   driverId: string;
+  assignedDriverType?: string;
   status: string;
   customerName: string;
   deliveryAddress: string;
@@ -107,7 +108,8 @@ export default function TrackingClient() {
           orderId: oid,
           businessId,
           businessName: d.businessName || d.restaurantName || 'Restaurant',
-          driverId: d.driverId || '',
+          driverId: d.driverId || d.assignedDriverId || '',
+          assignedDriverType: d.assignedDriverType || '',
           status: d.status || 'confirmed',
           customerName: d.customerName || d.customer?.name || 'Customer',
           deliveryAddress: d.deliveryAddress || d.customer?.address || '',
@@ -186,10 +188,10 @@ export default function TrackingClient() {
   useEffect(() => {
     if (!order?.driverId || !order?.businessId) return;
 
-    const unsub = subscribeToDriverLocation(
-      order.businessId,
-      order.driverId,
-      (loc) => {
+    // Use courier-specific RTDB path if driver is a courier
+    const isCourierDriver = order.assignedDriverType === 'courier';
+
+    const locationCallback = (loc: DriverLocation | null) => {
         if (!loc) return;
         setDriverLoc(loc);
 
@@ -218,9 +220,13 @@ export default function TrackingClient() {
           bounds.extend([loc.lng, loc.lat]);
           mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 1000 });
         }
-      },
-      (status) => setDriverStatus(status),
-    );
+    };
+
+    const statusCallback = (status: string) => setDriverStatus(status);
+
+    const unsub = isCourierDriver
+      ? subscribeToCourierLocation(order.driverId, locationCallback, statusCallback)
+      : subscribeToDriverLocation(order.businessId, order.driverId, locationCallback, statusCallback);
 
     return unsub;
   }, [order?.driverId, order?.businessId, order?.deliveryLat, order?.deliveryLng, order?.restaurantLat, order?.restaurantLng]);

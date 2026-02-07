@@ -228,6 +228,114 @@ export async function completeDelivery(
   });
 }
 
+// ─── Community Courier Functions (cross-business) ─────────────────
+
+/**
+ * Start tracking a community courier's location.
+ * Uses shared `couriers/{courierId}` RTDB path instead of business-specific path.
+ */
+export async function startCourierTracking(
+  courierId: string,
+  onLocationUpdate?: (location: DriverLocation) => void
+): Promise<() => void> {
+  let watchId: number | null = null;
+  let lastUpdate = 0;
+  const MIN_UPDATE_INTERVAL = 1000;
+
+  watchId = navigator.geolocation.watchPosition(
+    (position) => {
+      const now = Date.now();
+      if (now - lastUpdate < MIN_UPDATE_INTERVAL) return;
+      lastUpdate = now;
+
+      const { latitude, longitude, accuracy, speed, heading } = position.coords;
+      const location: DriverLocation = {
+        lat: latitude,
+        lng: longitude,
+        timestamp: position.timestamp,
+        accuracy,
+        speed: speed || undefined,
+        heading: heading || undefined,
+      };
+
+      const locationRef = ref(realtimeDb, `couriers/${courierId}/location`);
+      set(locationRef, location).catch(() => {});
+
+      if (onLocationUpdate) onLocationUpdate(location);
+    },
+    (error) => console.error('Geolocation error:', error),
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+  );
+
+  // Mark online
+  const statusRef = ref(realtimeDb, `couriers/${courierId}/status`);
+  await set(statusRef, 'idle');
+
+  return () => {
+    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+    set(statusRef, 'offline').catch(() => {});
+  };
+}
+
+/**
+ * Update community courier status
+ */
+export async function updateCourierStatus(
+  courierId: string,
+  status: 'idle' | 'in_transit' | 'delivering' | 'offline'
+): Promise<void> {
+  const statusRef = ref(realtimeDb, `couriers/${courierId}/status`);
+  return set(statusRef, status);
+}
+
+/**
+ * Complete a courier delivery
+ */
+export async function completeCourierDelivery(courierId: string): Promise<void> {
+  const courierRef = ref(realtimeDb, `couriers/${courierId}`);
+  return update(courierRef, {
+    currentOrderId: null,
+    status: 'idle',
+  });
+}
+
+/**
+ * Subscribe to a community courier's location (for customer tracking)
+ */
+export function subscribeToCourierLocation(
+  courierId: string,
+  onLocationUpdate: (location: DriverLocation | null) => void,
+  onStatusChange?: (status: string) => void
+): () => void {
+  const locationRef = ref(realtimeDb, `couriers/${courierId}/location`);
+  const statusRef = ref(realtimeDb, `couriers/${courierId}/status`);
+
+  const unsubLoc = onValue(locationRef, (snapshot) => {
+    onLocationUpdate(snapshot.exists() ? snapshot.val() as DriverLocation : null);
+  });
+
+  let unsubStatus = () => {};
+  if (onStatusChange) {
+    unsubStatus = onValue(statusRef, (snapshot) => {
+      if (snapshot.exists()) onStatusChange(snapshot.val());
+    });
+  }
+
+  return () => { unsubLoc(); unsubStatus(); };
+}
+
+/**
+ * Subscribe to all online community couriers (for owner dispatch view)
+ */
+export function subscribeToAllCouriers(
+  onUpdate: (couriers: Record<string, DriverTrackingData>) => void
+): () => void {
+  const couriersRef = ref(realtimeDb, 'couriers');
+  return onValue(couriersRef, (snapshot) => {
+    onUpdate(snapshot.exists() ? snapshot.val() as Record<string, DriverTrackingData> : {});
+  });
+}
+
 /**
  * Get real-time ETA between two coordinates
  * Note: For production, you'd integrate with Google Maps Distance Matrix API

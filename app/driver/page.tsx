@@ -9,13 +9,16 @@ import {
   FaBicycle, FaWalking, FaCar, FaMotorcycle
 } from 'react-icons/fa';
 import {
-  collection, query, where, getDocs, doc, getDoc, onSnapshot, updateDoc,
+  collection, query, where, getDocs, doc, getDoc, onSnapshot, updateDoc, collectionGroup,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
   startDriverTracking,
+  startCourierTracking,
   updateDriverStatus,
+  updateCourierStatus,
   completeDelivery,
+  completeCourierDelivery,
   type DriverLocation,
 } from '@/lib/realTimeTracking';
 
@@ -53,6 +56,7 @@ export default function DriverDashboard() {
 
   const trackingCleanup = useRef<(() => void) | null>(null);
   const businessId = MohnMenuUser?.activeBusinessId || MohnMenuUser?.businessIds?.[0] || '';
+  const isCourier = !businessId; // Community couriers have no businessId
 
   // Auth guard
   useEffect(() => {
@@ -105,58 +109,142 @@ export default function DriverDashboard() {
 
   // Listen for available orders when online
   useEffect(() => {
-    if (driverStatus !== 'online' || !businessId) return;
+    if (driverStatus !== 'online') return;
 
+    // In-house drivers: query their single business
+    // Community couriers: query ALL businesses with courierDelivery enabled
     setLoadingOrders(true);
-    const ordersRef = collection(db, 'businesses', businessId, 'orders');
-    const q = query(ordersRef, where('status', '==', 'ready'), where('orderType', '==', 'delivery'));
 
-    const unsub = onSnapshot(q, async (snap) => {
-      const businessDoc = await getDoc(doc(db, 'businesses', businessId));
-      const bizName = businessDoc.exists() ? businessDoc.data().name : 'Business';
+    if (!isCourier && businessId) {
+      // In-house driver — single business query
+      const ordersRef = collection(db, 'businesses', businessId, 'orders');
+      const q = query(ordersRef, where('status', '==', 'ready'), where('orderType', '==', 'delivery'));
 
-      const orders: ActiveDelivery[] = snap.docs
-        .filter(d => !d.data().assignedDriverId)
-        .map(d => {
-          const data = d.data();
-          return {
-            orderId: d.id,
-            businessId,
-            businessName: bizName,
-            customerName: data.customerName || 'Customer',
-            deliveryAddress: data.deliveryAddress || data.address || 'Address TBD',
-            items: (data.items || []).map((item: any) => ({
-              name: item.name,
-              quantity: item.quantity,
-            })),
-            total: data.total || 0,
-            status: data.status,
-          };
-        });
-      setAvailableOrders(orders);
-      setLoadingOrders(false);
-    });
+      const unsub = onSnapshot(q, async (snap) => {
+        const businessDoc = await getDoc(doc(db, 'businesses', businessId));
+        const bizName = businessDoc.exists() ? businessDoc.data().name : 'Business';
 
-    return () => unsub();
-  }, [driverStatus, businessId]);
+        const orders: ActiveDelivery[] = snap.docs
+          .filter(d => !d.data().assignedDriverId)
+          .map(d => {
+            const data = d.data();
+            return {
+              orderId: d.id,
+              businessId,
+              businessName: bizName,
+              customerName: data.customerName || 'Customer',
+              deliveryAddress: data.deliveryAddress || data.address || 'Address TBD',
+              items: (data.items || []).map((item: any) => ({
+                name: item.name,
+                quantity: item.quantity,
+              })),
+              total: data.total || 0,
+              status: data.status,
+            };
+          });
+        setAvailableOrders(orders);
+        setLoadingOrders(false);
+      });
+
+      return () => unsub();
+    } else {
+      // Community courier — discover orders across businesses with courier delivery enabled
+      let cancelled = false;
+
+      const discoverOrders = async () => {
+        try {
+          // Step 1: Find all businesses that have courier delivery enabled
+          const bizSnap = await getDocs(
+            query(collection(db, 'businesses'), where('settings.courierDelivery.enabled', '==', true))
+          );
+          if (cancelled) return;
+
+          const bizIds = bizSnap.docs.map(d => ({ id: d.id, name: d.data().name || 'Business' }));
+          if (bizIds.length === 0) {
+            setAvailableOrders([]);
+            setLoadingOrders(false);
+            return;
+          }
+
+          // Step 2: For each business, listen for ready delivery orders
+          const unsubs: (() => void)[] = [];
+          const ordersByBiz: Record<string, ActiveDelivery[]> = {};
+
+          for (const biz of bizIds) {
+            const ordersRef = collection(db, 'businesses', biz.id, 'orders');
+            const q = query(ordersRef, where('status', '==', 'ready'), where('orderType', '==', 'delivery'));
+
+            const unsub = onSnapshot(q, (snap) => {
+              if (cancelled) return;
+              ordersByBiz[biz.id] = snap.docs
+                .filter(d => !d.data().assignedDriverId)
+                .map(d => {
+                  const data = d.data();
+                  return {
+                    orderId: d.id,
+                    businessId: biz.id,
+                    businessName: biz.name,
+                    customerName: data.customerName || 'Customer',
+                    deliveryAddress: data.deliveryAddress || data.address || 'Address TBD',
+                    items: (data.items || []).map((item: any) => ({
+                      name: item.name,
+                      quantity: item.quantity,
+                    })),
+                    total: data.total || 0,
+                    status: data.status,
+                  };
+                });
+              // Merge all business orders into one list
+              setAvailableOrders(Object.values(ordersByBiz).flat());
+              setLoadingOrders(false);
+            });
+            unsubs.push(unsub);
+          }
+
+          return () => { unsubs.forEach(u => u()); };
+        } catch {
+          setLoadingOrders(false);
+        }
+      };
+
+      let cleanupFn: (() => void) | undefined;
+      discoverOrders().then(fn => { cleanupFn = fn; });
+
+      return () => {
+        cancelled = true;
+        if (cleanupFn) cleanupFn();
+      };
+    }
+  }, [driverStatus, businessId, isCourier]);
 
   // Go online — start GPS tracking
   const goOnline = useCallback(async () => {
-    if (!user || !businessId) return;
+    if (!user) return;
     try {
-      const cleanup = await startDriverTracking(
-        businessId,
-        user.uid,
-        (location) => setCurrentLocation(location)
-      );
+      let cleanup: () => void;
+      if (isCourier) {
+        // Community courier — use shared courier RTDB path
+        cleanup = await startCourierTracking(
+          user.uid,
+          (location) => setCurrentLocation(location)
+        );
+        await updateCourierStatus(user.uid, 'idle');
+      } else {
+        // In-house driver — use business-specific path
+        cleanup = await startDriverTracking(
+          businessId,
+          user.uid,
+          (location) => setCurrentLocation(location)
+        );
+        await updateDriverStatus(businessId, user.uid, 'idle');
+      }
       trackingCleanup.current = cleanup;
       setIsTracking(true);
       setDriverStatus('online');
-      await updateDriverStatus(businessId, user.uid, 'idle');
     } catch {
       alert('Failed to start GPS. Enable location services.');
     }
-  }, [user, businessId]);
+  }, [user, businessId, isCourier]);
 
   // Go offline — stop GPS
   const goOffline = useCallback(() => {
@@ -177,18 +265,23 @@ export default function DriverDashboard() {
       const orderRef = doc(db, 'businesses', order.businessId, 'orders', order.orderId);
       await updateDoc(orderRef, {
         assignedDriverId: user.uid,
+        assignedDriverType: isCourier ? 'courier' : 'inhouse',
         status: 'out_for_delivery',
         updatedAt: new Date().toISOString(),
       });
-      // Update RTDB driver status
-      await updateDriverStatus(order.businessId, user.uid, 'in_transit');
+      // Update RTDB status
+      if (isCourier) {
+        await updateCourierStatus(user.uid, 'in_transit');
+      } else {
+        await updateDriverStatus(order.businessId, user.uid, 'in_transit');
+      }
       setActiveDelivery(order);
       setDriverStatus('on_delivery');
       setAvailableOrders(prev => prev.filter(o => o.orderId !== order.orderId));
     } catch {
       alert('Failed to accept delivery');
     }
-  }, [user]);
+  }, [user, isCourier]);
 
   // Complete delivery
   const handleCompleteDelivery = useCallback(async () => {
@@ -201,7 +294,21 @@ export default function DriverDashboard() {
         updatedAt: new Date().toISOString(),
       });
       // Update RTDB
-      await completeDelivery(activeDelivery.businessId, user.uid);
+      if (isCourier) {
+        await completeCourierDelivery(user.uid);
+        // Update courier stats in Firestore
+        const courierRef = doc(db, 'couriers', user.uid);
+        const courierSnap = await getDoc(courierRef);
+        if (courierSnap.exists()) {
+          const prev = courierSnap.data();
+          await updateDoc(courierRef, {
+            totalDeliveries: (prev.totalDeliveries || 0) + 1,
+            totalEarnings: (prev.totalEarnings || 0) + (activeDelivery.total * 0.1), // ~10% of order as tip estimate
+          });
+        }
+      } else {
+        await completeDelivery(activeDelivery.businessId, user.uid);
+      }
       setActiveDelivery(null);
       setDriverStatus('online');
       // Update local counter

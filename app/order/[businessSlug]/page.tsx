@@ -95,6 +95,10 @@ interface RawMenuItem {
   orderCount?: number;
   averageRating?: number;
   reviewCount?: number;
+  flashSalePrice?: number;
+  saleStartTime?: string;
+  saleEndTime?: string;
+  isLimitedRun?: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -143,6 +147,10 @@ async function getMenuItems(businessId: string): Promise<RawMenuItem[]> {
           orderCount: data.orderCount,
           averageRating: data.averageRating,
           reviewCount: data.reviewCount,
+          flashSalePrice: data.flashSalePrice,
+          saleStartTime: data.saleStartTime,
+          saleEndTime: data.saleEndTime,
+          isLimitedRun: data.isLimitedRun,
         } as RawMenuItem;
       });
     }
@@ -194,6 +202,14 @@ function formatPriceLabel(key: string): string {
 
 function getLowestPrice(prices: Record<string, number>): number {
   return Math.min(...Object.values(prices));
+}
+
+function isFlashSaleActive(item: RawMenuItem): boolean {
+  if (!item.flashSalePrice) return false;
+  const now = Date.now();
+  if (item.saleStartTime && new Date(item.saleStartTime).getTime() > now) return false;
+  if (item.saleEndTime && new Date(item.saleEndTime).getTime() < now) return false;
+  return true;
 }
 
 function getDefaultPriceKey(prices: Record<string, number>): string {
@@ -334,7 +350,9 @@ export default function OrderPage({
     if (!showItemModal) return;
     const prices = showItemModal.prices;
     const sizeKey = selectedSize || getDefaultPriceKey(prices);
-    const price = prices[sizeKey];
+    // Use flash sale price if active, otherwise regular price
+    const onSale = isFlashSaleActive(showItemModal);
+    const price = onSale ? showItemModal.flashSalePrice! : prices[sizeKey];
 
     const cartItem: CartItem = {
       id: `${showItemModal.id}-${sizeKey}-${Date.now()}`,
@@ -829,6 +847,7 @@ export default function OrderPage({
               const lowestPrice = getLowestPrice(item.prices);
               const hasSizes = Object.keys(item.prices).length > 1;
               const isSoldOut = item.trackStock && item.stock !== undefined && item.stock !== null && item.stock <= 0;
+              const onSale = isFlashSaleActive(item);
 
               return (
                 <motion.button
@@ -858,6 +877,11 @@ export default function OrderPage({
                         loading="lazy"
                       />
                       <div className="absolute top-3 left-3 flex gap-1.5">
+                        {onSale && (
+                          <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <FaFire className="text-[10px]" /> Sale
+                          </span>
+                        )}
                         {item.isSpicy && (
                           <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                             <FaFire className="text-[10px]" /> Spicy
@@ -889,9 +913,16 @@ export default function OrderPage({
                         <p className="text-xs text-zinc-400 mt-1 line-clamp-2">{item.description}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="font-black text-black text-sm">
-                          {hasSizes ? `$${lowestPrice.toFixed(2)}+` : `$${lowestPrice.toFixed(2)}`}
-                        </p>
+                        {onSale ? (
+                          <div>
+                            <p className="font-black text-orange-600 text-sm">${item.flashSalePrice!.toFixed(2)}</p>
+                            <p className="text-[10px] text-zinc-400 line-through">${lowestPrice.toFixed(2)}</p>
+                          </div>
+                        ) : (
+                          <p className="font-black text-black text-sm">
+                            {hasSizes ? `$${lowestPrice.toFixed(2)}+` : `$${lowestPrice.toFixed(2)}`}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -1068,7 +1099,7 @@ export default function OrderPage({
                     onClick={handleAddToCart}
                     className="flex-1 py-3 bg-black text-white rounded-xl font-bold text-sm hover:bg-zinc-800 transition-all flex items-center justify-center gap-2"
                   >
-                    Add to Cart — ${((showItemModal.prices[selectedSize || getDefaultPriceKey(showItemModal.prices)]) * itemQty).toFixed(2)}
+                    Add to Cart — ${((isFlashSaleActive(showItemModal) ? showItemModal.flashSalePrice! : showItemModal.prices[selectedSize || getDefaultPriceKey(showItemModal.prices)]) * itemQty).toFixed(2)}
                   </button>
                 </div>
               </div>

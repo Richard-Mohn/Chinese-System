@@ -6,6 +6,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {
   subscribeToAllDrivers,
+  subscribeToAllCouriers,
   assignOrderToDriver,
   completeDelivery,
   updateDriverStatus,
@@ -104,10 +105,33 @@ export default function OwnerDispatchPage() {
   useEffect(() => {
     if (!businessId) return;
     const unsubscribe = subscribeToAllDrivers(businessId, (data) => {
-      setDrivers(data);
+      setDrivers(prev => ({ ...prev, ...data }));
     });
     return unsubscribe;
   }, [businessId]);
+
+  // ── Subscribe to community couriers (RTDB) ─────────
+  useEffect(() => {
+    if (!currentBusiness?.settings?.courierDelivery?.enabled) return;
+    const unsubscribe = subscribeToAllCouriers((courierData) => {
+      // Merge couriers into drivers map with a "courier:" prefix to distinguish
+      const courierEntries: Record<string, DriverTrackingData & { name?: string }> = {};
+      for (const [id, data] of Object.entries(courierData)) {
+        if (data.status && data.status !== 'offline') {
+          courierEntries[`courier:${id}`] = { ...data, name: `Courier ${id.slice(0, 6)}` } as any;
+        }
+      }
+      setDrivers(prev => {
+        // Remove old courier entries, add new ones
+        const cleaned: Record<string, any> = {};
+        for (const [k, v] of Object.entries(prev)) {
+          if (!k.startsWith('courier:')) cleaned[k] = v;
+        }
+        return { ...cleaned, ...courierEntries };
+      });
+    });
+    return unsubscribe;
+  }, [currentBusiness?.settings?.courierDelivery?.enabled]);
 
   // ── Fetch driver names from Firestore ──────────────
   const [driverNames, setDriverNames] = useState<Record<string, string>>({});

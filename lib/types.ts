@@ -50,7 +50,7 @@ export type DriverStatus =
 export type CourierVehicle = 'bike' | 'walk' | 'car' | 'scooter';
 
 // Platform fee configuration
-export const PLATFORM_FEE_CENTS = 25; // $0.25 per order
+export const PLATFORM_FEE_CENTS = 25; // $0.25 per courier delivery — canonical source: lib/stripe/config.ts
 
 // Order status throughout fulfillment
 export type OrderStatus = 
