@@ -13,6 +13,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef, type MouseEvent as ReactMouseEvent } from 'react';
 import { collection, query, where, getDocs, addDoc, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { authFetch } from '@/lib/authFetch';
 import type { MohnMenuBusiness } from '@/lib/types';
 import { useCart, type CartItem } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -452,7 +453,7 @@ export default function OrderPage({
 
         // Create PaymentIntent via API (with owner's Stripe Connect account if available)
         const amountCents = Math.round(total * 100);
-        const res = await fetch('/api/stripe/create-payment-intent', {
+        const res = await authFetch('/api/stripe/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -489,7 +490,7 @@ export default function OrderPage({
 
         await createTrackingLink(docRef.id, business.businessId);
 
-        const res = await fetch('/api/crypto/create-payment', {
+        const res = await authFetch('/api/crypto/create-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -634,7 +635,7 @@ export default function OrderPage({
 
     const poll = async () => {
       try {
-        const res = await fetch(`/api/crypto/create-payment?paymentId=${cryptoPayment.paymentId}`);
+        const res = await authFetch(`/api/crypto/create-payment?paymentId=${cryptoPayment.paymentId}`);
         if (!res.ok) return;
         const data = await res.json();
         const status = data.status as string;

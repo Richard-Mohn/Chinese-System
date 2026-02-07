@@ -55,10 +55,12 @@ service cloud.firestore {
       allow delete: if false;
 
       // ─── Bookings Subcollection (legacy) ─────────────────
-      // Public create (anyone can place a booking)
-      // Business members can read
+      // Require basic data validation for creates
+      // Business members can read/update
       match /bookings/{bookingId} {
-        allow create: if true;
+        allow create: if request.resource.data.keys().hasAll(['name', 'phone']) &&
+          request.resource.data.name is string &&
+          request.resource.data.phone is string;
         allow read: if isBusinessMember(businessId);
         allow update: if isBusinessMember(businessId);
         allow delete: if isBusinessOwner(businessId);
@@ -75,11 +77,13 @@ service cloud.firestore {
       }
 
       // ─── Orders Subcollection ─────────────────────────────
-      // Public create (anyone can place an order from the menu)
+      // Require order data validation for creates
       // Business members can read/update (manage orders)
       // Customers can read their own orders
       match /orders/{orderId} {
-        allow create: if true;
+        allow create: if request.resource.data.keys().hasAll(['items', 'total', 'orderType']) &&
+          request.resource.data.total is number &&
+          request.resource.data.total > 0;
         allow read: if isBusinessMember(businessId) ||
           (isAuthenticated() && resource.data.customerId == request.auth.uid);
         allow update: if isBusinessMember(businessId);
@@ -104,6 +108,32 @@ service cloud.firestore {
     // ─── Platform Collection ───────────────────────────────────
     // Public read, admin SDK write only
     match /platform/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ─── Couriers Collection ──────────────────────────────────
+    // Couriers can read/write their own document
+    // Business owners can read couriers
+    match /couriers/{courierId} {
+      allow read: if isAuthenticated();
+      allow create: if isUser(courierId);
+      allow update: if isUser(courierId);
+      allow delete: if false;
+    }
+
+    // ─── Tracking Links Collection ────────────────────────────
+    // Public read (customer tracking pages), authenticated create
+    match /trackingLinks/{linkId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ─── Custom Domains Collection ────────────────────────────
+    // Public read (for domain resolution), admin SDK write only
+    match /customDomains/{domainId} {
       allow read: if true;
       allow write: if false;
     }

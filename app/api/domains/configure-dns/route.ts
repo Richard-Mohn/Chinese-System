@@ -15,11 +15,17 @@ import {
   configureDNSForAppHosting,
   getDomainInfo,
 } from '@/lib/domain-registrar';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication — use token UID
+    const authResult = await verifyApiAuth(request);
+    if (authResult.error) return authResult.error;
+
     const body = await request.json();
-    const { domain, businessSlug, uid } = body;
+    const { domain, businessSlug } = body;
+    const uid = authResult.uid; // Use verified UID
 
     if (!domain || !businessSlug || !uid) {
       return NextResponse.json(

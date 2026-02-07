@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState, useCallback } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { authFetch } from '@/lib/authFetch';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -125,7 +126,7 @@ export default function OwnerAnalyticsPage() {
         setTopItems(Object.entries(itemMap).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.count - a.count).slice(0, 10));
         setOrdersByType(typeCount);
         setOrdersByStatus(statusCount);
-      } catch { /* */ }
+      } catch (err) { console.error('Failed to load analytics:', err); }
       finally { setLoading(false); }
     };
     fetchAnalytics();
@@ -137,7 +138,7 @@ export default function OwnerAnalyticsPage() {
     setSeoLoading(true);
     setSeoError(null);
     try {
-      const res = await fetch(`/api/tenant-seo/search-console?slug=${slug}&days=${dateRange}`);
+      const res = await authFetch(`/api/tenant-seo/search-console?slug=${slug}&days=${dateRange}`);
       const json = await res.json();
       if (json.success) setSeoData(json.data);
       else setSeoError(json.error || 'Failed to load');
@@ -152,7 +153,7 @@ export default function OwnerAnalyticsPage() {
     setTrafficLoading(true);
     setTrafficError(null);
     try {
-      const res = await fetch(`/api/tenant-seo/analytics?slug=${slug}&days=${dateRange}`);
+      const res = await authFetch(`/api/tenant-seo/analytics?slug=${slug}&days=${dateRange}`);
       const json = await res.json();
       if (json.success) setTrafficData(json.data);
       else setTrafficError(json.error || 'Failed to load');
@@ -166,10 +167,10 @@ export default function OwnerAnalyticsPage() {
     if (!slug || !hasPro) return;
     setRealtimeLoading(true);
     try {
-      const res = await fetch(`/api/tenant-seo/realtime?slug=${slug}`);
+      const res = await authFetch(`/api/tenant-seo/realtime?slug=${slug}`);
       const json = await res.json();
       if (json.success) setRealtimeData(json.data);
-    } catch { /* */ }
+    } catch (err) { console.error('Failed to load realtime data:', err); }
     finally { setRealtimeLoading(false); }
   }, [slug, hasPro]);
 

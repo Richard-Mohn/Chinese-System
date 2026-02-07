@@ -3,7 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collectionGroup, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -34,7 +34,7 @@ export default function CustomerOrdersPage() {
     const fetchOrders = async () => {
       if (!user) return;
       try {
-        const ordersRef = collection(db, 'orders');
+        const ordersRef = collectionGroup(db, 'orders');
         const q = query(
           ordersRef,
           where('customerId', '==', user.uid),

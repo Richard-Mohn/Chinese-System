@@ -11,6 +11,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { authFetch } from '@/lib/authFetch';
 import type { MohnMenuDriver } from '@/lib/types';
 
 const EMPTY_DRIVER: Partial<MohnMenuDriver> = {
@@ -119,7 +120,7 @@ export default function OwnerDriversPage() {
   const handleStripeOnboard = async (driver: MohnMenuDriver) => {
     if (!businessId) return;
     try {
-      const res = await fetch('/api/stripe/connect-account', {
+      const res = await authFetch('/api/stripe/connect-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

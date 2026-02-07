@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { authFetch } from '@/lib/authFetch';
 
 export default function OwnerSettingsPage() {
   const { currentBusiness } = useAuth();
@@ -748,7 +749,7 @@ function StripeConnectSection({
   useEffect(() => {
     if (!accountId) return;
     setChecking(true);
-    fetch(`/api/stripe/connect-account?accountId=${accountId}`)
+    authFetch(`/api/stripe/connect-account?accountId=${accountId}`)
       .then(r => r.json())
       .then(data => {
         if (data.chargesEnabled !== undefined) setStatus(data);
@@ -760,7 +761,7 @@ function StripeConnectSection({
   const handleConnect = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/stripe/connect-account', {
+      const res = await authFetch('/api/stripe/connect-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -791,7 +792,7 @@ function StripeConnectSection({
   const handleDashboard = async () => {
     if (!accountId) return;
     try {
-      const res = await fetch(`/api/stripe/connect-account?accountId=${accountId}&action=dashboard`);
+      const res = await authFetch(`/api/stripe/connect-account?accountId=${accountId}&action=dashboard`);
       const data = await res.json();
       if (data.dashboardUrl) window.open(data.dashboardUrl, '_blank');
     } catch {

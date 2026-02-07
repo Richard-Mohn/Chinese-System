@@ -13,40 +13,33 @@
   "rules": {
     "restaurants": {
       "$restaurantId": {
-        // Drivers: Real-time location data
         "drivers": {
           "$driverId": {
-            // Only this driver can write their own location
             "location": {
               ".write": "auth.uid === $driverId",
-              ".read": true  // Anyone can read, but security enforced at app level
+              ".read": "auth !== null"
             },
-            // Only this driver can write their own status
             "status": {
               ".write": "auth.uid === $driverId",
-              ".read": true
+              ".read": "auth !== null"
             },
-            // Current order assignment
             "currentOrderId": {
               ".write": "root.child('restaurants').child($restaurantId).child('managers').hasChild(auth.uid) || auth.uid === $driverId",
-              ".read": true
+              ".read": "auth !== null"
             },
-            // Driver info (public once assigned)
-            ".read": "true",
+            ".read": "auth !== null",
             ".validate": "newData.hasChildren(['location', 'status'])"
           },
           ".indexOn": ["status", "currentOrderId"]
         },
         
-        // Orders with delivery info
         "orders": {
           "$orderId": {
-            ".read": "true",  // Public read for now (ideally check order ownership)
+            ".read": "auth !== null",
             ".write": "root.child('restaurants').child($restaurantId).child('managers').hasChild(auth.uid)"
           }
         },
         
-        // Managers/staff who can assign orders
         "managers": {
           "$uid": {
             ".read": "auth.uid === $uid",
@@ -54,6 +47,25 @@
           }
         }
       }
+    },
+    
+    "couriers": {
+      "$courierId": {
+        "location": {
+          ".write": "auth.uid === $courierId",
+          ".read": "auth !== null"
+        },
+        "status": {
+          ".write": "auth.uid === $courierId",
+          ".read": "auth !== null"
+        },
+        "currentOrderId": {
+          ".write": "auth.uid === $courierId",
+          ".read": "auth !== null"
+        },
+        ".read": "auth !== null"
+      },
+      ".indexOn": ["status"]
     }
   }
 }

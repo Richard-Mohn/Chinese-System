@@ -11,6 +11,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef, type MouseEvent as ReactMouseEvent } from 'react';
 import { collection, query, getDocs, addDoc, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { authFetch } from '@/lib/authFetch';
 import type { MohnMenuBusiness } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -429,7 +430,7 @@ export default function QuickOrderModal({
       });
 
       if (paymentMethod === 'card') {
-        const res = await fetch('/api/stripe/create-payment-intent', {
+        const res = await authFetch('/api/stripe/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -455,7 +456,7 @@ export default function QuickOrderModal({
 
       if (paymentMethod === 'crypto') {
         // Inline white-label crypto payment — get deposit address directly
-        const res = await fetch('/api/crypto/create-payment', {
+        const res = await authFetch('/api/crypto/create-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -544,7 +545,7 @@ export default function QuickOrderModal({
 
     const poll = async () => {
       try {
-        const res = await fetch(`/api/crypto/create-payment?paymentId=${cryptoPayment.paymentId}`);
+        const res = await authFetch(`/api/crypto/create-payment?paymentId=${cryptoPayment.paymentId}`);
         if (!res.ok) return;
         const data = await res.json();
         const status = data.status as string;

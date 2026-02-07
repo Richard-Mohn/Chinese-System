@@ -111,7 +111,7 @@ export default function OwnerAuctionsPage() {
       setCreating(false);
       setEditing(null);
       setForm(EMPTY_FORM);
-    } catch { /* */ }
+    } catch (err) { console.error('Failed to save auction:', err); }
     finally { setSaving(false); }
   };
 

@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAnalyticsData, daysAgo, today } from '@/lib/google-analytics';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 /**
  * GET /api/tenant-seo/analytics?slug=xxx&days=28
  * 
  * Returns GA4 analytics data for a tenant's pages.
  * Filters by slug to only return data for that business.
+ * Requires authentication.
  */
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication — only business owners see analytics
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
     const days = parseInt(searchParams.get('days') || '28');

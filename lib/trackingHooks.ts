@@ -15,16 +15,19 @@ import {
   completeDelivery,
   startDriverTracking,
   stopDriverTracking,
+  calculateETA,
   DriverTrackingData,
 } from './realTimeTracking';
 
 /**
  * Hook: Track a single driver in real-time
- * Usage: const { location, eta, status } = useDriverTracking(restaurantId, driverId)
+ * Usage: const { location, eta, status } = useDriverTracking(restaurantId, driverId, destLat, destLng)
  */
 export function useDriverTracking(
   restaurantId: string | null,
-  driverId: string | null
+  driverId: string | null,
+  destinationLat?: number | null,
+  destinationLng?: number | null
 ) {
   const [location, setLocation] = useState<DriverLocation | null>(null);
   const [status, setStatus] = useState<string>('idle');
@@ -39,15 +42,21 @@ export function useDriverTracking(
       (loc) => {
         if (loc) {
           setLocation(loc);
-          // Update ETA based on location (you'd pass destination in real app)
-          setEta(Math.max(1, Math.round(Math.random() * 30))); // Placeholder
+          // Calculate real ETA if we have destination coordinates
+          if (destinationLat && destinationLng) {
+            const speed = loc.speed ? loc.speed * 2.237 : 25; // Convert m/s to mph, default 25mph
+            setEta(calculateETA(loc.lat, loc.lng, destinationLat, destinationLng, Math.max(5, speed)));
+          } else {
+            // No destination provided — estimate based on status
+            setEta(status === 'delivering' ? 10 : null);
+          }
         }
       },
       setStatus
     );
 
     return unsubscribe;
-  }, [restaurantId, driverId]);
+  }, [restaurantId, driverId, destinationLat, destinationLng]);
 
   return { location, status, eta };
 }

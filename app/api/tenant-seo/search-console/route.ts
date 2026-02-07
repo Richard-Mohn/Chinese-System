@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSearchConsoleData, daysAgo, today } from '@/lib/google-analytics';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 /**
  * GET /api/tenant-seo/search-console?slug=xxx&days=28
  * 
  * Returns Search Console performance data for a tenant's pages.
- * Filters by slug to only return data for that business.
+ * Requires authentication.
  */
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
     const days = parseInt(searchParams.get('days') || '28');

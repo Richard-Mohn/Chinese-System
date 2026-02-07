@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import { authFetch } from '@/lib/authFetch';
 import { useState, useEffect, useCallback } from 'react';
 import { FaGlobe, FaSearch, FaCheck, FaTimes, FaSpinner, FaCreditCard, FaCog, FaExternalLinkAlt, FaInfoCircle, FaStar, FaTag } from 'react-icons/fa';
 
@@ -172,7 +173,7 @@ export default function OwnerDomainPage() {
 
     try {
       // Step 1: Create Stripe PaymentIntent
-      const paymentRes = await fetch('/api/domains/create-payment-intent', {
+      const paymentRes = await authFetch('/api/domains/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: purchaseState.selectedDomain.domain }),
@@ -182,7 +183,7 @@ export default function OwnerDomainPage() {
       if (!paymentRes.ok) throw new Error(paymentData.error || 'Payment setup failed');
 
       // Step 2: Purchase domain
-      const purchaseRes = await fetch('/api/domains/purchase', {
+      const purchaseRes = await authFetch('/api/domains/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -237,7 +238,7 @@ export default function OwnerDomainPage() {
     setRetryingDns(true);
 
     try {
-      const res = await fetch('/api/domains/configure-dns', {
+      const res = await authFetch('/api/domains/configure-dns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

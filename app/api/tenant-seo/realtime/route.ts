@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRealtimeData } from '@/lib/google-analytics';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 /**
  * GET /api/tenant-seo/realtime?slug=xxx
  * 
  * Returns real-time GA4 data for a tenant's pages.
- * Shows active visitors, pages being viewed, traffic sources.
- * Professional tier only.
+ * Requires authentication.
  */
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
 

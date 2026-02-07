@@ -72,7 +72,7 @@ export default function ChefCamSetup() {
       try {
         const snap = await getDoc(doc(db, 'businesses', currentBusiness.businessId, 'config', 'chefCam'));
         if (snap.exists()) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() as ChefCamSettings });
-      } catch { /* */ }
+      } catch (err) { console.error('Failed to load chef cam settings:', err); }
     };
     load();
   }, [currentBusiness]);
@@ -85,7 +85,7 @@ export default function ChefCamSetup() {
       tempStream.getTracks().forEach(t => t.stop());
       const devices = await navigator.mediaDevices.enumerateDevices();
       setAvailableDevices(devices.filter(d => d.kind === 'videoinput'));
-    } catch { /* */ }
+    } catch (err) { console.error('Camera enumeration failed:', err); }
   }, []);
 
   const saveSettings = async () => {
@@ -95,7 +95,7 @@ export default function ChefCamSetup() {
       await setDoc(doc(db, 'businesses', currentBusiness.businessId, 'config', 'chefCam'), settings);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch { /* */ }
+    } catch (err) { console.error('Failed to save chef cam settings:', err); }
     finally { setSaving(false); }
   };
 

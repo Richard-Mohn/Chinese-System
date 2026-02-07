@@ -9,9 +9,11 @@
 
 import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { getAuth, type Auth } from 'firebase-admin/auth';
 
 let adminApp: App;
 let adminDb: Firestore;
+let adminAuth: Auth;
 
 function initAdmin() {
   if (getApps().length === 0) {
@@ -31,9 +33,10 @@ function initAdmin() {
   }
 
   adminDb = getFirestore(adminApp);
+  adminAuth = getAuth(adminApp);
 }
 
 // Initialize on import
 initAdmin();
 
-export { adminApp, adminDb };
+export { adminApp, adminDb, adminAuth };

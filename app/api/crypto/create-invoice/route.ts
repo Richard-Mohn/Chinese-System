@@ -14,9 +14,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createInvoice, getPaymentStatus } from '@/lib/nowpayments';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { orderId, businessId, amount, businessName, returnUrl } = body;
 

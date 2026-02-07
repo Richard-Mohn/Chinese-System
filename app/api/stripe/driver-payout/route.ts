@@ -10,9 +10,19 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { transferToDriver } from '@/lib/stripe/platform';
+import { verifyApiAuth } from '@/lib/apiAuth';
+import { paymentLimiter } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit
+    const limited = paymentLimiter(request);
+    if (limited) return limited;
+
+    // Verify authentication — only business owners should trigger payouts
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { driverStripeAccountId, amountCents, orderId, driverId, businessId } = body;
 

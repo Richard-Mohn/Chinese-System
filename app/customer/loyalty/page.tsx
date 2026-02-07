@@ -2,7 +2,9 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FaArrowLeft, FaGift, FaStar, FaCrown } from 'react-icons/fa';
@@ -16,6 +18,8 @@ const tiers = [
 export default function CustomerLoyaltyPage() {
   const { user, MohnMenuUser, loading, isCustomer } = useAuth();
   const router = useRouter();
+  const [points, setPoints] = useState(0);
+  const [loadingPoints, setLoadingPoints] = useState(true);
 
   useEffect(() => {
     if (!loading && (!user || !isCustomer())) {
@@ -23,7 +27,25 @@ export default function CustomerLoyaltyPage() {
     }
   }, [user, loading, isCustomer, router]);
 
-  if (loading) {
+  // Fetch loyalty points from Firestore user document
+  useEffect(() => {
+    const fetchPoints = async () => {
+      if (!user) return;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          setPoints(userDoc.data()?.loyaltyPoints || 0);
+        }
+      } catch (err) {
+        console.error('Error fetching loyalty points:', err);
+      } finally {
+        setLoadingPoints(false);
+      }
+    };
+    if (user) fetchPoints();
+  }, [user]);
+
+  if (loading || loadingPoints) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg font-bold text-zinc-400 animate-pulse">Loading...</div>
@@ -31,7 +53,6 @@ export default function CustomerLoyaltyPage() {
     );
   }
 
-  const points = 0; // TODO: fetch from Firestore
   const currentTier = tiers.reduce((acc, tier) => (points >= tier.minPoints ? tier : acc), tiers[0]);
 
   return (

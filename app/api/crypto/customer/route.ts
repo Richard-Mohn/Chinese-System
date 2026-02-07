@@ -15,30 +15,15 @@ import {
   createCustodyCustomer,
   getCustodyCustomerBalance,
 } from '@/lib/nowpayments';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-
-// Initialize Firebase Admin
-if (getApps().length === 0) {
-  try {
-    const keyPath = join(process.cwd(), 'serviceAccountKey.json');
-    if (existsSync(keyPath)) {
-      const serviceAccount = JSON.parse(readFileSync(keyPath, 'utf-8'));
-      initializeApp({ credential: cert(serviceAccount) });
-    } else {
-      initializeApp();
-    }
-  } catch {
-    initializeApp();
-  }
-}
-
-const adminDb = getFirestore();
+import { adminDb } from '@/lib/firebaseAdmin';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { businessId, businessSlug } = body;
 
@@ -111,6 +96,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const customerId = searchParams.get('customerId');
 

@@ -23,6 +23,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDb } from '@/lib/firebaseAdmin';
+import { verifyApiAuth } from '@/lib/apiAuth';
+import { paymentLimiter } from '@/lib/rateLimit';
 import {
   registerDomain,
   getDomainInfo,
@@ -31,12 +33,22 @@ import {
   type DomainContact,
 } from '@/lib/domain-registrar';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeKey) console.error('STRIPE_SECRET_KEY is not set for domain purchase');
+const stripe = new Stripe(stripeKey || 'missing', {
   apiVersion: '2025-04-30.basil' as Stripe.LatestApiVersion,
 });
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit
+    const limited = paymentLimiter(request);
+    if (limited) return limited;
+
+    // Verify authentication — use token UID instead of client-supplied uid
+    const authResult = await verifyApiAuth(request);
+    if (authResult.error) return authResult.error;
+
     const body = await request.json();
     const {
       domain,
@@ -44,8 +56,8 @@ export async function POST(request: NextRequest) {
       years = 1,
       contact,
       stripePaymentIntentId,
-      uid,
     } = body;
+    const uid = authResult.uid; // Use verified UID, not client-supplied
 
     // ── Validation ─────────────────────────────────────────────
     if (!domain || !businessSlug || !contact || !uid) {

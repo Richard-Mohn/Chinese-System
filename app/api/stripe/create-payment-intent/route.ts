@@ -14,9 +14,19 @@ import {
   createDestinationCharge,
 } from '@/lib/stripe/platform';
 import { MINIMUM_ORDER_AMOUNT } from '@/lib/stripe/config';
+import { verifyApiAuth } from '@/lib/apiAuth';
+import { paymentLimiter } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit
+    const limited = paymentLimiter(request);
+    if (limited) return limited;
+
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { amount, orderId, businessId, ownerStripeAccountId, customerEmail } = body;
 

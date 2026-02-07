@@ -18,13 +18,20 @@ import {
   formatPrice,
   getCompetitorComparison,
 } from '@/lib/domain-registrar';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeKey) console.error('STRIPE_SECRET_KEY is not set for domain payments');
+const stripe = new Stripe(stripeKey || 'missing', {
   apiVersion: '2025-04-30.basil' as Stripe.LatestApiVersion,
 });
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { domain, years = 1 } = body;
 

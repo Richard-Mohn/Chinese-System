@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUrlIndexStatus } from '@/lib/google-analytics';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 /**
  * GET /api/tenant-seo/index-status?url=xxx
  * 
  * Returns Google index status for a specific URL.
- * Uses the URL Inspection API.
+ * Requires authentication.
  */
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const url = searchParams.get('url');
 

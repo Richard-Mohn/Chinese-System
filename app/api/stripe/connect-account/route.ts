@@ -27,9 +27,19 @@ import {
   getAccountBalance,
   createOnboardingLink,
 } from '@/lib/stripe/platform';
+import { verifyApiAuth } from '@/lib/apiAuth';
+import { standardLimiter } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit
+    const limited = standardLimiter(request);
+    if (limited) return limited;
+
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { role } = body;
     const origin = request.headers.get('origin') || 'https://mohnmenu.com';
@@ -97,6 +107,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyApiAuth(request);
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const accountId = searchParams.get('accountId');
     const action = searchParams.get('action');

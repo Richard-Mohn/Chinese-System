@@ -12,6 +12,7 @@ import {
   collection, query, where, getDocs, doc, getDoc, onSnapshot, updateDoc, collectionGroup,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { authFetch } from '@/lib/authFetch';
 import {
   startDriverTracking,
   startCourierTracking,
@@ -578,7 +579,7 @@ export default function DriverDashboard() {
             <button
               onClick={async () => {
                 try {
-                  const res = await fetch('/api/stripe/connect-account', {
+                  const res = await authFetch('/api/stripe/connect-account', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
