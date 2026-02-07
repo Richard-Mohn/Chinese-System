@@ -14,6 +14,7 @@ import {
   getStateName,
   generateSeoKeywords,
 } from '@/lib/seo-data';
+import CityTypeahead from './CityTypeahead';
 
 /**
  * WebsiteBuilder — 8-step wizard that generates an SEO-optimized website
@@ -177,29 +178,8 @@ export default function WebsiteBuilder({
     );
   }, [stateSearch]);
 
-  // ── Available cities from selected states ─────────────────
-  const availableCities = useMemo(() => {
-    const cities: string[] = [];
-    selectedStates.forEach(st => {
-      const data = US_STATES_WITH_CITIES[st];
-      if (data) cities.push(...data.cities);
-    });
-    return cities;
-  }, [selectedStates]);
-
-  // ── Auto-populate cities when a new state is selected ─────
-  useEffect(() => {
-    // When states change, add all cities from newly added states
-    const newCities = new Set(selectedCities);
-    selectedStates.forEach(st => {
-      const data = US_STATES_WITH_CITIES[st];
-      if (data) {
-        data.cities.forEach(city => newCities.add(city));
-      }
-    });
-    setSelectedCities(Array.from(newCities));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedStates]);
+  // ── When state is deselected, remove cities that the user likely added for that state ──
+  // (We keep all cities since we can't track which state each came from)
 
   // ── Auto-generate SEO keywords on step 8 entry ────────────
   useEffect(() => {
@@ -242,10 +222,7 @@ export default function WebsiteBuilder({
 
   const toggleState = (state: string) => {
     if (selectedStates.includes(state)) {
-      // Remove state and its cities
-      const stateCities = US_STATES_WITH_CITIES[state]?.cities || [];
       setSelectedStates(prev => prev.filter(s => s !== state));
-      setSelectedCities(prev => prev.filter(c => !stateCities.includes(c)));
     } else {
       setSelectedStates(prev => [...prev, state]);
     }
@@ -610,8 +587,8 @@ export default function WebsiteBuilder({
         <div>
           <h2 className="text-2xl font-black mb-2">Select Service Areas</h2>
           <p className="text-zinc-500 mb-6">
-            Each city generates a geo-targeted SEO landing page.
-            Select states first — their major cities auto-populate.
+            Each city you select generates a geo-targeted SEO landing page.
+            Select states first, then search for cities within them.
           </p>
 
           {/* State Search */}
@@ -645,64 +622,27 @@ export default function WebsiteBuilder({
             </div>
           </div>
 
-          {/* Cities from selected states */}
-          {selectedStates.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-3">
-                Cities ({selectedCities.length} selected)
-              </h3>
+          {/* City typeahead */}
+          <div className="mb-6">
+            <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-3">
+              Cities
+            </h3>
+            <CityTypeahead
+              selectedStates={selectedStates}
+              selectedCities={selectedCities}
+              onCitiesChange={setSelectedCities}
+              getStateName={getStateName}
+            />
+          </div>
 
-              {/* Group by state */}
-              {selectedStates.map(st => {
-                const stateData = US_STATES_WITH_CITIES[st];
-                if (!stateData) return null;
-                return (
-                  <div key={st} className="mb-4">
-                    <p className="text-xs font-bold text-zinc-500 mb-2">
-                      {stateData.name} ({stateData.cities.filter(c => selectedCities.includes(c)).length}/{stateData.cities.length})
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {stateData.cities.map(city => (
-                        <button
-                          key={city}
-                          onClick={() => toggleCity(city)}
-                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
-                            selectedCities.includes(city)
-                              ? 'bg-indigo-600 text-white'
-                              : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
-                          }`}
-                        >
-                          {city}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Add custom city */}
-              <div className="flex gap-2 mt-4">
-                <input
-                  type="text"
-                  value={customCity}
-                  onChange={e => setCustomCity(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && addCustomCity()}
-                  placeholder="Add a custom city..."
-                  className="flex-1 px-4 py-3 border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <button
-                  onClick={addCustomCity}
-                  className="px-6 py-3 bg-zinc-100 rounded-xl text-sm font-bold hover:bg-zinc-200 transition-colors"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-          )}
-
-          <p className="text-sm text-zinc-400 font-bold">
-            {selectedCities.length} cities → {selectedCities.length} SEO landing pages
-          </p>
+          <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+            <p className="text-sm text-zinc-600 font-bold">
+              📍 {selectedCities.length} cities selected → {selectedCities.length} SEO landing pages
+            </p>
+            <p className="text-xs text-zinc-400 mt-1">
+              Every city includes cities, towns, villages, and hamlets from our 135,000+ US places database.
+            </p>
+          </div>
         </div>
       )}
 

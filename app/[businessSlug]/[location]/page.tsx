@@ -16,6 +16,11 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getServerBasePath, getServerOrderPath } from '@/lib/tenant-links';
 
+// ISR: revalidate location pages every 1 hour
+export const revalidate = 3600;
+// Allow dynamic params so any city slug is rendered on-demand
+export const dynamicParams = true;
+
 async function getBusinessBySlug(slug: string): Promise<MohnMenuBusiness | null> {
   try {
     const businessesRef = collection(db, 'businesses');
