@@ -53,7 +53,7 @@ export default function OnlineOrderingFeature() {
             className="inline-block px-4 py-1.5 mb-6 rounded-full bg-orange-50 border border-orange-100 text-xs font-black uppercase tracking-widest text-orange-600"
           >Feature</motion.div>
           <motion.h1
-            className="text-5xl md:text-7xl font-black mb-6 tracking-tighter text-zinc-900"
+            className="text-5xl md:text-7xl font-black mb-6 tracking-tighter text-zinc-900 text-balance"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           >
             Online Ordering<span className="text-orange-600">.</span>

@@ -107,12 +107,12 @@ export default function DemoPage() {
             className="inline-block px-4 py-1.5 mb-6 rounded-full bg-orange-50 border border-orange-100 text-xs font-black uppercase tracking-widest text-orange-600"
           >Live Demos</motion.div>
           <motion.h1
-            className="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-zinc-900"
+            className="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-zinc-900 text-balance"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            See it before you build it<span className="text-orange-500">.</span>
+            Try before you build<span className="text-orange-500">.</span>
           </motion.h1>
           <motion.p
             className="text-xl md:text-2xl text-zinc-500 leading-relaxed font-medium max-w-3xl mx-auto mb-6"

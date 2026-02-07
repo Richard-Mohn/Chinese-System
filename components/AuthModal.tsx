@@ -145,9 +145,9 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login' }: Aut
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Backdrop */}
+          {/* Backdrop — transparent so the page shows through */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -156,7 +156,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login' }: Aut
 
           {/* Modal */}
           <motion.div
-            className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl border border-zinc-100 overflow-hidden"
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-[2.5rem] shadow-[0_25px_120px_rgba(0,0,0,0.15)] border border-zinc-200"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}

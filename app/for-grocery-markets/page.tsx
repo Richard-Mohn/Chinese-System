@@ -39,7 +39,7 @@ export default function ForGroceryMarkets() {
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}
             className="inline-block px-4 py-1.5 mb-6 rounded-full bg-green-50 border border-green-100 text-xs font-black uppercase tracking-widest text-green-700"
           >For Grocery Stores &amp; Markets</motion.div>
-          <motion.h1 className="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-zinc-900" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <motion.h1 className="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-zinc-900 text-balance" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             Fresh. Local. Online<span className="text-green-600">.</span>
           </motion.h1>
           <motion.p className="text-xl md:text-2xl text-zinc-500 leading-relaxed font-medium max-w-3xl mx-auto mb-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>

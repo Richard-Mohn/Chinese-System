@@ -63,7 +63,7 @@ export default function CryptoPaymentsFeature() {
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
             className="inline-block px-4 py-1.5 mb-6 rounded-full bg-amber-50 border border-amber-100 text-xs font-black uppercase tracking-widest text-amber-600"
           >Feature</motion.div>
-          <motion.h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter text-zinc-900"
+          <motion.h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter text-zinc-900 text-balance"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           >
             Crypto Payments<span className="text-orange-600">.</span>

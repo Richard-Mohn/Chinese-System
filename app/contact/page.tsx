@@ -39,7 +39,7 @@ export default function Contact() {
             className="inline-block px-4 py-1.5 mb-6 rounded-full bg-orange-50 border border-orange-100 text-xs font-black uppercase tracking-widest text-orange-600"
           >Get In Touch</motion.div>
           <motion.h1
-            className="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-zinc-900"
+            className="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-zinc-900 text-balance"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
