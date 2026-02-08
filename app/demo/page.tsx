@@ -96,6 +96,16 @@ const DEMO_STORES = [
     pageName: 'Quick-Shop',
     live: false,
   },
+  {
+    type: 'Coffee Shop',
+    slug: 'griffin-lounge',
+    name: 'Griffin Lounge',
+    emoji: '☕',
+    color: 'from-amber-600 to-orange-700',
+    description: 'Order-ahead espresso, cold brew, pastries, peer delivery & loyalty rewards.',
+    pageName: 'Coffee Menu',
+    live: true,
+  },
 ];
 
 export default function DemoPage() {

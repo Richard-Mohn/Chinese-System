@@ -1,6 +1,6 @@
 # MohnMenu Platform Blueprint
 
-> **Last Updated:** February 7, 2026  
+> **Last Updated:** February 8, 2026  
 > **Live URL:** https://mohnmenu.com  
 > **Hosting:** Firebase App Hosting (us-east4)  
 > **Repo:** Richard-Mohn/Mohn-Menu (auto-deploys from `main`)
@@ -154,7 +154,7 @@ All plans include 14-day free trial. Zero per-order commissions.
 - [x] Owner auction management (create/edit/end auctions, stats dashboard)
 - [x] Public auction browser on tenant storefront (`/{slug}/auctions`)
 
-**Marketing Pages (7 industry landing pages):**
+**Marketing Pages (8 industry landing pages):**
 - [x] `/for-restaurants/`
 - [x] `/for-bakeries-cafes/`
 - [x] `/for-grocery-markets/`
@@ -162,6 +162,7 @@ All plans include 14-day free trial. Zero per-order commissions.
 - [x] `/for-bars-nightlife/`
 - [x] `/for-convenience-stores/`
 - [x] `/for-retail-shops/`
+- [x] `/for-coffee-shops/` — Griffin Lounge demo, amber/brown theme, peer delivery focus
 
 **SEO Infrastructure:**
 - [x] Per-page metadata on all 17+ marketing pages (via layout.tsx)
@@ -179,16 +180,18 @@ All plans include 14-day free trial. Zero per-order commissions.
 - [x] ISR on tenant pages (revalidate=3600)
 - [x] City typeahead with 135,135 US places
 - [x] Features index page (`/features/`)
-- [x] 7 feature subpages in sitemap
+- [x] 8 feature subpages in sitemap (including `/features/peer-delivery/`)
 
 **Other Pages:**
 - [x] `/pricing/` — 3 tiers with feature comparison
 - [x] `/faq/` — comprehensive FAQ
 - [x] `/about/` — company info
 - [x] `/contact/` — contact form
-- [x] `/demo/` — demo request
+- [x] `/demo/` — demo request + `/demo/coffee/` showcase page
 - [x] `/comparison/` — vs DoorDash/UberEats/etc.
-- [x] `/features/` — features index + 7 subpages
+- [x] `/features/` — features index + 8 subpages
+- [x] `/features/peer-delivery/` — peer delivery feature page (how it works, benefits, comparison table)
+- [x] `/careers/` — careers & staffing marketplace (6 roles, business staffing, tax services coming soon)
 - [x] `/terms/`, `/privacy/` — legal pages
 
 ### In Progress 🔄
@@ -205,6 +208,40 @@ All plans include 14-day free trial. Zero per-order commissions.
 
 ### Planned 📋
 
+**Peer Delivery System:**
+- [x] Peer delivery feature page (`/features/peer-delivery/`)
+- [x] Peer delivery settings schema: `{ enabled, discountAmount, maxDistance }`
+- [x] Peer delivery config in seed scripts (coffee shop demo: $2 discount, 2mi max)
+- [ ] Peer delivery matching engine (nearby customer → available carrier)
+- [ ] Peer delivery carrier verification & rating system
+- [ ] Peer delivery earnings dashboard for carriers
+- [ ] Peer delivery insurance & liability framework
+
+**Careers & Staffing Marketplace:**
+- [x] Careers page with 6 role cards (Barista, Bartender, Server, Driver, Kitchen, Manager)
+- [ ] Job posting system for business owners
+- [ ] Worker profile & application flow
+- [ ] Shift scheduling & availability matching
+- [ ] Staffing agency partnerships
+- [ ] Tax services integration for gig workers (1099, W-2)
+- [ ] Background check integration
+
+**Corporate & Enterprise Tier:**
+- [ ] Corporate accounts (Starbucks-scale multi-location chains)
+- [ ] Enterprise dashboard with multi-store analytics
+- [ ] Corporate ordering & catering portal
+- [ ] Franchise management tools
+- [ ] White-label enterprise deployment
+- [ ] Investor-ready analytics & reporting
+
+**Demo Stores:**
+- [x] Griffin Lounge coffee shop demo (50+ items, 5 accounts, 3 KDS stations)
+- [x] Demo coffee showcase page (`/demo/coffee/`)
+- [x] Bar demo (Dragon's Den)
+- [ ] Restaurant demo
+- [ ] Grocery/market demo
+
+**Other Planned:**
 - [ ] Blog infrastructure for SEO content marketing
 - [ ] Search Console site verification automation
 - [ ] Export reports (CSV/PDF)
@@ -257,6 +294,12 @@ All plans include 14-day free trial. Zero per-order commissions.
 | `app/api/tenant-seo/` | API routes for Search Console, GA4, Realtime, Index Status |
 | `data/us-cities.json` | 135,135 US places (OpenStreetMap) |
 | `data/starterMenus.ts` | Starter menu templates for all business types |
+| `scripts/seedCoffeeDemo.js` | Griffin Lounge coffee shop seed (50+ items, 5 accounts, 3 KDS) |
+| `scripts/seedBarDemo.js` | Dragon's Den bar demo seed |
+| `app/for-coffee-shops/page.tsx` | Coffee shop industry landing page |
+| `app/careers/page.tsx` | Careers & staffing marketplace page |
+| `app/features/peer-delivery/page.tsx` | Peer delivery feature page |
+| `app/demo/coffee/page.tsx` | Coffee shop demo showcase page |
 
 ---
 

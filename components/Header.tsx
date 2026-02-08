@@ -10,7 +10,8 @@ import {
   FaSignOutAlt, FaChevronDown, FaBitcoin, FaMapMarkerAlt, FaVideo,
   FaShoppingCart, FaUtensils, FaCoffee, FaDesktop, FaTruck,
   FaClipboardList, FaGlobe, FaBirthdayCake, FaShoppingBasket,
-  FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt, FaUserTie, FaMusic
+  FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt, FaUserTie, FaMusic,
+  FaMugHot
 } from 'react-icons/fa';
 import { useAuthModal } from '@/context/AuthModalContext';
 
@@ -23,6 +24,7 @@ const solutions = [
   { href: '/for-bars-nightlife', icon: FaGlassCheers, label: 'Bars & Nightlife', desc: 'Table ordering, tabs & event menus' },
   { href: '/for-convenience-stores', icon: FaCoffee, label: 'Convenience Stores', desc: 'QR ordering, inventory & grab-and-go' },
   { href: '/for-retail-shops', icon: FaStore, label: 'Shops & Boutiques', desc: 'AI product listing & online storefront' },
+  { href: '/for-coffee-shops', icon: FaMugHot, label: 'Coffee Shops', desc: 'Order-ahead, loyalty & peer delivery' },
 ];
 
 const featureItems = [
@@ -37,6 +39,7 @@ const featureItems = [
   { href: '/features/reservations', icon: FaCalendarAlt, label: 'Table Reservations', desc: 'Book tables — zero per-diner fees' },
   { href: '/features/staff-marketplace', icon: FaUserTie, label: 'Staff Marketplace', desc: 'Bartender & server multi-venue work' },
   { href: '/features/bar-entertainment', icon: FaMusic, label: 'Bar Entertainment', desc: 'Jukebox, karaoke & kiosk ordering' },
+  { href: '/features/peer-delivery', icon: FaBicycle, label: 'Peer Delivery', desc: 'Customers deliver for each other' },
 ];
 
 /* ─── Dropdown wrapper ─── */
@@ -157,6 +160,7 @@ const Header = () => {
           <Link href="/comparison" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Compare</Link>
           <Link href="/quick-delivery" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">📦 Send</Link>
           <Link href="/about" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">About</Link>
+          <Link href="/careers" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Careers</Link>
           <Link href="/contact" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Contact</Link>
         </nav>
 

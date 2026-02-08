@@ -69,6 +69,7 @@ export default async function sitemap({
       { url: `${BASE_URL}/for-food-trucks/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
       { url: `${BASE_URL}/for-bars-nightlife/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
       { url: `${BASE_URL}/for-retail-shops/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+      { url: `${BASE_URL}/for-coffee-shops/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
       // Feature subpages
       { url: `${BASE_URL}/features/online-ordering/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
       { url: `${BASE_URL}/features/gps-tracking/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
@@ -81,6 +82,9 @@ export default async function sitemap({
       { url: `${BASE_URL}/features/reservations/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
       { url: `${BASE_URL}/features/staff-marketplace/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
       { url: `${BASE_URL}/features/bar-entertainment/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/peer-delivery/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/careers/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
+      { url: `${BASE_URL}/demo/coffee/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
       { url: `${BASE_URL}/quick-delivery/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     ];
   }

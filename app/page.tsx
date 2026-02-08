@@ -8,7 +8,7 @@ import {
   FaMapMarkerAlt, FaVideo, FaRocket, FaShieldAlt, FaArrowRight, FaCheck,
   FaTruck, FaBitcoin, FaCreditCard, FaBrain, FaChartLine, FaStore,
   FaGoogle, FaLock, FaBolt, FaUtensils, FaBirthdayCake, FaShoppingBasket,
-  FaGlassCheers, FaCoffee, FaShoppingCart, FaPlay
+  FaGlassCheers, FaCoffee, FaShoppingCart, FaPlay, FaMugHot
 } from 'react-icons/fa';
 
 import { useAuthModal } from '@/context/AuthModalContext';
@@ -217,6 +217,7 @@ export default function Home() {
               { type: 'Boutique', slug: '', name: 'Ivy & Thread', emoji: '👗', color: 'from-amber-500 to-orange-500', description: 'Clothing, accessories, and gifts with AI product listings.', pageName: 'Storefront', live: false },
               { type: 'Antique Shop', slug: '', name: 'Timeless Treasures', emoji: '🏺', color: 'from-amber-600 to-yellow-600', description: 'Vintage finds with AI-powered photo-to-listing tool.', pageName: 'Product Gallery', live: false },
               { type: 'Convenience Store', slug: '', name: 'QuickStop Mini Mart', emoji: '🏪', color: 'from-blue-500 to-indigo-500', description: 'Snacks, drinks, and essentials with grab-and-go ordering.', pageName: 'Quick-Shop', live: false },
+              { type: 'Coffee Shop', slug: 'griffin-lounge', name: 'Griffin Lounge', emoji: '☕', color: 'from-amber-600 to-orange-700', description: 'Order-ahead espresso, cold brew, pastries & peer delivery.', pageName: 'Coffee Menu', live: true },
             ].map((store, i) => (
               <motion.div
                 key={store.name}
@@ -617,6 +618,7 @@ export default function Home() {
                 { href: '/for-bars-nightlife', icon: FaGlassCheers, label: 'Bars' },
                 { href: '/for-convenience-stores', icon: FaCoffee, label: 'Stores' },
                 { href: '/for-retail-shops', icon: FaStore, label: 'Shops & Boutiques' },
+                { href: '/for-coffee-shops', icon: FaMugHot, label: 'Coffee Shops' },
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-zinc-700 hover:border-white hover:bg-white/10 transition-all group">
                   <item.icon className="text-sm text-zinc-500 group-hover:text-orange-400 transition-colors" />
