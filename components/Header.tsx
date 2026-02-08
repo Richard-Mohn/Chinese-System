@@ -10,7 +10,7 @@ import {
   FaSignOutAlt, FaChevronDown, FaBitcoin, FaMapMarkerAlt, FaVideo,
   FaShoppingCart, FaUtensils, FaCoffee, FaDesktop, FaTruck,
   FaClipboardList, FaGlobe, FaBirthdayCake, FaShoppingBasket,
-  FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt, FaUserTie
+  FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt, FaUserTie, FaMusic
 } from 'react-icons/fa';
 import { useAuthModal } from '@/context/AuthModalContext';
 
@@ -36,6 +36,7 @@ const featureItems = [
   { href: '/features/community-delivery', icon: FaBicycle, label: 'Community Courier', desc: 'Hyper-local delivery for $0.25/order' },
   { href: '/features/reservations', icon: FaCalendarAlt, label: 'Table Reservations', desc: 'Book tables — zero per-diner fees' },
   { href: '/features/staff-marketplace', icon: FaUserTie, label: 'Staff Marketplace', desc: 'Bartender & server multi-venue work' },
+  { href: '/features/bar-entertainment', icon: FaMusic, label: 'Bar Entertainment', desc: 'Jukebox, karaoke & kiosk ordering' },
 ];
 
 /* ─── Dropdown wrapper ─── */

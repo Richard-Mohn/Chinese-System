@@ -6,7 +6,8 @@ import {
   FaGlassCheers, FaArrowRight, FaCreditCard, FaBitcoin, FaMobileAlt,
   FaShieldAlt, FaMusic, FaCalendarAlt, FaUsers, FaClock,
   FaListAlt, FaPercent, FaConciergeBell, FaStar, FaChair,
-  FaIdBadge, FaExchangeAlt, FaHeart, FaUserTie
+  FaIdBadge, FaExchangeAlt, FaHeart, FaUserTie, FaMicrophone,
+  FaTabletAlt, FaThLarge
 } from 'react-icons/fa';
 import FloatingStoreIcons from '@/components/FloatingStoreIcons';
 
@@ -97,6 +98,38 @@ export default function ForBarsNightlife() {
           <div className="text-center mt-10">
             <Link href="/features/reservations" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-purple-500/20 transition-all">
               Learn About Reservations <FaArrowRight />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Entertainment System */}
+      <section className="py-24 px-4 bg-gradient-to-b from-white to-zinc-100">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <span className="text-purple-600 font-black uppercase tracking-widest text-xs mb-3 block">Entertainment Suite</span>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Jukebox. Karaoke. <span className="text-purple-600">Kiosk.</span></h2>
+            <p className="text-xl text-zinc-500 max-w-2xl mx-auto">Turn your bar into the ultimate hangout with a digital jukebox, karaoke with live lyrics, touch-to-order kiosks, and floor plan management.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {[
+              { icon: FaMusic, title: 'Digital Jukebox', desc: 'Customers request songs from their phone. Credit-based queue — new revenue stream.' },
+              { icon: FaMicrophone, title: 'Karaoke Mode', desc: 'Lyrics on any TV or projector. Works with Fire Stick, Chromecast — sync delay adjustable.' },
+              { icon: FaTabletAlt, title: 'Kiosk Ordering', desc: 'Tablet at the bar for self-service ordering. One tap, pay by phone, get notified when ready.' },
+              { icon: FaThLarge, title: 'Floor Plan', desc: 'Drag-and-drop table layout with zones: indoor, patio, bar seats, private rooms, VIP.' },
+            ].map((f, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all border border-purple-100 hover:border-purple-300 text-center">
+                <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <f.icon className="text-purple-600 text-2xl" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">{f.title}</h3>
+                <p className="text-sm text-zinc-500">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link href="/features/bar-entertainment" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-purple-500/20 transition-all">
+              Explore Entertainment Suite <FaArrowRight />
             </Link>
           </div>
         </div>
