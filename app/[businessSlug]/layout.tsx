@@ -11,6 +11,7 @@ import { db } from '@/lib/firebase';
 import type { MohnMenuBusiness } from '@/lib/types';
 import { headers } from 'next/headers';
 import TenantNav from '@/components/TenantNav';
+import DemoBanner from '@/components/DemoBanner';
 import { generateTenantJsonLd, generateTenantKeywords, generateTenantBreadcrumb } from '@/lib/tenant-seo';
 
 // Fetch business by slug
@@ -99,6 +100,7 @@ export default async function TenantLayout({
   const basePath = isCustomDomain ? '' : `/${businessSlug}`;
   const orderPath = isCustomDomain ? '/order' : `/order/${businessSlug}`;
   const primaryColor = business.settings?.primaryColor || business.brandColors?.primary || '#4F46E5';
+  const isDemo = !!(business as any).isDemo;
 
   // Generate JSON-LD structured data for this business
   const baseUrl = `https://mohnmenu.com/${businessSlug}`;
@@ -110,11 +112,14 @@ export default async function TenantLayout({
       {/* Tenant JSON-LD Structured Data */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(tenantJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {/* Demo Banner — only for demo businesses */}
+      {isDemo && <DemoBanner businessSlug={businessSlug} />}
+
       {/* Tenant Navigation */}
       <TenantNav business={business} basePath={basePath} orderPath={orderPath} />
 
-      {/* Page Content */}
-      <main className="pt-20">
+      {/* Page Content — extra top padding when demo banner is shown */}
+      <main className={isDemo ? 'pt-28' : 'pt-20'}>
         {children}
       </main>
 

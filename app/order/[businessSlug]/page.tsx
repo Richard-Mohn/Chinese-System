@@ -28,6 +28,7 @@ import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { QRCodeSVG } from 'qrcode.react';
 import LiveStaffSection from '@/components/LiveStaffSection';
+import DemoBanner from '@/components/DemoBanner';
 import {
   addToCartEvent, removeFromCartEvent, beginCheckout, purchase,
   viewItem, makeGtagItem, event as gtagEvent,
@@ -797,8 +798,11 @@ export default function OrderPage({
 
   return (
     <div className="min-h-screen bg-zinc-50">
+      {/* Demo Banner for demo businesses */}
+      {(business as any)?.isDemo && <DemoBanner businessSlug={businessSlug} />}
+
       {/* ── Sticky Header ────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-zinc-200">
+      <div className={`sticky ${(business as any)?.isDemo ? 'top-[36px]' : 'top-0'} z-40 bg-white/95 backdrop-blur-xl border-b border-zinc-200`}>
         <div className="container mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">

@@ -33,7 +33,7 @@ export default function TenantNav({
   basePath: string;
   orderPath: string;
 }) {
-  const { user, logout } = useAuth();
+  const { user, MohnMenuUser, logout } = useAuth();
   const { openAuthModal } = useAuthModal();
   const [quickOrderOpen, setQuickOrderOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,6 +41,8 @@ export default function TenantNav({
 
   const orderingEnabled = business.settings?.orderingEnabled;
   const isBarType = BAR_TYPES.includes(business.type);
+  const isDemo = !!(business as any).isDemo;
+  const isDemoOwner = isDemo && user?.email?.endsWith('@coppertap.demo') && MohnMenuUser?.role === 'owner';
   const hasReservations = (business as any).features?.reservations || (business as any).reservationSettings?.enabled;
   const hasEntertainment = (business as any).entertainment?.jukeboxEnabled;
 
@@ -97,6 +99,16 @@ export default function TenantNav({
             <a href={`${basePath}/contact`} className="text-sm font-bold text-zinc-600 hover:text-black transition-colors">
               Contact
             </a>
+
+            {/* Owner Dashboard link — demo businesses */}
+            {isDemoOwner && (
+              <a
+                href="/owner"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-amber-700 bg-amber-100 rounded-full hover:bg-amber-200 transition-colors"
+              >
+                📊 Dashboard
+              </a>
+            )}
 
             {/* Quick Order button — desktop */}
             {orderingEnabled && (
@@ -209,6 +221,9 @@ export default function TenantNav({
                 <a href={`${basePath}/about`} className="block py-3 text-sm font-bold text-zinc-700 hover:text-black">About</a>
                 <a href={`${basePath}/contact`} className="block py-3 text-sm font-bold text-zinc-700 hover:text-black">Contact</a>
                 <a href={orderPath} className="block py-3 text-sm font-bold text-zinc-700 hover:text-black">Full Menu & Order</a>
+                {isDemoOwner && (
+                  <a href="/owner" className="block py-3 text-sm font-bold text-amber-700 hover:text-amber-900">📊 Owner Dashboard</a>
+                )}
 
                 <div className="pt-3 border-t border-zinc-100 space-y-2">
                   {user ? (
