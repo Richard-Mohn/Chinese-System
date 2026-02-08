@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function DashboardRouter() {
-  const { user, MohnMenuUser, loading } = useAuth();
+  const { user, MohnMenuUser, currentBusiness, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,18 +17,24 @@ export default function DashboardRouter() {
     }
 
     // Route based on user role
-    if (MohnMenuUser?.role === 'owner' || MohnMenuUser?.role === 'manager') {
+    const role = MohnMenuUser?.role;
+
+    if (role === 'owner' || role === 'manager') {
       router.push('/owner');
-    } else if (MohnMenuUser?.role === 'driver_inhouse' || MohnMenuUser?.role === 'driver_marketplace') {
+    } else if (role === 'driver_inhouse' || role === 'driver_marketplace' || role === 'driver') {
       router.push('/driver');
-    } else if (MohnMenuUser?.role === 'customer') {
+    } else if (role === 'staff') {
+      // Staff (bartender/server) — go to their business storefront
+      const slug = currentBusiness?.slug;
+      router.push(slug ? `/${slug}` : '/');
+    } else if (role === 'customer') {
       router.push('/customer');
-    } else if (MohnMenuUser?.role === 'admin') {
+    } else if (role === 'admin') {
       router.push('/admin');
     } else {
       router.push('/onboarding');
     }
-  }, [user, MohnMenuUser, loading, router]);
+  }, [user, MohnMenuUser, currentBusiness, loading, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-zinc-50">

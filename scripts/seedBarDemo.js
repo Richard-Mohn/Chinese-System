@@ -153,7 +153,7 @@ const DEMO_ACCOUNTS = [
     email: 'driver@coppertap.demo',
     password: 'DemoPass123!',
     displayName: 'James Kowalski (Driver)',
-    role: 'driver',
+    role: 'driver_inhouse',
   },
   {
     email: 'customer@coppertap.demo',
@@ -201,8 +201,10 @@ async function seed() {
         email: acct.email,
         displayName: acct.displayName,
         role: acct.role,
-        businessId: BUSINESS_ID,
+        businessIds: [BUSINESS_ID],
+        activeBusinessId: BUSINESS_ID,
         createdAt: now,
+        updatedAt: now,
         isDemo: true,
       }, { merge: true });
 

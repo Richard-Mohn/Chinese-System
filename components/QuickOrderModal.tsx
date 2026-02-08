@@ -646,14 +646,14 @@ export default function QuickOrderModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[110] bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[310] bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* ── Close button — always visible, top-right, above header ── */}
       <button
         onClick={onClose}
-        className="fixed top-5 right-5 z-[130] w-10 h-10 bg-white hover:bg-zinc-100 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 cursor-pointer border border-zinc-200"
+        className="fixed top-5 right-5 z-[330] w-10 h-10 bg-white hover:bg-zinc-100 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 cursor-pointer border border-zinc-200"
         aria-label="Close Quick Order"
       >
         <FaTimes className="text-zinc-700 text-sm" />
@@ -665,7 +665,7 @@ export default function QuickOrderModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-        className="fixed inset-x-4 top-4 bottom-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[480px] sm:h-[85vh] sm:max-h-[720px] z-[120] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        className="fixed inset-x-4 top-4 bottom-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[480px] sm:h-[85vh] sm:max-h-[720px] z-[320] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         {/* ── Header bar ── */}
@@ -1580,7 +1580,7 @@ export default function QuickOrderModal({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[125] bg-black/30"
+              className="fixed inset-0 z-[325] bg-black/30"
               onClick={() => setSelectedItem(null)}
             />
             <motion.div
@@ -1588,7 +1588,7 @@ export default function QuickOrderModal({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-              className="fixed bottom-0 inset-x-0 sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[400px] z-[135] bg-white rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl space-y-4"
+              className="fixed bottom-0 inset-x-0 sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[400px] z-[335] bg-white rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl space-y-4"
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-start justify-between">

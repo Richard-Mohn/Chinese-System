@@ -211,7 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isOwner = () => MohnMenuUser?.role === 'owner';
   const isManager = () => MohnMenuUser?.role === 'manager';
   const isDriver = () => 
-    MohnMenuUser?.role === 'driver_inhouse' || MohnMenuUser?.role === 'driver_marketplace';
+    MohnMenuUser?.role === 'driver_inhouse' || MohnMenuUser?.role === 'driver_marketplace' || MohnMenuUser?.role === 'driver';
   const isCustomer = () => MohnMenuUser?.role === 'customer';
   const isAdmin = () => MohnMenuUser?.role === 'admin';
 

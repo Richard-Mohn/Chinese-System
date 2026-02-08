@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaUserTie, FaGlassMartini, FaConciergeBell, FaUser,
@@ -27,6 +28,7 @@ interface DemoAccount {
   icon: React.ComponentType<{ className?: string }>;
   color: string;
   description: string;
+  /** Use {slug} as placeholder — replaced at runtime */
   dashboardPath: string;
 }
 
@@ -47,7 +49,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     icon: FaGlassMartini,
     color: 'from-purple-500 to-indigo-600',
     description: 'Staff view — receive orders, toggle on/off duty',
-    dashboardPath: '/dashboard',
+    dashboardPath: '/{slug}',
   },
   {
     role: 'server',
@@ -56,7 +58,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     icon: FaConciergeBell,
     color: 'from-emerald-500 to-teal-600',
     description: 'Staff view — table service, order assignments',
-    dashboardPath: '/dashboard',
+    dashboardPath: '/{slug}',
   },
   {
     role: 'driver',
@@ -74,7 +76,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     icon: FaUser,
     color: 'from-pink-500 to-rose-600',
     description: 'Customer experience — browse, order, track',
-    dashboardPath: '/customer',
+    dashboardPath: '/order/{slug}',
   },
 ];
 
@@ -82,6 +84,7 @@ const DEMO_PASSWORD = 'DemoPass123!';
 
 export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
   const { user, MohnMenuUser, loginWithEmail, logout, loading } = useAuth();
+  const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [loggingIn, setLoggingIn] = useState<string | null>(null);
@@ -90,6 +93,9 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
   // Detect if current user is a demo account
   const isDemoUser = user?.email?.endsWith('@coppertap.demo') ?? false;
   const currentDemoAccount = DEMO_ACCOUNTS.find(a => a.email === user?.email);
+
+  /** Resolve {slug} placeholder in dashboard paths */
+  const resolvePath = useCallback((path: string) => path.replace(/\{slug\}/g, businessSlug), [businessSlug]);
 
   // Auto-expand on first visit
   useEffect(() => {
@@ -112,13 +118,17 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
       }
       await loginWithEmail(account.email, DEMO_PASSWORD);
       setExpanded(false);
+
+      // Auto-navigate to the role's dashboard
+      const dest = resolvePath(account.dashboardPath);
+      router.push(dest);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Login failed';
       setLoginError(`Failed to log in as ${account.label}: ${message}`);
     } finally {
       setLoggingIn(null);
     }
-  }, [user, loginWithEmail, logout]);
+  }, [user, loginWithEmail, logout, resolvePath, router]);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -291,11 +301,11 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
                     )}
                     {(currentDemoAccount.role === 'bartender' || currentDemoAccount.role === 'server') && (
                       <>
-                        <a href="/dashboard" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
-                          <FaTachometerAlt className="text-[10px]" /> Staff Dashboard
-                        </a>
                         <a href={`/${businessSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
-                          🏠 Storefront
+                          <FaTachometerAlt className="text-[10px]" /> Storefront
+                        </a>
+                        <a href={`/order/${businessSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
+                          🍽️ Order Page
                         </a>
                       </>
                     )}
@@ -308,6 +318,9 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
                       <>
                         <a href={`/order/${businessSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
                           🍽️ Order Food
+                        </a>
+                        <a href={`/${businessSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
+                          🏠 Storefront
                         </a>
                         <a href="/customer/orders" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
                           📋 My Orders

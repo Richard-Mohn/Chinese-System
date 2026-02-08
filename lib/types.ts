@@ -34,6 +34,7 @@ export type UserRole =
   | 'customer'           // Regular customer placing orders
   | 'owner'              // Business owner (full access)
   | 'manager'            // Staff manager (manage drivers, orders, limited settings)
+  | 'staff'              // Staff member (bartender, server, kitchen — receives orders)
   | 'driver_inhouse'     // In-house driver (their own business's drivers)
   | 'driver_marketplace' // Marketplace driver (MohnMenu's overflow driver pool)
   | 'admin'              // MohnMenu admin (super user)
