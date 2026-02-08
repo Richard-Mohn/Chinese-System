@@ -225,7 +225,7 @@ async function seed() {
     description: 'Richmond\'s premier craft cocktail bar & grill. Live music, karaoke nights, and the best Old Fashioned in town. Full kitchen open late.',
     logo: '',
 
-    tier: 'pro',
+    tier: 'professional',
     subscriptionStatus: 'active',
     subscriptionStartDate: now,
 

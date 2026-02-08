@@ -71,13 +71,30 @@ const TIER_RANK: Record<SubscriptionTier, number> = {
 };
 
 /**
+ * Normalize tier aliases (e.g. 'pro' → 'professional') to canonical names.
+ * Handles legacy or shorthand tier values stored in Firestore.
+ */
+const TIER_ALIASES: Record<string, SubscriptionTier> = {
+  pro: 'professional',
+  basic: 'starter',
+  premium: 'growth',
+  enterprise: 'reseller',
+};
+
+function normalizeTier(tier: string | undefined): SubscriptionTier {
+  if (!tier) return 'free';
+  if (tier in TIER_RANK) return tier as SubscriptionTier;
+  return TIER_ALIASES[tier] || 'free';
+}
+
+/**
  * Check if a given tier meets or exceeds the required tier level.
  */
 export function tierMeetsRequirement(
-  currentTier: SubscriptionTier | undefined,
+  currentTier: SubscriptionTier | string | undefined,
   requiredTier: SubscriptionTier
 ): boolean {
-  const current = TIER_RANK[currentTier || 'free'] ?? 0;
+  const current = TIER_RANK[normalizeTier(currentTier)] ?? 0;
   const required = TIER_RANK[requiredTier] ?? 0;
   return current >= required;
 }
