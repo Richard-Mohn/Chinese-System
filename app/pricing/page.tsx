@@ -13,9 +13,10 @@ interface PricingTierProps {
   icon: any;
   featured?: boolean;
   delay: number;
+  tier: string;
 }
 
-const PricingCard = ({ title, price, period, description, features, icon: Icon, featured = false, delay }: PricingTierProps) => (
+const PricingCard = ({ title, price, period, description, features, icon: Icon, featured = false, delay, tier }: PricingTierProps) => (
   <motion.div
     className={`p-10 rounded-3xl border flex flex-col items-start text-left h-full transition-all duration-500 group relative overflow-hidden ${
       featured
@@ -65,7 +66,7 @@ const PricingCard = ({ title, price, period, description, features, icon: Icon, 
       })}
     </ul>
 
-    <Link href="/register" className="w-full">
+    <Link href={`/register?plan=${tier}`} className="w-full">
       <button className={`w-full py-4 rounded-full font-bold text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 ${
         featured
           ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-lg hover:shadow-orange-500/20'
@@ -115,6 +116,7 @@ export default function Pricing() {
               period="/month"
               description="Everything you need to sell online. 14-day free trial."
               icon={FaStar}
+              tier="starter"
               features={[
                 'Unlimited menu items & categories',
                 'White-label branded storefront',
@@ -134,6 +136,7 @@ export default function Pricing() {
               period="/month"
               description="Premium tools for growing businesses. 14-day free trial."
               icon={FaRocket}
+              tier="growth"
               features={[
                 'Everything in Starter',
                 'Kitchen Display System (KDS)',
@@ -154,6 +157,7 @@ export default function Pricing() {
               period="/month"
               description="Full platform for serious operations. 14-day free trial."
               icon={FaBuilding}
+              tier="professional"
               features={[
                 'Everything in Growth',
                 'Sub-second GPS fleet tracking',
@@ -204,7 +208,7 @@ export default function Pricing() {
               <div>No Hidden Fees</div>
               <div>No Contracts</div>
             </div>
-            <Link href="/register" className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-orange-500/20 transition-all active:scale-95">
+            <Link href="/register?plan=starter" className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-orange-500/20 transition-all active:scale-95">
               Start Your Free Trial <FaArrowRight />
             </Link>
           </div>

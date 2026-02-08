@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -49,7 +50,15 @@ const STATUS_LABELS: Record<string, string> = {
   offline: 'Offline',
 };
 
-export default function OwnerDispatchPage() {
+export default function OwnerDispatchPageGated() {
+  return (
+    <GatedPage feature="dispatch">
+      <OwnerDispatchPage />
+    </GatedPage>
+  );
+}
+
+function OwnerDispatchPage() {
   const { currentBusiness } = useAuth();
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);

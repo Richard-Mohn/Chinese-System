@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useEffect, useState } from 'react';
 import {
   collection,
@@ -30,7 +31,15 @@ const EMPTY_DRIVER: Partial<MohnMenuDriver> = {
   activeLocationIds: [],
 };
 
-export default function OwnerDriversPage() {
+export default function OwnerDriversPageGated() {
+  return (
+    <GatedPage feature="drivers">
+      <OwnerDriversPage />
+    </GatedPage>
+  );
+}
+
+function OwnerDriversPage() {
   const { currentBusiness } = useAuth();
   const [drivers, setDrivers] = useState<MohnMenuDriver[]>([]);
   const [loading, setLoading] = useState(true);

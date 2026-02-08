@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { collection, query, where, getDocs, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,7 +39,15 @@ interface BusinessData {
   };
 }
 
-export default function OwnerEntertainmentPage() {
+export default function OwnerEntertainmentPageGated() {
+  return (
+    <GatedPage feature="entertainment">
+      <OwnerEntertainmentPage />
+    </GatedPage>
+  );
+}
+
+function OwnerEntertainmentPage() {
   const { user } = useAuth();
   const [business, setBusiness] = useState<BusinessData | null>(null);
   const [loading, setLoading] = useState(true);

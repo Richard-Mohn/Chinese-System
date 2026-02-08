@@ -179,6 +179,19 @@ export default function JukeboxPage() {
     );
   }
 
+  // Tier gate: entertainment requires professional
+  if (!tierMeetsRequirement(business.tier, FEATURE_REGISTRY['entertainment'].minTier)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6"><FaCrown className="text-2xl text-amber-500" /></div>
+          <h1 className="text-2xl font-black mb-2">Jukebox Unavailable</h1>
+          <p className="text-zinc-500 text-sm">This feature is not enabled for this business.</p>
+        </div>
+      </div>
+    );
+  }
+
   // Name prompt
   if (showNamePrompt) {
     return (

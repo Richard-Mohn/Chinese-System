@@ -9,8 +9,9 @@ import Link from 'next/link';
 import {
   FaCalendarAlt, FaClock, FaUsers, FaUser, FaPhone, FaEnvelope,
   FaArrowRight, FaCheck, FaGlassCheers, FaUtensils, FaConciergeBell,
-  FaStar, FaChevronLeft
+  FaStar, FaChevronLeft, FaCrown
 } from 'react-icons/fa';
+import { tierMeetsRequirement, FEATURE_REGISTRY } from '@/lib/tier-features';
 
 interface BusinessData {
   businessId: string;
@@ -141,6 +142,24 @@ export default function ReservePage() {
           <h1 className="text-6xl font-black mb-4">404</h1>
           <p className="text-zinc-500 mb-6">This business was not found.</p>
           <Link href="/" className="text-orange-600 font-bold hover:underline">Go Home</Link>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─── Tier gate ─── */
+  if (!tierMeetsRequirement((business as any).tier, FEATURE_REGISTRY['reservations'].minTier)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white px-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-amber-500/20">
+            <FaCrown className="text-3xl text-white" />
+          </div>
+          <h1 className="text-3xl font-black text-black mb-3">Reservations Unavailable</h1>
+          <p className="text-zinc-500 mb-6">This business hasn&apos;t enabled online reservations yet.</p>
+          <Link href={`/${slug}`} className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full font-bold hover:bg-zinc-800 transition-all">
+            <FaChevronLeft className="text-sm" /> Back to {business.businessName}
+          </Link>
         </div>
       </div>
     );

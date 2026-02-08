@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -35,7 +36,15 @@ const EMPTY_FORM: AuctionForm = {
   durationDays: '7', shippingOptions: ['local_pickup'],
 };
 
-export default function OwnerAuctionsPage() {
+export default function OwnerAuctionsPageGated() {
+  return (
+    <GatedPage feature="auctions">
+      <OwnerAuctionsPage />
+    </GatedPage>
+  );
+}
+
+function OwnerAuctionsPage() {
   const { user, currentBusiness, loading, isOwner } = useAuth();
   const router = useRouter();
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);

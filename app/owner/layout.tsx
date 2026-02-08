@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   FaHome,
@@ -21,16 +21,27 @@ import {
   FaGavel,
   FaLink,
   FaUsers,
+  FaLock,
+  FaCrown,
+  FaCalendarAlt,
+  FaMusic,
+  FaThLarge,
 } from 'react-icons/fa';
+import type { FeatureKey } from '@/lib/tier-features';
+import { OWNER_PAGE_FEATURE, tierMeetsRequirement, FEATURE_REGISTRY } from '@/lib/tier-features';
+import type { SubscriptionTier } from '@/lib/types';
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { href: string; label: string; icon: any; beta?: boolean }[] = [
   { href: '/owner', label: 'Dashboard', icon: FaHome },
   { href: '/owner/website', label: 'Website', icon: FaGlobe },
   { href: '/owner/orders', label: 'Orders', icon: FaClipboardList },
   { href: '/owner/kds', label: 'Kitchen Display', icon: FaDesktop },
   { href: '/owner/menu', label: 'Menu', icon: FaUtensils },
   { href: '/owner/staff', label: 'Staff', icon: FaUsers },
+  { href: '/owner/reservations', label: 'Reservations', icon: FaCalendarAlt },
   { href: '/owner/chef-cam', label: 'Chef Cam', icon: FaVideo },
+  { href: '/owner/entertainment', label: 'Entertainment', icon: FaMusic },
+  { href: '/owner/floor-plan', label: 'Floor Plan', icon: FaThLarge },
   { href: '/owner/auctions', label: 'Auctions', icon: FaGavel, beta: true },
   { href: '/owner/drivers', label: 'Drivers', icon: FaTruck },
   { href: '/owner/dispatch', label: 'Dispatch', icon: FaMapMarkerAlt },
@@ -39,11 +50,34 @@ const NAV_ITEMS = [
   { href: '/owner/settings', label: 'Settings', icon: FaCog },
 ];
 
+const TIER_BADGE: Record<string, { label: string; color: string }> = {
+  free:         { label: 'Free Trial',    color: 'bg-zinc-100 text-zinc-500' },
+  starter:      { label: 'Starter',       color: 'bg-emerald-50 text-emerald-700' },
+  growth:       { label: 'Growth',        color: 'bg-blue-50 text-blue-700' },
+  professional: { label: 'Professional',  color: 'bg-amber-50 text-amber-700' },
+  reseller:     { label: 'Reseller',      color: 'bg-purple-50 text-purple-700' },
+};
+
 export default function OwnerLayout({ children }: { children: React.ReactNode }) {
   const { user, MohnMenuUser, currentBusiness, loading, isOwner, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const businessTier = (currentBusiness?.tier || 'free') as SubscriptionTier;
+  const tierBadge = TIER_BADGE[businessTier] || TIER_BADGE.free;
+
+  // Pre-compute which nav items are locked
+  const navLocks = useMemo(() => {
+    const locks: Record<string, boolean> = {};
+    for (const item of NAV_ITEMS) {
+      const featureKey = OWNER_PAGE_FEATURE[item.href];
+      if (featureKey) {
+        locks[item.href] = !tierMeetsRequirement(businessTier, FEATURE_REGISTRY[featureKey].minTier);
+      }
+    }
+    return locks;
+  }, [businessTier]);
 
   useEffect(() => {
     if (!loading && (!user || !isOwner())) {
@@ -89,26 +123,40 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               </p>
             )}
           </Link>
+          {/* Tier Badge */}
+          <Link
+            href="/owner/settings#subscription"
+            className={`inline-flex items-center gap-1.5 px-3 py-1 mt-3 rounded-full text-[10px] font-black uppercase tracking-widest ${tierBadge.color} hover:opacity-80 transition-opacity`}
+          >
+            <FaCrown className="text-[8px]" />
+            {tierBadge.label}
+          </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(item => {
             const Icon = item.icon;
             const active = isActive(item.href);
+            const locked = navLocks[item.href];
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative ${
+                className={`group/nav flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative ${
                   active
                     ? 'bg-black text-white'
+                    : locked
+                    ? 'text-zinc-300 hover:bg-zinc-50 hover:text-zinc-400'
                     : 'text-zinc-500 hover:bg-zinc-50 hover:text-black'
                 }`}
               >
                 <Icon className="text-base shrink-0" />
                 {item.label}
-                {'beta' in item && item.beta && (
+                {locked && (
+                  <FaLock className="ml-auto text-[10px] text-zinc-300 group-hover/nav:text-amber-500 transition-colors shrink-0" />
+                )}
+                {'beta' in item && item.beta && !locked && (
                   <span className="absolute right-2 bg-orange-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase leading-none">
                     Beta
                   </span>
@@ -171,24 +219,37 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
                   {currentBusiness.name}
                 </p>
               )}
+              <Link
+                href="/owner/settings#subscription"
+                className={`inline-flex items-center gap-1.5 px-3 py-1 mt-2 rounded-full text-[10px] font-black uppercase tracking-widest ${tierBadge.color}`}
+              >
+                <FaCrown className="text-[8px]" />
+                {tierBadge.label}
+              </Link>
             </div>
             <nav className="p-4 space-y-1">
               {NAV_ITEMS.map(item => {
                 const Icon = item.icon;
                 const active = isActive(item.href);
+                const locked = navLocks[item.href];
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative ${
+                    className={`group/nav flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative ${
                       active
                         ? 'bg-black text-white'
+                        : locked
+                        ? 'text-zinc-300 hover:bg-zinc-50 hover:text-zinc-400'
                         : 'text-zinc-500 hover:bg-zinc-50 hover:text-black'
                     }`}
                   >
                     <Icon className="text-base shrink-0" />
                     {item.label}
-                    {'beta' in item && item.beta && (
+                    {locked && (
+                      <FaLock className="ml-auto text-[10px] text-zinc-300 group-hover/nav:text-amber-500 transition-colors shrink-0" />
+                    )}
+                    {'beta' in item && item.beta && !locked && (
                       <span className="absolute right-2 bg-orange-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase leading-none">
                         Beta
                       </span>

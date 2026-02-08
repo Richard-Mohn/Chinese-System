@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
@@ -46,7 +47,15 @@ const CAMERA_TYPES: { value: CamType; label: string; icon: typeof FaCamera; desc
   { value: 'image', label: 'IP Camera (Snapshot)', icon: FaCamera, desc: 'Simple cameras that provide a snapshot URL — refreshes every 2s' },
 ];
 
-export default function ChefCamSetup() {
+export default function ChefCamSetupGated() {
+  return (
+    <GatedPage feature="chef-cam">
+      <ChefCamSetup />
+    </GatedPage>
+  );
+}
+
+function ChefCamSetup() {
   const { user, currentBusiness, loading, isOwner } = useAuth();
   const router = useRouter();
   const [settings, setSettings] = useState<ChefCamSettings>(DEFAULT_SETTINGS);

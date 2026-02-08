@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useEffect, useState, useCallback } from 'react';
 import {
   collection,
@@ -67,7 +68,15 @@ const EMPTY_FORM = {
   onDuty: true,
 };
 
-export default function OwnerStaffPage() {
+export default function OwnerStaffPageGated() {
+  return (
+    <GatedPage feature="staff">
+      <OwnerStaffPage />
+    </GatedPage>
+  );
+}
+
+function OwnerStaffPage() {
   const { currentBusiness } = useAuth();
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);

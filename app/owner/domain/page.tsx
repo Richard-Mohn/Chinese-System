@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { authFetch } from '@/lib/authFetch';
 import { useState, useEffect, useCallback } from 'react';
 import { FaGlobe, FaSearch, FaCheck, FaTimes, FaSpinner, FaCreditCard, FaCog, FaExternalLinkAlt, FaInfoCircle, FaStar, FaTag } from 'react-icons/fa';
@@ -45,7 +46,15 @@ interface DomainPurchaseState {
   orderId: number | null;
 }
 
-export default function OwnerDomainPage() {
+export default function OwnerDomainPageGated() {
+  return (
+    <GatedPage feature="domain">
+      <OwnerDomainPage />
+    </GatedPage>
+  );
+}
+
+function OwnerDomainPage() {
   const { user, currentBusiness } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');

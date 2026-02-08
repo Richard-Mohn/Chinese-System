@@ -9,8 +9,10 @@ import {
   FaShoppingCart, FaPlus, FaMinus, FaTrash, FaCreditCard,
   FaMobileAlt, FaCheck, FaArrowLeft, FaSearch, FaClock,
   FaConciergeBell, FaUtensils, FaGlassMartini, FaCoffee,
-  FaHamburger, FaPizzaSlice, FaIceCream, FaBeer
+  FaHamburger, FaPizzaSlice, FaIceCream, FaBeer, FaCrown
 } from 'react-icons/fa';
+import { tierMeetsRequirement, FEATURE_REGISTRY } from '@/lib/tier-features';
+import Link from 'next/link';
 
 interface MenuItem {
   id: string;
@@ -172,6 +174,24 @@ export default function KioskPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <h1 className="text-4xl font-black">404</h1>
+      </div>
+    );
+  }
+
+  // Tier gate — kiosk requires Growth tier (KDS feature)
+  if (!tierMeetsRequirement((business as any).tier, FEATURE_REGISTRY['kds'].minTier)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black px-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-amber-500/20">
+            <FaCrown className="text-3xl text-white" />
+          </div>
+          <h1 className="text-3xl font-black text-white mb-3">Kiosk Unavailable</h1>
+          <p className="text-zinc-400 mb-6">This business hasn&apos;t enabled self-service kiosk ordering yet.</p>
+          <Link href={`/${slug}`} className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-full font-bold hover:bg-purple-500 transition-all">
+            Back to Menu
+          </Link>
+        </div>
       </div>
     );
   }

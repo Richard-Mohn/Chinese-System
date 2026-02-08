@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useEffect, useState, useCallback } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -52,7 +53,15 @@ interface RealtimeData {
   activeDevices: { deviceCategory: string; activeUsers: number }[];
 }
 
-export default function OwnerAnalyticsPage() {
+export default function OwnerAnalyticsPageGated() {
+  return (
+    <GatedPage feature="analytics">
+      <OwnerAnalyticsPage />
+    </GatedPage>
+  );
+}
+
+function OwnerAnalyticsPage() {
   const { currentBusiness } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [dateRange, setDateRange] = useState(28);

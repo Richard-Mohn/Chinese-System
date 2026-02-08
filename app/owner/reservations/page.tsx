@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import {
@@ -43,7 +44,15 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   'no-show': { label: 'No Show', color: 'text-red-700', bg: 'bg-red-50 border-red-200' },
 };
 
-export default function OwnerReservations() {
+export default function OwnerReservationsGated() {
+  return (
+    <GatedPage feature="reservations">
+      <OwnerReservations />
+    </GatedPage>
+  );
+}
+
+function OwnerReservations() {
   const { user } = useAuth();
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
@@ -45,7 +46,15 @@ const INITIAL_TABLES: TableItem[] = [];
 let nextId = 1;
 function genId() { return `table_${nextId++}_${Date.now()}`; }
 
-export default function OwnerFloorPlanPage() {
+export default function OwnerFloorPlanPageGated() {
+  return (
+    <GatedPage feature="floor-plan">
+      <OwnerFloorPlanPage />
+    </GatedPage>
+  );
+}
+
+function OwnerFloorPlanPage() {
   const { user } = useAuth();
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);

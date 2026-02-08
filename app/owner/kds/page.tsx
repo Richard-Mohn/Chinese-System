@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import GatedPage from '@/components/GatedPage';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   collection,
@@ -141,7 +142,15 @@ function playBump() {
 }
 
 /* ─── Main Component ─── */
-export default function KDSPage() {
+export default function KDSPageGated() {
+  return (
+    <GatedPage feature="kds">
+      <KDSPage />
+    </GatedPage>
+  );
+}
+
+function KDSPage() {
   const { currentBusiness } = useAuth();
   const [orders, setOrders] = useState<KDSOrder[]>([]);
   const [stations, setStations] = useState<KDSStation[]>([]);
