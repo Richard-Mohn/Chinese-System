@@ -21,7 +21,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaShoppingCart, FaPlus, FaMinus, FaTrash, FaTimes, FaCheck,
   FaMotorcycle, FaStore, FaSearch, FaFire, FaArrowLeft, FaCreditCard, FaLock,
-  FaBitcoin, FaCopy,
+  FaBitcoin, FaCopy, FaUtensils, FaCalendarAlt, FaUsers, FaClock, FaStar,
+  FaConciergeBell, FaGlassCheers,
 } from 'react-icons/fa';
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -267,7 +268,15 @@ export default function OrderPage({
 
   // Checkout state
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [orderType, setOrderType] = useState<'delivery' | 'pickup'>('delivery');
+  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | 'dine-in'>('delivery');
+
+  // Dine-in reservation state
+  const [reservationDate, setReservationDate] = useState('');
+  const [reservationTime, setReservationTime] = useState('');
+  const [partySize, setPartySize] = useState(2);
+  const [seatingPreference, setSeatingPreference] = useState<'indoor' | 'outdoor' | 'bar' | 'private' | ''>('');
+  const [reservationOccasion, setReservationOccasion] = useState('');
+  const [isVIP, setIsVIP] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -406,6 +415,17 @@ export default function OrderPage({
     deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
     deliveryInstructions: orderType === 'delivery' ? deliveryInstructions : undefined,
     deliveryProvider: orderType === 'delivery' ? deliveryProvider : undefined,
+    // Dine-in reservation fields
+    ...(orderType === 'dine-in' ? {
+      reservation: {
+        date: reservationDate,
+        time: reservationTime,
+        partySize,
+        seatingPreference: seatingPreference || 'no preference',
+        occasion: reservationOccasion || undefined,
+        isVIP,
+      },
+    } : {}),
     subtotal,
     taxAmount,
     taxRate,
@@ -431,6 +451,31 @@ export default function OrderPage({
     }
   };
 
+  // ── Create booking for dine-in orders ──
+  const createDineInBooking = async (oId: string, bizId: string) => {
+    if (orderType !== 'dine-in') return;
+    try {
+      await addDoc(collection(db, 'businesses', bizId, 'bookings'), {
+        name: customerName,
+        phone,
+        email,
+        partySize,
+        date: reservationDate,
+        time: reservationTime,
+        occasion: reservationOccasion || '',
+        seatingPreference: seatingPreference || '',
+        isVIP,
+        status: 'confirmed',
+        type: 'dine-in-order',
+        orderId: oId,
+        specialRequests: `Pre-ordered ${cart.length} item(s) with order`,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error('Failed to create dine-in booking:', err);
+    }
+  };
+
   // ── Place order ──
   const handlePlaceOrder = async () => {
     if (!business || cart.length === 0) return;
@@ -440,6 +485,10 @@ export default function OrderPage({
     }
     if (orderType === 'delivery' && !deliveryAddress) {
       alert('Please enter a delivery address.');
+      return;
+    }
+    if (orderType === 'dine-in' && (!reservationDate || !reservationTime)) {
+      alert('Please select a date and time for your reservation.');
       return;
     }
 
@@ -457,6 +506,7 @@ export default function OrderPage({
 
         // Create tracking link
         await createTrackingLink(docRef.id, business.businessId);
+        await createDineInBooking(docRef.id, business.businessId);
 
         // Create PaymentIntent via API (with owner's Stripe Connect account if available)
         const amountCents = Math.round(total * 100);
@@ -496,6 +546,7 @@ export default function OrderPage({
         );
 
         await createTrackingLink(docRef.id, business.businessId);
+        await createDineInBooking(docRef.id, business.businessId);
 
         const res = await authFetch('/api/crypto/create-payment', {
           method: 'POST',
@@ -534,6 +585,7 @@ export default function OrderPage({
       );
 
       await createTrackingLink(docRef.id, business.businessId);
+      await createDineInBooking(docRef.id, business.businessId);
 
       setOrderId(docRef.id);
       setOrderPlaced(true);
@@ -1253,7 +1305,10 @@ export default function OrderPage({
                 {/* Order Type */}
                 <div>
                   <h3 className="text-sm font-black text-black mb-3">Order Type</h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className={`grid gap-3 ${
+                    business?.type === 'bar_grill' || business?.type === 'restaurant' || business?.type === 'chinese_restaurant'
+                      ? 'grid-cols-3' : 'grid-cols-2'
+                  }`}>
                     <button
                       onClick={() => setOrderType('delivery')}
                       className={`flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
@@ -1270,7 +1325,120 @@ export default function OrderPage({
                     >
                       <FaStore /> Pickup
                     </button>
+                    {(business?.type === 'bar_grill' || business?.type === 'restaurant' || business?.type === 'chinese_restaurant') && (
+                      <button
+                        onClick={() => setOrderType('dine-in')}
+                        className={`flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
+                          orderType === 'dine-in' ? 'bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                        }`}
+                      >
+                        <FaUtensils /> Dine-In
+                      </button>
+                    )}
                   </div>
+
+                  {/* Dine-In Reservation Widget */}
+                  {orderType === 'dine-in' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-5 border border-purple-100 space-y-4"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <FaCalendarAlt className="text-purple-600" />
+                        <h4 className="text-sm font-black text-black">Reserve Your Table</h4>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold text-zinc-500 mb-1">Date</label>
+                          <input
+                            type="date"
+                            min={new Date().toISOString().split('T')[0]}
+                            value={reservationDate}
+                            onChange={e => setReservationDate(e.target.value)}
+                            className="w-full px-3 py-2.5 bg-white rounded-xl border border-purple-200 text-sm font-medium focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-zinc-500 mb-1">Time</label>
+                          <select
+                            value={reservationTime}
+                            onChange={e => setReservationTime(e.target.value)}
+                            className="w-full px-3 py-2.5 bg-white rounded-xl border border-purple-200 text-sm font-medium focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                          >
+                            <option value="">Select time</option>
+                            {['5:00 PM','5:30 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM','8:00 PM','8:30 PM','9:00 PM','9:30 PM','10:00 PM','10:30 PM','11:00 PM'].map(t => (
+                              <option key={t} value={t}>{t}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-zinc-500 mb-1">Party Size</label>
+                        <div className="flex gap-2 flex-wrap">
+                          {[1,2,3,4,5,6,8,10].map(n => (
+                            <button
+                              key={n}
+                              onClick={() => setPartySize(n)}
+                              className={`w-10 h-10 rounded-xl text-sm font-black transition-all ${
+                                partySize === n
+                                  ? 'bg-purple-600 text-white shadow-md'
+                                  : 'bg-white text-zinc-600 border border-purple-200 hover:border-purple-400'
+                              }`}
+                            >
+                              {n}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-zinc-500 mb-1">Seating</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[
+                            { v: 'indoor' as const, icon: FaUtensils, label: 'Indoor' },
+                            { v: 'outdoor' as const, icon: FaStar, label: 'Patio' },
+                            { v: 'bar' as const, icon: FaGlassCheers, label: 'Bar' },
+                            { v: 'private' as const, icon: FaConciergeBell, label: 'Private' },
+                          ].map(opt => (
+                            <button
+                              key={opt.v}
+                              onClick={() => setSeatingPreference(seatingPreference === opt.v ? '' : opt.v)}
+                              className={`flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                                seatingPreference === opt.v
+                                  ? 'bg-purple-600 text-white'
+                                  : 'bg-white text-zinc-500 border border-purple-200 hover:border-purple-400'
+                              }`}
+                            >
+                              <opt.icon className="text-sm" />
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* VIP toggle */}
+                      <div className="flex items-center justify-between bg-white rounded-xl p-3 border border-purple-200">
+                        <div className="flex items-center gap-2">
+                          <FaStar className="text-amber-500" />
+                          <span className="text-xs font-bold text-black">VIP Experience</span>
+                        </div>
+                        <button
+                          onClick={() => setIsVIP(!isVIP)}
+                          className={`w-11 h-6 rounded-full transition-all relative ${isVIP ? 'bg-amber-500' : 'bg-zinc-200'}`}
+                        >
+                          <div className={`w-5 h-5 bg-white rounded-full shadow-md absolute top-0.5 transition-all ${isVIP ? 'left-5' : 'left-0.5'}`} />
+                        </button>
+                      </div>
+
+                      <p className="text-[10px] text-purple-500 font-medium">
+                        Your table and pre-ordered items will be ready when you arrive.
+                      </p>
+                    </motion.div>
+                  )}
 
                   {/* Third-party delivery options */}
                   {orderType === 'delivery' && business?.settings?.thirdPartyDelivery?.enabled && (
