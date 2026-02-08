@@ -353,7 +353,7 @@ async function seed() {
     isDemo: true,
 
     maxInhouseDrivers: 2,
-    inHouseDriverIds: accountMap.driver ? [accountMap.driver] : [],
+    inHouseDriverIds: accountMap.driver_inhouse ? [accountMap.driver_inhouse] : [],
     staffIds: [accountMap.staff, accountMap.owner].filter(Boolean),
     staffCount: 12,
 

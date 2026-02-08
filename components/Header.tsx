@@ -104,15 +104,16 @@ const Header = () => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { openAuthModal } = useAuthModal();
 
-  // Hide global header on order pages (they have their own nav)
-  const hideHeader = pathname?.startsWith('/order/');
-  if (hideHeader) return null;
-
+  // Scroll listener — must be called unconditionally (React hooks rules)
   useEffect(() => {
     const h = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', h);
     return () => window.removeEventListener('scroll', h);
   }, []);
+
+  // Hide global header on order pages (they have their own nav)
+  const hideHeader = pathname?.startsWith('/order/');
+  if (hideHeader) return null;
 
   const closeMobile = () => setMobileOpen(false);
   const closeDropdown = () => setOpenMenu(null);
