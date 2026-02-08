@@ -251,9 +251,19 @@ export interface BusinessWebsite {
   domainOrderId?: number;
   domainAutoRenew?: boolean;
   dnsConfigured?: boolean;
-  domainStatus?: 'active' | 'pending_dns' | 'expired';
+  domainStatus?: 'active' | 'pending_dns' | 'expired' | 'disconnected';
   domainRegistrar?: string;
   stripePaymentIntentId?: string;
+  domainSource?: 'purchased' | 'external'; // 'purchased' = via MohnMenu, 'external' = BYOD
+  domainConnectedAt?: string;
+  domainDisconnectedAt?: string;
+  domainPrivacy?: boolean;
+  dnsInstructionsShown?: string;
+  sitemapSubmittedAt?: string;
+  sitemapPingSuccess?: boolean;
+  gscSiteAdded?: boolean;
+  gscSitemapSubmitted?: boolean;
+  gscRegisteredAt?: string;
   
   // Selected verticals for SEO pages
   selectedServices: string[]; // e.g., ["dine-in", "takeout", "delivery", "catering", "meal-prep"]

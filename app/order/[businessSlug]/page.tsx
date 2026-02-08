@@ -27,6 +27,7 @@ import {
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { QRCodeSVG } from 'qrcode.react';
+import LiveStaffSection from '@/components/LiveStaffSection';
 import {
   addToCartEvent, removeFromCartEvent, beginCheckout, purchase,
   viewItem, makeGtagItem, event as gtagEvent,
@@ -277,6 +278,9 @@ export default function OrderPage({
   const [seatingPreference, setSeatingPreference] = useState<'indoor' | 'outdoor' | 'bar' | 'private' | ''>('');
   const [reservationOccasion, setReservationOccasion] = useState('');
   const [isVIP, setIsVIP] = useState(false);
+  // Staff assignment state
+  const [selectedStaffId, setSelectedStaffId] = useState('');
+  const [selectedStaffName, setSelectedStaffName] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -425,6 +429,8 @@ export default function OrderPage({
         occasion: reservationOccasion || undefined,
         isVIP,
       },
+      assignedStaffId: selectedStaffId || undefined,
+      assignedStaffName: selectedStaffName || undefined,
     } : {}),
     subtotal,
     taxAmount,
@@ -1437,6 +1443,23 @@ export default function OrderPage({
                       <p className="text-[10px] text-purple-500 font-medium">
                         Your table and pre-ordered items will be ready when you arrive.
                       </p>
+
+                      {/* Live Staff Selection */}
+                      {business && (
+                        <div className="border-t border-purple-100 pt-4 mt-2">
+                          <LiveStaffSection
+                            businessId={business.businessId}
+                            primaryColor={business.brandColors?.primary || '#7C3AED'}
+                            orderPath=""
+                            compact
+                            selectedStaffId={selectedStaffId}
+                            onSelectStaff={(staff) => {
+                              setSelectedStaffId(staff.id);
+                              setSelectedStaffName(staff.name);
+                            }}
+                          />
+                        </div>
+                      )}
                     </motion.div>
                   )}
 

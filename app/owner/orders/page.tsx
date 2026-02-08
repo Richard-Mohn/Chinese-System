@@ -22,11 +22,14 @@ interface Order {
   total: number;
   subtotal: number;
   status: string;
-  orderType: string; // delivery | pickup
+  orderType: string; // delivery | pickup | dine-in | takeout
   address?: string;
   notes?: string;
   createdAt: string;
   tip?: number;
+  paymentMethod?: string;
+  assignedStaffName?: string;
+  assignedStaffId?: string;
 }
 
 const STATUS_FLOW = ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
@@ -118,11 +121,14 @@ export default function OwnerOrdersPage() {
           total: d.total || d.pricing?.total || 0,
           subtotal: d.subtotal || d.pricing?.subtotal || 0,
           status: d.status || 'pending',
-          orderType: d.orderType || 'delivery',
+          orderType: d.orderType || d.type || 'delivery',
           address: d.deliveryAddress || d.address || '',
           notes: d.notes || d.specialInstructions || '',
           createdAt: d.createdAt || '',
           tip: d.tip || d.pricing?.tip || 0,
+          paymentMethod: d.paymentMethod || '',
+          assignedStaffName: d.assignedStaffName || '',
+          assignedStaffId: d.assignedStaffId || '',
         });
       });
 
@@ -268,8 +274,18 @@ export default function OwnerOrdersPage() {
                     {STATUS_LABELS[order.status] || order.status}
                   </span>
                   <span className="text-zinc-400 text-xs">
-                    {order.orderType === 'delivery' ? '🚗 Delivery' : '🏪 Pickup'}
+                    {order.orderType === 'delivery' ? '🚗 Delivery' : order.orderType === 'dine-in' ? '🍽️ Dine-in' : order.orderType === 'takeout' ? '📦 Takeout' : '🏪 Pickup'}
                   </span>
+                  {order.paymentMethod && (
+                    <span className="text-zinc-300 text-xs">
+                      {order.paymentMethod === 'crypto' ? '₿' : order.paymentMethod === 'cash' ? '💵' : '💳'} {order.paymentMethod}
+                    </span>
+                  )}
+                  {order.assignedStaffName && (
+                    <span className="text-purple-500 text-xs font-bold">
+                      → {order.assignedStaffName}
+                    </span>
+                  )}
                   {order.createdAt && (
                     <span className="text-zinc-300 text-xs ml-auto">
                       {new Date(order.createdAt).toLocaleTimeString([], {
@@ -317,7 +333,23 @@ export default function OwnerOrdersPage() {
                 {selectedOrder.address && (
                   <p className="text-zinc-600">📍 {selectedOrder.address}</p>
                 )}
+                <p className="text-zinc-600">
+                  {selectedOrder.orderType === 'delivery' ? '🚗 Delivery' : selectedOrder.orderType === 'dine-in' ? '🍽️ Dine-in' : selectedOrder.orderType === 'takeout' ? '📦 Takeout' : '🏪 Pickup'}
+                </p>
+                {selectedOrder.paymentMethod && (
+                  <p className="text-zinc-600">
+                    {selectedOrder.paymentMethod === 'crypto' ? '₿ Crypto' : selectedOrder.paymentMethod === 'cash' ? '💵 Cash' : '💳 Card'}
+                  </p>
+                )}
               </div>
+
+              {/* Assigned Staff */}
+              {selectedOrder.assignedStaffName && (
+                <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
+                  <p className="text-xs font-bold text-purple-700 mb-1">Assigned To</p>
+                  <p className="text-sm font-bold text-purple-600">👤 {selectedOrder.assignedStaffName}</p>
+                </div>
+              )}
 
               {/* Items */}
               <div>

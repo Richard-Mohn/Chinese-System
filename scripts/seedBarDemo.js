@@ -408,6 +408,60 @@ async function seed() {
   }
   console.log(`✅ ${count} menu items seeded`);
 
+  // ── 3b. Staff on duty profiles ──
+  console.log('\n👥 Seeding staff on duty...');
+  const staffRef = db.collection(`businesses/${BUSINESS_ID}/staffOnDuty`);
+
+  // Clear existing
+  const existStaff = await staffRef.get();
+  if (existStaff.docs.length > 0) {
+    const sBatch = db.batch();
+    existStaff.docs.forEach(d => sBatch.delete(d.ref));
+    await sBatch.commit();
+  }
+
+  const staffProfiles = [
+    {
+      name: 'Mike Reeves',
+      role: 'bartender',
+      specialty: 'Craft Cocktails & Whiskey Flights',
+      bio: 'Award-winning mixologist. If you can dream it, Mike can pour it. Try his Copper Old Fashioned.',
+      yearsExp: 8,
+      customerFavorite: true,
+      uid: accountMap.staff || '',
+    },
+    {
+      name: 'Sarah Lin',
+      role: 'server',
+      specialty: 'Wine Pairings & VIP Service',
+      bio: 'Sarah knows every item on the menu by heart. Ask her for dinner recs — she never misses.',
+      yearsExp: 5,
+      customerFavorite: true,
+      uid: accountMap.staff2 || '',
+    },
+    {
+      name: 'DJ Ty',
+      role: 'dj / karaoke host',
+      specialty: 'Karaoke Nights & Music Curation',
+      bio: 'Thursday through Saturday, DJ Ty keeps the energy right. Request songs through the jukebox or talk to him directly.',
+      yearsExp: 3,
+      customerFavorite: false,
+    },
+    {
+      name: 'Amanda Cruz',
+      role: 'bartender',
+      specialty: 'Tequila & Mezcal Cocktails',
+      bio: 'If you like spicy margaritas, Amanda makes the best in Richmond. Period.',
+      yearsExp: 6,
+      customerFavorite: false,
+    },
+  ];
+
+  for (const sp of staffProfiles) {
+    await staffRef.add({ ...sp, onDuty: true, updatedAt: now });
+  }
+  console.log(`✅ ${staffProfiles.length} staff profiles seeded`);
+
   // ── 4. Demo jukebox queue ──
   console.log('\n🎵 Seeding jukebox queue...');
   const jukeboxRef = db.collection(`businesses/${BUSINESS_ID}/jukeboxQueue`);

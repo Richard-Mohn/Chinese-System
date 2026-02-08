@@ -9,7 +9,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef, type MouseEvent as ReactMouseEvent } from 'react';
-import { collection, query, getDocs, addDoc, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, getDocs, addDoc, orderBy, doc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { authFetch } from '@/lib/authFetch';
 import type { MohnMenuBusiness } from '@/lib/types';
@@ -18,7 +18,7 @@ import {
   FaTimes, FaPlus, FaMinus, FaTrash, FaCheck,
   FaMotorcycle, FaStore, FaSearch, FaFire, FaShoppingCart,
   FaCreditCard, FaLock, FaArrowRight, FaArrowLeft, FaBitcoin,
-  FaCopy,
+  FaCopy, FaUtensils, FaCalendarAlt, FaUserTie, FaUsers, FaStar,
 } from 'react-icons/fa';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -230,7 +230,7 @@ export default function QuickOrderModal({
   const [itemNote, setItemNote] = useState('');
 
   // Checkout
-  const [orderType, setOrderType] = useState<'delivery' | 'pickup'>('pickup');
+  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | 'dine-in'>('pickup');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -239,6 +239,18 @@ export default function QuickOrderModal({
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'crypto' | 'cash'>('card');
   const [tip, setTip] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+
+  // Dine-in / reservation
+  const [reservationDate, setReservationDate] = useState('');
+  const [reservationTime, setReservationTime] = useState('');
+  const [partySize, setPartySize] = useState(2);
+  const [seatingPreference, setSeatingPreference] = useState('Indoor');
+
+  // Staff assignment
+  interface StaffMember { id: string; name: string; role: string; specialty?: string; isFavorite?: boolean; }
+  const [staffList, setStaffList] = useState<StaffMember[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState<string>('');
+  const isDineInType = ['bar_grill', 'restaurant', 'chinese_restaurant'].includes(business.type);
 
   // Payment
   const [clientSecret, setClientSecret] = useState('');
@@ -332,6 +344,23 @@ export default function QuickOrderModal({
     []
   );
 
+  // Load staff on duty (real-time)
+  useEffect(() => {
+    if (!isDineInType) return;
+    const ref = collection(db, 'businesses', business.businessId, 'staffOnDuty');
+    const unsub = onSnapshot(ref, snap => {
+      if (!snap.empty) {
+        const onDuty = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as StaffMember & { onDuty?: boolean }))
+          .filter(s => s.onDuty !== false);
+        setStaffList(onDuty);
+      } else {
+        setStaffList([]);
+      }
+    });
+    return () => unsub();
+  }, [business.businessId, isDineInType]);
+
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
   const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const taxRate = business.settings?.pricing?.taxRate ?? 0.07;
@@ -380,6 +409,10 @@ export default function QuickOrderModal({
       alert('Please enter a delivery address.');
       return;
     }
+    if (orderType === 'dine-in' && (!reservationDate || !reservationTime)) {
+      alert('Please select a date and time for your reservation.');
+      return;
+    }
     setSubmitting(true);
     setPaymentError('');
 
@@ -401,6 +434,16 @@ export default function QuickOrderModal({
       status: 'pending',
       deliveryAddress: orderType === 'delivery' ? address : undefined,
       deliveryInstructions: orderType === 'delivery' ? instructions : undefined,
+      ...(orderType === 'dine-in' ? {
+        reservation: {
+          date: reservationDate,
+          time: reservationTime,
+          partySize,
+          seatingPreference,
+        },
+        assignedStaffId: selectedStaff || undefined,
+        assignedStaffName: staffList.find(s => s.id === selectedStaff)?.name || undefined,
+      } : {}),
       subtotal,
       taxAmount,
       taxRate,
@@ -877,7 +920,7 @@ export default function QuickOrderModal({
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2">
                   Order Type
                 </p>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className={`grid gap-1.5 ${isDineInType ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   <button
                     onClick={() => setOrderType('pickup')}
                     className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all ${
@@ -898,8 +941,120 @@ export default function QuickOrderModal({
                   >
                     <FaMotorcycle className="text-[10px]" /> Delivery
                   </button>
+                  {isDineInType && (
+                    <button
+                      onClick={() => setOrderType('dine-in')}
+                      className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+                        orderType === 'dine-in'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
+                      }`}
+                    >
+                      <FaUtensils className="text-[10px]" /> Dine-In
+                    </button>
+                  )}
                 </div>
               </div>
+
+              {/* Dine-in reservation details */}
+              {orderType === 'dine-in' && (
+                <div className="bg-purple-50 rounded-2xl p-3.5 border border-purple-100 space-y-2.5">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-purple-600 flex items-center gap-1.5">
+                    <FaCalendarAlt className="text-[9px]" /> Reservation Details
+                  </p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <input
+                      type="date"
+                      value={reservationDate}
+                      onChange={e => setReservationDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="px-3 py-2 bg-white border border-purple-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-purple-400"
+                    />
+                    <select
+                      value={reservationTime}
+                      onChange={e => setReservationTime(e.target.value)}
+                      className="px-3 py-2 bg-white border border-purple-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-purple-400"
+                    >
+                      <option value="">Time</option>
+                      {['11:00 AM','11:30 AM','12:00 PM','12:30 PM','1:00 PM','1:30 PM','2:00 PM',
+                        '4:00 PM','4:30 PM','5:00 PM','5:30 PM','6:00 PM','6:30 PM','7:00 PM',
+                        '7:30 PM','8:00 PM','8:30 PM','9:00 PM','9:30 PM','10:00 PM','10:30 PM',
+                      ].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FaUsers className="text-purple-500 text-xs" />
+                    <div className="flex items-center gap-1">
+                      {[1,2,3,4,5,6].map(n => (
+                        <button
+                          key={n}
+                          onClick={() => setPartySize(n)}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                            partySize === n
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-white text-zinc-500 border border-purple-200 hover:border-purple-400'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                      <span className="text-[10px] text-purple-400 font-bold ml-1">guests</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5">
+                    {['Indoor', 'Patio', 'Bar', 'VIP'].map(s => (
+                      <button
+                        key={s}
+                        onClick={() => setSeatingPreference(s)}
+                        className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                          seatingPreference === s
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-white text-zinc-500 border border-purple-200 hover:border-purple-400'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Send to specific staff */}
+                  {staffList.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-purple-500 mb-1.5 flex items-center gap-1">
+                        <FaUserTie className="text-[8px]" /> Send to Staff (optional)
+                      </p>
+                      <div className="space-y-1">
+                        <button
+                          onClick={() => setSelectedStaff('')}
+                          className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                            !selectedStaff ? 'bg-purple-600 text-white' : 'bg-white border border-purple-200 text-zinc-600 hover:border-purple-400'
+                          }`}
+                        >
+                          Anyone available
+                        </button>
+                        {staffList.map(s => (
+                          <button
+                            key={s.id}
+                            onClick={() => setSelectedStaff(s.id)}
+                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                              selectedStaff === s.id ? 'bg-purple-600 text-white' : 'bg-white border border-purple-200 text-zinc-600 hover:border-purple-400'
+                            }`}
+                          >
+                            <span className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-[10px] font-black shrink-0">
+                              {s.name.charAt(0)}
+                            </span>
+                            <span className="flex-1 text-left">
+                              <span className="font-bold">{s.name}</span>
+                              {s.specialty && <span className="text-[10px] opacity-60 ml-1">• {s.specialty}</span>}
+                            </span>
+                            <span className="text-[10px] opacity-50 capitalize">{s.role}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Contact info */}
               <div>
@@ -1324,7 +1479,9 @@ export default function QuickOrderModal({
                 #{orderId.slice(0, 8).toUpperCase()}
               </p>
               <p className="text-zinc-400 text-xs max-w-[260px]">
-                {orderType === 'pickup'
+                {orderType === 'dine-in'
+                  ? `Table for ${partySize} — ${reservationDate} at ${reservationTime}. We'll have everything ready!`
+                  : orderType === 'pickup'
                   ? "We're preparing your order now."
                   : 'Your order is being prepared for delivery.'}
               </p>
@@ -1374,7 +1531,8 @@ export default function QuickOrderModal({
                 cart.length === 0 ||
                 !name ||
                 !phone ||
-                (orderType === 'delivery' && !address)
+                (orderType === 'delivery' && !address) ||
+                (orderType === 'dine-in' && (!reservationDate || !reservationTime))
               }
               className="w-full py-3 bg-black text-white rounded-xl font-bold text-xs hover:bg-zinc-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >

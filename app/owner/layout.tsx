@@ -20,6 +20,7 @@ import {
   FaVideo,
   FaGavel,
   FaLink,
+  FaUsers,
 } from 'react-icons/fa';
 
 const NAV_ITEMS = [
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { href: '/owner/orders', label: 'Orders', icon: FaClipboardList },
   { href: '/owner/kds', label: 'Kitchen Display', icon: FaDesktop },
   { href: '/owner/menu', label: 'Menu', icon: FaUtensils },
+  { href: '/owner/staff', label: 'Staff', icon: FaUsers },
   { href: '/owner/chef-cam', label: 'Chef Cam', icon: FaVideo },
   { href: '/owner/auctions', label: 'Auctions', icon: FaGavel, beta: true },
   { href: '/owner/drivers', label: 'Drivers', icon: FaTruck },

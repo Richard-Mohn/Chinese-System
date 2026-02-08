@@ -118,5 +118,11 @@ const MAIN_DOMAINS = [
  */
 export function isMainDomain(hostname: string): boolean {
   const clean = hostname.split(':')[0]; // Remove port
-  return MAIN_DOMAINS.some(d => clean === d || clean.endsWith(`.hosted.app`));
+  return MAIN_DOMAINS.some(d => clean === d) ||
+    clean.endsWith('.hosted.app') ||
+    clean.endsWith('.apphosting.dev') ||
+    clean.endsWith('.run.app') ||
+    clean.endsWith('.web.app') ||
+    clean.endsWith('.firebaseapp.com') ||
+    clean.endsWith('.vercel.app');
 }

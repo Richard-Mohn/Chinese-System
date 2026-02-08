@@ -206,37 +206,78 @@ export default function Home() {
             <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4">Your business. Online. Instantly.</h2>
             <p className="text-zinc-400 text-lg max-w-xl mx-auto">Every business type gets a branded storefront tailored to how they sell — menus, catalogs, or product listings.</p>
           </motion.div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { type: 'Restaurant', page: 'Your Menu', emoji: '🍽️', color: 'from-orange-500 to-red-500', href: '/demo' },
-              { type: 'Bakery / Café', page: 'Your Menu', emoji: '🧁', color: 'from-pink-500 to-rose-500', href: '/demo' },
-              { type: 'Food Truck', page: 'Your Menu', emoji: '🚚', color: 'from-yellow-500 to-orange-500', href: '/demo' },
-              { type: 'Bar & Grill', page: 'Your Drink Menu', emoji: '🍺', color: 'from-purple-500 to-violet-500', href: '/demo' },
-              { type: 'Grocery Store', page: 'Your Product Catalog', emoji: '🛒', color: 'from-green-500 to-emerald-500', href: '/demo' },
-              { type: 'Boutique', page: 'Your Storefront', emoji: '👗', color: 'from-amber-500 to-orange-500', href: '/demo' },
-              { type: 'Antique Shop', page: 'Your Product Gallery', emoji: '🏺', color: 'from-amber-600 to-yellow-600', href: '/demo' },
-              { type: 'Convenience Store', page: 'Your Quick-Shop', emoji: '🏪', color: 'from-blue-500 to-indigo-500', href: '/demo' },
-            ].map((item, i) => (
+              { type: 'Chinese Restaurant', slug: 'china-wok-rva', name: 'China Wok', emoji: '🥡', color: 'from-red-500 to-orange-500', description: 'Full-service restaurant with online ordering, delivery, and Quick Order.', pageName: 'Menu', live: true },
+              { type: 'Bar & Grill', slug: 'the-copper-tap', name: 'The Copper Tap', emoji: '🍺', color: 'from-purple-500 to-violet-500', description: 'Craft cocktail bar with reservations, jukebox & karaoke, kiosk mode, crypto payments.', pageName: 'Drink Menu', live: true },
+              { type: 'Pizza Shop', slug: '', name: 'Demo Pizza Co.', emoji: '🍕', color: 'from-orange-500 to-yellow-500', description: 'Pizza shop with build-your-own pizzas, sides, and delivery.', pageName: 'Menu', live: false },
+              { type: 'Bakery & Café', slug: '', name: 'Sweet Crumb Bakery', emoji: '🧁', color: 'from-pink-500 to-rose-500', description: 'Pre-orders, custom cakes, pastries, and coffee drinks.', pageName: 'Menu', live: false },
+              { type: 'Food Truck', slug: '', name: 'Street Eats RVA', emoji: '🚚', color: 'from-yellow-500 to-orange-500', description: 'Mobile food service with QR ordering and GPS location.', pageName: 'Menu', live: false },
+              { type: 'Grocery Store', slug: '', name: 'Fresh Valley Market', emoji: '🛒', color: 'from-green-500 to-emerald-500', description: 'Online product catalog with curbside pickup & delivery.', pageName: 'Product Catalog', live: false },
+              { type: 'Boutique', slug: '', name: 'Ivy & Thread', emoji: '👗', color: 'from-amber-500 to-orange-500', description: 'Clothing, accessories, and gifts with AI product listings.', pageName: 'Storefront', live: false },
+              { type: 'Antique Shop', slug: '', name: 'Timeless Treasures', emoji: '🏺', color: 'from-amber-600 to-yellow-600', description: 'Vintage finds with AI-powered photo-to-listing tool.', pageName: 'Product Gallery', live: false },
+              { type: 'Convenience Store', slug: '', name: 'QuickStop Mini Mart', emoji: '🏪', color: 'from-blue-500 to-indigo-500', description: 'Snacks, drinks, and essentials with grab-and-go ordering.', pageName: 'Quick-Shop', live: false },
+            ].map((store, i) => (
               <motion.div
-                key={item.type}
+                key={store.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
+                transition={{ delay: i * 0.05 }}
+                className="group"
               >
-                <Link href={item.href} className="group block bg-white rounded-2xl border border-zinc-100 hover:border-zinc-300 hover:shadow-xl transition-all duration-500 overflow-hidden">
-                  <div className={`h-24 md:h-32 bg-gradient-to-br ${item.color} flex items-center justify-center relative overflow-hidden`}>
-                    <span className="text-4xl md:text-5xl z-10 group-hover:scale-110 transition-transform duration-500">{item.emoji}</span>
+                <div className="bg-white rounded-3xl border border-zinc-100 hover:border-zinc-300 hover:shadow-xl transition-all duration-500 overflow-hidden h-full flex flex-col">
+                  {/* Color header */}
+                  <div className={`h-36 bg-gradient-to-br ${store.color} flex items-center justify-center relative overflow-hidden`}>
+                    <span className="text-6xl z-10 group-hover:scale-110 transition-transform duration-500">{store.emoji}</span>
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                    {store.live && (
+                      <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-green-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        Live
+                      </div>
+                    )}
+                    {!store.live && (
+                      <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-zinc-500 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
+                        Coming Soon
+                      </div>
+                    )}
                   </div>
-                  <div className="p-4">
-                    <div className="font-bold text-black text-sm mb-0.5">{item.type}</div>
-                    <div className="text-xs text-zinc-400 font-medium">{item.page}</div>
-                    <div className="mt-2 flex items-center gap-1 text-[10px] font-black text-orange-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                      <FaPlay className="text-[8px]" /> Live Demo
+
+                  {/* Content */}
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">{store.type}</div>
+                    <h3 className="text-xl font-bold text-black mb-1">{store.name}</h3>
+                    <p className="text-sm text-zinc-400 font-medium mb-4 flex-1">{store.description}</p>
+
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 font-bold mb-4">
+                      <span className="px-2 py-0.5 bg-zinc-100 rounded-full">{store.pageName}</span>
+                      <span className="px-2 py-0.5 bg-zinc-100 rounded-full">Quick Order</span>
+                      <span className="px-2 py-0.5 bg-zinc-100 rounded-full">Cart</span>
                     </div>
+
+                    {store.live ? (
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/${store.slug}`}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-900 text-white rounded-full font-bold text-sm hover:bg-black transition-colors"
+                        >
+                          <FaPlay className="text-[10px]" /> View Storefront
+                        </Link>
+                        <Link
+                          href={`/order/${store.slug}`}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-bold text-sm hover:shadow-lg hover:shadow-orange-500/20 transition-all"
+                        >
+                          <FaShoppingCart className="text-[10px]" /> Order Page
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="py-3 bg-zinc-100 text-zinc-400 rounded-full font-bold text-sm text-center cursor-not-allowed">
+                        Demo Coming Soon
+                      </div>
+                    )}
                   </div>
-                </Link>
+                </div>
               </motion.div>
             ))}
           </div>

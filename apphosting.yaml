@@ -20,3 +20,7 @@ env:
     secret: NOWPAYMENTS_API_KEY
   - variable: NOWPAYMENTS_IPN_SECRET
     secret: NOWPAYMENTS_IPN_SECRET
+  - variable: DNA_API_USERNAME
+    secret: DNA_API_USERNAME
+  - variable: DNA_API_PASSWORD
+    secret: DNA_API_PASSWORD

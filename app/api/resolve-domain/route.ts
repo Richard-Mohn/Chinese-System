@@ -4,12 +4,12 @@
  * Maps custom domains to business slugs.
  * GET /api/resolve-domain?domain=chinawok.com → { slug: "china-wok" }
  * 
- * Uses in-memory cache with 5-minute TTL (resets on cold start).
+ * Uses Firebase Admin SDK (server-side) + in-memory cache with 5-minute TTL.
+ * Also checks the customDomains collection for fast BYOD domain lookups.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebaseAdmin';
 
 // In-memory cache: domain → { slug, cachedAt }
 const domainCache = new Map<string, { slug: string; cachedAt: number }>();
@@ -23,51 +23,58 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing domain parameter' }, { status: 400 });
   }
 
+  // Clean the domain
+  const cleanDomain = domain.split(':')[0].replace(/^www\./, '');
+
   // Check cache first
-  const cached = domainCache.get(domain);
+  const cached = domainCache.get(cleanDomain);
   if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
     return NextResponse.json({ slug: cached.slug });
   }
 
   try {
-    // Query Firestore for business with this custom domain
-    const businessesRef = collection(db, 'businesses');
-    const q = query(
-      businessesRef,
-      where('website.customDomain', '==', domain),
-      where('website.customDomainEnabled', '==', true)
-    );
-    
-    const snapshot = await getDocs(q);
+    // Query Firestore for business with this custom domain (Admin SDK)
+    const businessesRef = adminDb.collection('businesses');
+    let snapshot = await businessesRef
+      .where('website.customDomain', '==', cleanDomain)
+      .where('website.customDomainEnabled', '==', true)
+      .limit(1)
+      .get();
     
     if (!snapshot.empty) {
       const business = snapshot.docs[0].data();
       const slug = business.slug;
       
       // Cache the result
-      domainCache.set(domain, { slug, cachedAt: Date.now() });
+      domainCache.set(cleanDomain, { slug, cachedAt: Date.now() });
       
       return NextResponse.json({ slug });
     }
 
-    // Fallback: try without www. prefix
-    if (domain.startsWith('www.')) {
-      const bareDomain = domain.replace('www.', '');
-      const q2 = query(
-        businessesRef,
-        where('website.customDomain', '==', bareDomain),
-        where('website.customDomainEnabled', '==', true)
-      );
+    // Fallback: try with www. prefix if original didn't have it
+    if (!domain.includes('www.')) {
+      snapshot = await businessesRef
+        .where('website.customDomain', '==', `www.${cleanDomain}`)
+        .where('website.customDomainEnabled', '==', true)
+        .limit(1)
+        .get();
       
-      const snapshot2 = await getDocs(q2);
-      
-      if (!snapshot2.empty) {
-        const business = snapshot2.docs[0].data();
+      if (!snapshot.empty) {
+        const business = snapshot.docs[0].data();
         const slug = business.slug;
         
-        domainCache.set(domain, { slug, cachedAt: Date.now() });
+        domainCache.set(cleanDomain, { slug, cachedAt: Date.now() });
         return NextResponse.json({ slug });
       }
+    }
+
+    // Also check the customDomains collection (created by domain purchase/connect flow)
+    const customDomainDoc = await adminDb.collection('customDomains').doc(cleanDomain).get();
+    if (customDomainDoc.exists) {
+      const data = customDomainDoc.data()!;
+      const slug = data.businessSlug || data.slug;
+      domainCache.set(cleanDomain, { slug, cachedAt: Date.now() });
+      return NextResponse.json({ slug });
     }
 
     return NextResponse.json({ error: 'Domain not found' }, { status: 404 });

@@ -17,6 +17,7 @@ import { headers } from 'next/headers';
 import { getServerBasePath, getServerOrderPath } from '@/lib/tenant-links';
 import TenantHeroActions from '@/components/TenantHeroActions';
 import TenantCTA from '@/components/TenantCTA';
+import LiveStaffSection from '@/components/LiveStaffSection';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -218,6 +219,15 @@ export default async function TenantHomePage({
             </div>
           </div>
         </section>
+      )}
+
+      {/* ─── Who's Working Tonight (live real-time staff) ─── */}
+      {isBarType && (
+        <LiveStaffSection
+          businessId={business.businessId}
+          primaryColor={primaryColor}
+          orderPath={orderPath}
+        />
       )}
 
       {/* ─── Reservations CTA (bar/restaurant) ────────────────── */}
