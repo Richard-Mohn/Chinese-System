@@ -24,9 +24,8 @@ export default function DashboardRouter() {
     } else if (role === 'driver_inhouse' || role === 'driver_marketplace' || role === 'driver') {
       router.push('/driver');
     } else if (role === 'staff') {
-      // Staff (bartender/server) — go to their business storefront
-      const slug = currentBusiness?.slug;
-      router.push(slug ? `/${slug}` : '/');
+      // Staff (bartender/server) — go to KDS / Orders inside owner dashboard
+      router.push('/owner/kds');
     } else if (role === 'customer') {
       router.push('/customer');
     } else if (role === 'admin') {

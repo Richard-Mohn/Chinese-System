@@ -37,7 +37,7 @@ export default function TenantHeroActions({
   orderPath: string;
   menuPath: string;
 }) {
-  const { user } = useAuth();
+  const { user, MohnMenuUser } = useAuth();
   const { openAuthModal } = useAuthModal();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -67,11 +67,11 @@ export default function TenantHeroActions({
         {/* Register / Account — secondary action */}
         {user ? (
           <a
-            href="/customer/orders"
+            href={MohnMenuUser?.role === 'staff' ? '/owner/kds' : MohnMenuUser?.role === 'owner' || MohnMenuUser?.role === 'manager' ? '/owner/orders' : '/customer/orders'}
             className="px-10 py-5 bg-zinc-100 text-black rounded-full font-bold text-lg flex items-center gap-3 hover:bg-zinc-200 transition-all"
           >
             <FaReceipt className="text-base" />
-            My Orders
+            {MohnMenuUser?.role === 'staff' ? 'Kitchen Display' : 'My Orders'}
           </a>
         ) : (
           <button

@@ -48,8 +48,8 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     email: 'bartender@coppertap.demo',
     icon: FaGlassMartini,
     color: 'from-purple-500 to-indigo-600',
-    description: 'Staff view — receive orders, toggle on/off duty',
-    dashboardPath: '/{slug}',
+    description: 'Staff view — kitchen display, orders, toggle on/off duty',
+    dashboardPath: '/owner/kds',
   },
   {
     role: 'server',
@@ -57,8 +57,8 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     email: 'server@coppertap.demo',
     icon: FaConciergeBell,
     color: 'from-emerald-500 to-teal-600',
-    description: 'Staff view — table service, order assignments',
-    dashboardPath: '/{slug}',
+    description: 'Staff view — kitchen display, orders, table service',
+    dashboardPath: '/owner/kds',
   },
   {
     role: 'driver',
@@ -301,11 +301,14 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
                     )}
                     {(currentDemoAccount.role === 'bartender' || currentDemoAccount.role === 'server') && (
                       <>
+                        <a href="/owner/kds" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
+                          🖥️ Kitchen Display
+                        </a>
+                        <a href="/owner/orders" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
+                          <FaClipboardList className="text-[10px]" /> Orders
+                        </a>
                         <a href={`/${businessSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
                           <FaTachometerAlt className="text-[10px]" /> Storefront
-                        </a>
-                        <a href={`/order/${businessSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
-                          🍽️ Order Page
                         </a>
                       </>
                     )}

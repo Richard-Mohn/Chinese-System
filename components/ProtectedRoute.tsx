@@ -63,6 +63,8 @@ function getRoleDashboard(role: string): string {
     case 'owner':
     case 'manager':
       return '/owner';
+    case 'staff':
+      return '/owner/kds';
     case 'driver_inhouse':
     case 'driver_marketplace':
       return '/driver';

@@ -79,11 +79,13 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
     return locks;
   }, [businessTier]);
 
+  const isStaff = MohnMenuUser?.role === 'staff';
+
   useEffect(() => {
-    if (!loading && (!user || !isOwner())) {
+    if (!loading && (!user || (!isOwner() && !isStaff))) {
       router.push('/login');
     }
-  }, [user, loading, isOwner, router]);
+  }, [user, loading, isOwner, isStaff, router]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -100,7 +102,13 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!user || !isOwner()) return null;
+  if (!user || (!isOwner() && !isStaff)) return null;
+
+  // Staff users only see KDS and Orders
+  const STAFF_PAGES = ['/owner/kds', '/owner/orders'];
+  const visibleNavItems = isStaff
+    ? NAV_ITEMS.filter(item => STAFF_PAGES.includes(item.href))
+    : NAV_ITEMS;
 
   const isActive = (href: string) => {
     if (href === '/owner') return pathname === '/owner';
@@ -135,7 +143,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
 
         {/* Nav */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map(item => {
+          {visibleNavItems.map(item => {
             const Icon = item.icon;
             const active = isActive(item.href);
             const locked = navLocks[item.href];
@@ -228,7 +236,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               </Link>
             </div>
             <nav className="p-4 space-y-1">
-              {NAV_ITEMS.map(item => {
+              {visibleNavItems.map(item => {
                 const Icon = item.icon;
                 const active = isActive(item.href);
                 const locked = navLocks[item.href];

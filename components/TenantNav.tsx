@@ -140,18 +140,52 @@ export default function TenantNav({
                       exit={{ opacity: 0, y: 8 }}
                       className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-zinc-100 overflow-hidden z-50"
                     >
-                      <a
-                        href="/customer/orders"
-                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
-                      >
-                        <FaReceipt className="text-zinc-400" /> My Orders & Receipts
-                      </a>
-                      <a
-                        href="/customer/loyalty"
-                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
-                      >
-                        <FaStar className="text-amber-500" /> Rewards & Loyalty
-                      </a>
+                      {MohnMenuUser?.role === 'staff' ? (
+                        <>
+                          <a
+                            href="/owner/kds"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+                          >
+                            <FaReceipt className="text-zinc-400" /> Kitchen Display
+                          </a>
+                          <a
+                            href="/owner/orders"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+                          >
+                            <FaStar className="text-amber-500" /> Orders
+                          </a>
+                        </>
+                      ) : MohnMenuUser?.role === 'owner' || MohnMenuUser?.role === 'manager' ? (
+                        <>
+                          <a
+                            href="/owner"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+                          >
+                            <FaReceipt className="text-zinc-400" /> Owner Dashboard
+                          </a>
+                          <a
+                            href="/owner/orders"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+                          >
+                            <FaStar className="text-amber-500" /> Manage Orders
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          <a
+                            href="/customer/orders"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+                          >
+                            <FaReceipt className="text-zinc-400" /> My Orders & Receipts
+                          </a>
+                          <a
+                            href="/customer/loyalty"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+                          >
+                            <FaStar className="text-amber-500" /> Rewards & Loyalty
+                          </a>
+                        </>
+                      )}
                       <a
                         href="/customer/profile"
                         className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
@@ -228,18 +262,34 @@ export default function TenantNav({
                 <div className="pt-3 border-t border-zinc-100 space-y-2">
                   {user ? (
                     <>
-                      <a
-                        href="/customer/orders"
-                        className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700"
-                      >
-                        <FaReceipt className="text-zinc-400" /> My Orders & Receipts
-                      </a>
-                      <a
-                        href="/customer/loyalty"
-                        className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700"
-                      >
-                        <FaStar className="text-amber-500" /> Rewards & Loyalty
-                      </a>
+                      {MohnMenuUser?.role === 'staff' ? (
+                        <>
+                          <a href="/owner/kds" className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700">
+                            <FaReceipt className="text-zinc-400" /> Kitchen Display
+                          </a>
+                          <a href="/owner/orders" className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700">
+                            <FaStar className="text-amber-500" /> Orders
+                          </a>
+                        </>
+                      ) : MohnMenuUser?.role === 'owner' || MohnMenuUser?.role === 'manager' ? (
+                        <>
+                          <a href="/owner" className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700">
+                            <FaReceipt className="text-zinc-400" /> Owner Dashboard
+                          </a>
+                          <a href="/owner/orders" className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700">
+                            <FaStar className="text-amber-500" /> Manage Orders
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          <a href="/customer/orders" className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700">
+                            <FaReceipt className="text-zinc-400" /> My Orders & Receipts
+                          </a>
+                          <a href="/customer/loyalty" className="flex items-center gap-3 py-3 text-sm font-bold text-zinc-700">
+                            <FaStar className="text-amber-500" /> Rewards & Loyalty
+                          </a>
+                        </>
+                      )}
                       <button
                         onClick={() => { logout(); setMobileOpen(false); }}
                         className="flex items-center gap-3 py-3 text-sm font-bold text-red-600 w-full"
