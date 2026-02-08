@@ -42,7 +42,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "babel-plugin-react-compiler": "1.0.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
@@ -57,6 +56,12 @@
   ],
   "author": "Richard",
   "license": "MIT",
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "not op_mini all",
+    "> 0.2% and last 2 versions"
+  ],
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"

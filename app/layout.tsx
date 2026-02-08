@@ -15,7 +15,7 @@ import {
   WEBSITE_JSONLD,
 } from '@/lib/platform-seo';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://mohnmenu.com'),

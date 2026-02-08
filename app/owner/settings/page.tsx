@@ -6,6 +6,27 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { authFetch } from '@/lib/authFetch';
 
+/** Reusable iOS-style toggle switch */
+function Toggle({ checked, onChange, color = 'bg-emerald-500' }: { checked: boolean; onChange: () => void; color?: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black ${
+        checked ? color : 'bg-zinc-300'
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200 ${
+          checked ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
+  );
+}
+
 export default function OwnerSettingsPage() {
   const { currentBusiness } = useAuth();
 
@@ -260,19 +281,7 @@ export default function OwnerSettingsPage() {
             <span className="font-bold text-black text-sm">Online Ordering</span>
             <p className="text-xs text-zinc-400">Allow customers to place orders on your website</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setSettings(p => ({ ...p, orderingEnabled: !p.orderingEnabled }))}
-            className={`w-12 h-7 rounded-full transition-colors relative ${
-              settings.orderingEnabled ? 'bg-emerald-500' : 'bg-zinc-200'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                settings.orderingEnabled ? 'translate-x-5.5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
+          <Toggle checked={settings.orderingEnabled} onChange={() => setSettings(p => ({ ...p, orderingEnabled: !p.orderingEnabled }))} />
         </label>
 
         <label className="flex items-center justify-between cursor-pointer">
@@ -280,19 +289,7 @@ export default function OwnerSettingsPage() {
             <span className="font-bold text-black text-sm">Accept Cash Payments</span>
             <p className="text-xs text-zinc-400">When off, customers must pay by card before you start cooking</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setSettings(p => ({ ...p, cashPaymentsEnabled: !p.cashPaymentsEnabled }))}
-            className={`w-12 h-7 rounded-full transition-colors relative ${
-              settings.cashPaymentsEnabled ? 'bg-emerald-500' : 'bg-zinc-200'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                settings.cashPaymentsEnabled ? 'translate-x-5.5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
+          <Toggle checked={settings.cashPaymentsEnabled} onChange={() => setSettings(p => ({ ...p, cashPaymentsEnabled: !p.cashPaymentsEnabled }))} />
         </label>
 
         <label className="flex items-center justify-between cursor-pointer">
@@ -300,19 +297,7 @@ export default function OwnerSettingsPage() {
             <span className="font-bold text-black text-sm">Show Order Stats on Menu</span>
             <p className="text-xs text-zinc-400">Display order counts and ratings on your public menu page</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setSettings(p => ({ ...p, showMenuStats: !p.showMenuStats }))}
-            className={`w-12 h-7 rounded-full transition-colors relative ${
-              settings.showMenuStats ? 'bg-emerald-500' : 'bg-zinc-200'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                settings.showMenuStats ? 'translate-x-5.5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
+          <Toggle checked={settings.showMenuStats} onChange={() => setSettings(p => ({ ...p, showMenuStats: !p.showMenuStats }))} />
         </label>
 
         <label className="flex items-center justify-between cursor-pointer">
@@ -320,19 +305,7 @@ export default function OwnerSettingsPage() {
             <span className="font-bold text-black text-sm">Enable Inventory Tracking</span>
             <p className="text-xs text-zinc-400">Track stock for items like baked goods, daily specials, etc.</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setSettings(p => ({ ...p, inventoryEnabled: !p.inventoryEnabled }))}
-            className={`w-12 h-7 rounded-full transition-colors relative ${
-              settings.inventoryEnabled ? 'bg-emerald-500' : 'bg-zinc-200'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                settings.inventoryEnabled ? 'translate-x-5.5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
+          <Toggle checked={settings.inventoryEnabled} onChange={() => setSettings(p => ({ ...p, inventoryEnabled: !p.inventoryEnabled }))} />
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -440,19 +413,7 @@ export default function OwnerSettingsPage() {
             <span className="font-bold text-black text-sm">Enable Third-Party Delivery</span>
             <p className="text-xs text-zinc-400">Offer DoorDash / Uber delivery alongside your own drivers</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setThirdPartyDelivery(p => ({ ...p, enabled: !p.enabled }))}
-            className={`w-12 h-7 rounded-full transition-colors relative ${
-              thirdPartyDelivery.enabled ? 'bg-emerald-500' : 'bg-zinc-200'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                thirdPartyDelivery.enabled ? 'translate-x-5.5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
+          <Toggle checked={thirdPartyDelivery.enabled} onChange={() => setThirdPartyDelivery(p => ({ ...p, enabled: !p.enabled }))} />
         </label>
 
         {thirdPartyDelivery.enabled && (
@@ -463,19 +424,9 @@ export default function OwnerSettingsPage() {
                 <span className="font-bold text-black text-sm">⚡ White-Label Delivery API</span>
                 <p className="text-xs text-zinc-500">Use DoorDash Drive & Uber Direct APIs — customers see delivery options at checkout, no redirects. Powered by third-party drivers under your brand.</p>
               </div>
-              <button
-                type="button"
-                onClick={() => setThirdPartyDelivery(p => ({ ...p, whiteLabel: !p.whiteLabel }))}
-                className={`w-12 h-7 rounded-full transition-colors relative shrink-0 ml-4 ${
-                  thirdPartyDelivery.whiteLabel ? 'bg-orange-500' : 'bg-zinc-200'
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                    thirdPartyDelivery.whiteLabel ? 'translate-x-5.5' : 'translate-x-0.5'
-                  }`}
-                />
-              </button>
+              <div className="shrink-0 ml-4">
+                <Toggle checked={thirdPartyDelivery.whiteLabel} onChange={() => setThirdPartyDelivery(p => ({ ...p, whiteLabel: !p.whiteLabel }))} color="bg-orange-500" />
+              </div>
             </label>
 
             {thirdPartyDelivery.whiteLabel && (
@@ -552,19 +503,7 @@ export default function OwnerSettingsPage() {
             <span className="font-bold text-black text-sm">Enable Community Couriers</span>
             <p className="text-xs text-zinc-400">Allow nearby couriers to pick up and deliver your orders</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setCourierDelivery(p => ({ ...p, enabled: !p.enabled }))}
-            className={`w-12 h-7 rounded-full transition-colors relative ${
-              courierDelivery.enabled ? 'bg-emerald-500' : 'bg-zinc-200'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                courierDelivery.enabled ? 'translate-x-5.5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
+          <Toggle checked={courierDelivery.enabled} onChange={() => setCourierDelivery(p => ({ ...p, enabled: !p.enabled }))} />
         </label>
 
         {courierDelivery.enabled && (
@@ -598,19 +537,7 @@ export default function OwnerSettingsPage() {
                 <span className="font-bold text-black text-sm">Enable Flash Sales</span>
                 <p className="text-xs text-zinc-400">Allow time-limited sale prices on menu items</p>
               </div>
-              <button
-                type="button"
-                onClick={() => setSettings(p => ({ ...p, flashSalesEnabled: !p.flashSalesEnabled }))}
-                className={`w-12 h-7 rounded-full transition-colors relative ${
-                  settings.flashSalesEnabled ? 'bg-orange-500' : 'bg-zinc-200'
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                    settings.flashSalesEnabled ? 'translate-x-5.5' : 'translate-x-0.5'
-                  }`}
-                />
-              </button>
+              <Toggle checked={settings.flashSalesEnabled} onChange={() => setSettings(p => ({ ...p, flashSalesEnabled: !p.flashSalesEnabled }))} color="bg-orange-500" />
             </label>
           </div>
         )}
@@ -630,19 +557,7 @@ export default function OwnerSettingsPage() {
               Other restaurants on the platform share their drivers when available.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setSettings(p => ({ ...p, useMarketplaceDrivers: !p.useMarketplaceDrivers }))}
-            className={`w-12 h-7 rounded-full transition-colors relative ${
-              settings.useMarketplaceDrivers ? 'bg-emerald-500' : 'bg-zinc-200'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${
-                settings.useMarketplaceDrivers ? 'translate-x-5.5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
+          <Toggle checked={settings.useMarketplaceDrivers} onChange={() => setSettings(p => ({ ...p, useMarketplaceDrivers: !p.useMarketplaceDrivers }))} />
         </label>
 
         {settings.useMarketplaceDrivers && (

@@ -77,6 +77,11 @@ export default async function sitemap({
       { url: `${BASE_URL}/features/kitchen-display/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
       { url: `${BASE_URL}/features/real-time-orders/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
       { url: `${BASE_URL}/features/white-label-website/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/community-delivery/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/reservations/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/staff-marketplace/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/features/bar-entertainment/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+      { url: `${BASE_URL}/quick-delivery/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     ];
   }
 

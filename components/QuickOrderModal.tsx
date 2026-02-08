@@ -85,7 +85,12 @@ function hasCryptoUriScheme(currency: string): boolean {
   return ['btc', 'ltc', 'doge', 'eth'].includes(currency.toLowerCase());
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+// Deferred Stripe loading — only loads when user reaches checkout
+let _stripePromise: ReturnType<typeof loadStripe> | null = null;
+function getStripe() {
+  if (!_stripePromise) _stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+  return _stripePromise;
+}
 
 // ─── Types ─────────────────────────────────────────────────
 
@@ -1259,7 +1264,7 @@ export default function QuickOrderModal({
                     </p>
                   </div>
                   <Elements
-                    stripe={stripePromise}
+                    stripe={getStripe()}
                     options={{
                       clientSecret,
                       appearance: {

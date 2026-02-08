@@ -88,8 +88,8 @@ export default function Home() {
           100% { transform: translateX(100%); }
         }
         @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.1); }
-          50% { box-shadow: 0 0 30px rgba(249,115,22,0.5), 0 0 80px rgba(249,115,22,0.2); }
+          0%, 100% { opacity: 0.4; transform: scale(0.97); }
+          50% { opacity: 0.8; transform: scale(1.02); }
         }
       `}</style>
 
@@ -169,7 +169,7 @@ export default function Home() {
 
                 <button
                   onClick={() => setQuickOrderOpen(true)}
-                  className="relative px-8 py-4 md:px-10 md:py-5 rounded-full font-bold text-base md:text-lg bg-gradient-to-r from-orange-500 to-red-600 text-white overflow-hidden transition-all active:scale-95 flex items-center gap-3"
+                  className="relative px-8 py-4 md:px-10 md:py-5 rounded-full font-bold text-base md:text-lg bg-gradient-to-r from-orange-500 to-red-600 text-white overflow-hidden transition-all active:scale-95 flex items-center gap-3 shadow-[0_0_24px_rgba(249,115,22,0.4)]"
                   style={{ animation: 'glow-pulse 3s ease-in-out infinite' }}
                 >
                   <span className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">

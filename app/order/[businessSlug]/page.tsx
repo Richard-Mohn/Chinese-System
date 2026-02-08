@@ -34,8 +34,12 @@ import {
   viewItem, makeGtagItem, event as gtagEvent,
 } from '@/lib/gtag';
 
-// ─── Stripe setup ──────────────────────────────────────────
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+// ─── Stripe setup (deferred — only loads when user reaches checkout) ──
+let _stripePromise: ReturnType<typeof loadStripe> | null = null;
+function getStripe() {
+  if (!_stripePromise) _stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+  return _stripePromise;
+}
 
 // ─── Supported Crypto Options ──────────────────────────────
 
@@ -1789,7 +1793,7 @@ export default function OrderPage({
               </div>
 
               <div className="p-6">
-                <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe', variables: { colorPrimary: '#000000', borderRadius: '12px' } } }}>
+                <Elements stripe={getStripe()} options={{ clientSecret, appearance: { theme: 'stripe', variables: { colorPrimary: '#000000', borderRadius: '12px' } } }}>
                   <StripeCardForm
                     clientSecret={clientSecret}
                     total={total}
