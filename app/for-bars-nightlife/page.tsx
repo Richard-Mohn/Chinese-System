@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   FaGlassCheers, FaArrowRight, FaCreditCard, FaBitcoin, FaMobileAlt,
   FaShieldAlt, FaMusic, FaCalendarAlt, FaUsers, FaClock,
-  FaListAlt, FaPercent
+  FaListAlt, FaPercent, FaConciergeBell, FaStar, FaChair
 } from 'react-icons/fa';
 
 interface FeatureCardProps { icon: any; title: string; description: string; delay: number; }
@@ -71,6 +71,30 @@ export default function ForBarsNightlife() {
             <FeatureCard icon={FaBitcoin} title="Crypto Payments" description="Accept Bitcoin via Cash App QR and 7 other cryptocurrencies. The crypto crowd loves this — differentiate your bar." delay={0.2} />
             <FeatureCard icon={FaCalendarAlt} title="Event & Happy Hour" description="Schedule happy hour pricing, create event-specific menus, and promote specials — all from your dashboard." delay={0.25} />
             <FeatureCard icon={FaShieldAlt} title="Fraud Protection" description="Automatic chargeback coverage on every digital transaction. No tab-walkers, no stolen card worries." delay={0.3} />
+          </div>
+        </div>
+      </section>
+
+      {/* Reservations & VIP Section */}
+      <section className="py-24 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <span className="text-purple-600 font-black uppercase tracking-widest text-xs mb-3 block">Reservations & VIP</span>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Tables. Bottles. VIP.</h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Let customers book tables, reserve VIP sections, and request bottle service — directly from your page. No OpenTable fees.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard icon={FaCalendarAlt} title="Table Reservations" description="Customers pick their date, time, and party size. You confirm with one click. Zero per-diner fees — unlike OpenTable's $1.50/guest." delay={0.05} />
+            <FeatureCard icon={FaStar} title="VIP Experiences" description="Flag VIP reservations for priority treatment. Track birthdays, bachelor parties, corporate events, and bottle service requests." delay={0.1} />
+            <FeatureCard icon={FaConciergeBell} title="Seating Preferences" description="Indoor, outdoor, bar seating, or private rooms. Customers choose — you manage capacity and layout." delay={0.15} />
+            <FeatureCard icon={FaUsers} title="Party Management" description="Handle parties from 1 to 20+. Large group bookings with special requests and occasion tracking built in." delay={0.2} />
+            <FeatureCard icon={FaClock} title="Waitlist & Status" description="Track every reservation: pending → confirmed → seated → completed. Mark no-shows and build history." delay={0.25} />
+            <FeatureCard icon={FaChair} title="Bottle Service" description="Accept bottle service reservations with minimum spend requirements. Upsell premium packages directly online." delay={0.3} />
+          </div>
+          <div className="text-center mt-10">
+            <Link href="/features/reservations" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-purple-500/20 transition-all">
+              Learn About Reservations <FaArrowRight />
+            </Link>
           </div>
         </div>
       </section>

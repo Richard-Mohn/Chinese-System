@@ -10,7 +10,7 @@ import {
   FaSignOutAlt, FaChevronDown, FaBitcoin, FaMapMarkerAlt, FaVideo,
   FaShoppingCart, FaUtensils, FaCoffee, FaDesktop, FaTruck,
   FaClipboardList, FaGlobe, FaBirthdayCake, FaShoppingBasket,
-  FaGlassCheers, FaStore, FaBicycle
+  FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt
 } from 'react-icons/fa';
 import { useAuthModal } from '@/context/AuthModalContext';
 
@@ -34,6 +34,7 @@ const featureItems = [
   { href: '/features/real-time-orders', icon: FaClipboardList, label: 'Real-Time Orders', desc: 'Audio alerts & instant status tracking' },
   { href: '/features/white-label-website', icon: FaGlobe, label: 'White-Label Website', desc: 'Branded storefront with SEO built in' },
   { href: '/features/community-delivery', icon: FaBicycle, label: 'Community Courier', desc: 'Hyper-local delivery for $0.25/order' },
+  { href: '/features/reservations', icon: FaCalendarAlt, label: 'Table Reservations', desc: 'Book tables — zero per-diner fees' },
 ];
 
 /* ─── Dropdown wrapper ─── */
@@ -144,7 +145,7 @@ const Header = () => {
           </NavDropdown>
 
           <NavDropdown label="Features" open={openMenu === 'features'} onToggle={() => toggle('features')} onClose={closeDropdown}>
-            <div className="grid grid-cols-2 gap-1 min-w-[520px]">
+            <div className="grid grid-cols-3 gap-1 min-w-[720px]">
               {featureItems.map(f => <DropLink key={f.label} {...f} onClick={closeDropdown} />)}
             </div>
           </NavDropdown>
