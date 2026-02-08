@@ -43,6 +43,7 @@ interface OrderItem {
   price: number;
   size?: string;
   notes?: string;
+  category?: string;   // menu category (e.g., "Signature Cocktails", "Burgers & Sandwiches")
 }
 
 interface KDSOrder {
@@ -54,15 +55,44 @@ interface KDSOrder {
   createdAt: string;
   notes?: string;
   total: number;
+  tableNumber?: string;
 }
 
 interface KDSStation {
   id: string;
   name: string;
   color: string;
-  categories: string[];      // menu categories this station handles (e.g., "Grill", "Drinks")
-  position: number;           // order in the flow
-  isExpo: boolean;            // expo station sees all items after completion
+  categories: string[];      // menu categories this station handles
+  position: number;
+  isExpo: boolean;
+}
+
+/* ─── Category Classification ─── */
+
+const DRINK_CATEGORIES = [
+  'Signature Cocktails', 'Cocktails', 'Draft Beer', 'Beer', 'Bottled & Canned',
+  'Wine', 'Whiskey & Bourbon', 'Shots', 'Non-Alcoholic', 'Drinks',
+  'Spirits', 'Mocktails', 'Hot Drinks', 'Coffee', 'Tea',
+  'Beverages', 'Smoothies', 'Juice',
+];
+
+const FOOD_CATEGORIES = [
+  'Appetizers & Shareables', 'Appetizers', 'Wings', 'Burgers & Sandwiches',
+  'Burgers', 'Sandwiches', 'Sides', 'Entrees', 'Main Course',
+  'Pizza', 'Pasta', 'Salads', 'Soups', 'Desserts', 'Dessert',
+  'Seafood', 'Grill', 'Fryer', 'Specials', 'Kids Menu',
+  'Breakfast', 'Lunch', 'Dinner', 'Starters', 'Mains',
+];
+
+/** Classify an item as 'bar', 'kitchen', or 'unknown' based on its category */
+function classifyItem(item: OrderItem): 'bar' | 'kitchen' | 'unknown' {
+  const cat = (item.category || '').toLowerCase();
+  if (DRINK_CATEGORIES.some(d => d.toLowerCase() === cat)) return 'bar';
+  if (FOOD_CATEGORIES.some(f => f.toLowerCase() === cat)) return 'kitchen';
+  // Heuristic: check item name for drink-related keywords
+  const name = item.name.toLowerCase();
+  if (/\b(beer|ale|ipa|lager|stout|cocktail|margarita|martini|shot|wine|whiskey|bourbon|vodka|rum|tequila|gin|spritz|mule|sour|negroni|mojito|daiquiri|bloody mary|mimosa|cider|seltzer|claw)\b/.test(name)) return 'bar';
+  return 'unknown';
 }
 
 const STATION_COLORS = [
@@ -78,7 +108,8 @@ const STATION_COLORS = [
 
 const DEFAULT_STATIONS: Omit<KDSStation, 'id'>[] = [
   { name: 'Kitchen', color: '#f97316', categories: [], position: 0, isExpo: false },
-  { name: 'Expo', color: '#22c55e', categories: [], position: 1, isExpo: true },
+  { name: 'Bar', color: '#a855f7', categories: [], position: 1, isExpo: false },
+  { name: 'Expo', color: '#22c55e', categories: [], position: 2, isExpo: true },
 ];
 
 /* ─── Time helpers ─── */
@@ -151,7 +182,7 @@ export default function KDSPageGated() {
 }
 
 function KDSPage() {
-  const { currentBusiness } = useAuth();
+  const { currentBusiness, MohnMenuUser } = useAuth();
   const [orders, setOrders] = useState<KDSOrder[]>([]);
   const [stations, setStations] = useState<KDSStation[]>([]);
   const [activeStation, setActiveStation] = useState<string | null>(null); // null = all stations view
@@ -191,6 +222,24 @@ function KDSPage() {
 
     return () => unsub();
   }, [currentBusiness?.businessId]);
+
+  /* ─── Role-aware auto-station selection ─── */
+  // Bartender → auto-focus on "Bar" station
+  // Server → stays on "All" view to see full order pipeline
+  // Owner → stays on "All" view
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
+  useEffect(() => {
+    if (hasAutoSelected || stations.length === 0) return;
+    const userEmail = MohnMenuUser?.email || '';
+    const isBartender = userEmail.includes('bartender');
+    if (isBartender) {
+      const barStation = stations.find(s => s.name.toLowerCase() === 'bar');
+      if (barStation) {
+        setActiveStation(barStation.id);
+      }
+    }
+    setHasAutoSelected(true);
+  }, [stations, MohnMenuUser?.email, hasAutoSelected]);
 
   /* ─── Load orders (active: pending → ready) ─── */
   useEffect(() => {
@@ -278,23 +327,70 @@ function KDSPage() {
     const key = `${order.id}::${station.id}`;
     if (bumpedOrders.has(key)) return false;
 
+    // Don't show order at station if it has no relevant items
+    const stationItems = getItemsForStation(order, station);
+    if (!station.isExpo && stationItems.length === 0) return false;
+
     // Expo station sees orders that have been bumped from all non-expo stations
     if (station.isExpo) {
       const nonExpoStations = stations.filter(s => !s.isExpo);
-      return nonExpoStations.every(s => bumpedOrders.has(`${order.id}::${s.id}`));
+      // Only show if at least one non-expo station had items & has been bumped
+      const relevantStations = nonExpoStations.filter(s => getItemsForStation(order, s).length > 0);
+      if (relevantStations.length === 0) return false;
+      return relevantStations.every(s => bumpedOrders.has(`${order.id}::${s.id}`));
     }
 
-    // Non-expo: show if previous stations are all bumped (or this is the first station)
-    const prevStations = stations.filter(s => !s.isExpo && s.position < station.position);
-    if (prevStations.length === 0) return true;
-    return prevStations.every(s => bumpedOrders.has(`${order.id}::${s.id}`));
+    // Non-expo stations: show immediately (they work in parallel, not sequential)
+    // Kitchen and Bar both start working on the same order simultaneously
+    return true;
+  };
+
+  /* ─── Cross-station progress for an order ─── */
+  const getOrderProgress = (order: KDSOrder): { station: string; color: string; done: boolean; itemCount: number }[] => {
+    return stations
+      .filter(s => !s.isExpo)
+      .map(s => {
+        const items = getItemsForStation(order, s);
+        if (items.length === 0) return null;
+        const done = bumpedOrders.has(`${order.id}::${s.id}`);
+        return { station: s.name, color: s.color, done, itemCount: items.length };
+      })
+      .filter(Boolean) as { station: string; color: string; done: boolean; itemCount: number }[];
   };
 
   /* ─── Get items for a station ─── */
   const getItemsForStation = (order: KDSOrder, station: KDSStation): OrderItem[] => {
-    if (station.isExpo || station.categories.length === 0) return order.items;
-    // Filter items by category (if station has category filters)
-    // Since orders don't have category metadata on items, show all for now
+    // Expo sees everything
+    if (station.isExpo) return order.items;
+
+    // If station has explicit category filters, use those
+    if (station.categories.length > 0) {
+      return order.items.filter(item => {
+        const cat = (item.category || '').toLowerCase();
+        return station.categories.some(sc => sc.toLowerCase() === cat);
+      });
+    }
+
+    // Auto-classify by station name
+    const stationName = station.name.toLowerCase();
+    const isBarStation = stationName.includes('bar') || stationName.includes('drink') || stationName.includes('cocktail') || stationName.includes('beverage');
+    const isKitchenStation = stationName.includes('kitchen') || stationName.includes('grill') || stationName.includes('fryer') || stationName.includes('food') || stationName.includes('cook');
+
+    if (isBarStation) {
+      // Bar station gets drink items
+      const drinkItems = order.items.filter(item => classifyItem(item) === 'bar');
+      return drinkItems.length > 0 ? drinkItems : order.items; // Fallback to all if no drinks found
+    }
+    if (isKitchenStation) {
+      // Kitchen station gets food items
+      const foodItems = order.items.filter(item => {
+        const cls = classifyItem(item);
+        return cls === 'kitchen' || cls === 'unknown'; // Kitchen gets unknown items too
+      });
+      return foodItems.length > 0 ? foodItems : order.items;
+    }
+
+    // Default: show all items
     return order.items;
   };
 
@@ -341,16 +437,30 @@ function KDSPage() {
     );
   }
 
+  // Detect role for display context
+  const userEmail = MohnMenuUser?.email || '';
+  const isStaffUser = MohnMenuUser?.role === 'staff';
+  const isBartenderUser = userEmail.includes('bartender');
+  const isServerUser = userEmail.includes('server');
+  const roleLabel = isBartenderUser ? 'Bartender' : isServerUser ? 'Server' : isStaffUser ? 'Staff' : 'Manager';
+
   return (
     <div ref={containerRef} className={`${isFullscreen ? 'bg-zinc-900 p-4' : ''}`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h1 className={`text-3xl font-black tracking-tight ${isFullscreen ? 'text-white' : 'text-black'}`}>
-            Kitchen Display<span className="text-orange-500">.</span>
+            {isBartenderUser ? 'Bar Display' : isServerUser ? 'Server Display' : 'Kitchen Display'}<span className="text-orange-500">.</span>
           </h1>
           <p className={`text-sm font-medium mt-1 ${isFullscreen ? 'text-zinc-400' : 'text-zinc-500'}`}>
             {orders.length} active {orders.length === 1 ? 'order' : 'orders'} • {stations.length} {stations.length === 1 ? 'station' : 'stations'}
+            {isStaffUser && (
+              <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                isBartenderUser ? 'bg-purple-100 text-purple-700' : isServerUser ? 'bg-emerald-100 text-emerald-700' : 'bg-zinc-100 text-zinc-600'
+              }`}>
+                {roleLabel}
+              </span>
+            )}
           </p>
         </div>
 
@@ -441,6 +551,7 @@ function KDSPage() {
           onToggleItem={toggleItem}
           onBump={bumpOrder}
           isFullscreen={isFullscreen}
+          getOrderProgress={getOrderProgress}
         />
       ) : (
         /* Multi-station columns */
@@ -458,6 +569,7 @@ function KDSPage() {
               onBump={bumpOrder}
               onFocus={() => setActiveStation(station.id)}
               isFullscreen={isFullscreen}
+              getOrderProgress={getOrderProgress}
             />
           ))}
         </div>
@@ -499,9 +611,10 @@ interface StationColumnProps {
   onBump: (orderId: string, stationId: string) => void;
   onFocus: () => void;
   isFullscreen: boolean;
+  getOrderProgress: (order: KDSOrder) => { station: string; color: string; done: boolean; itemCount: number }[];
 }
 
-function StationColumn({ station, orders, completedItems, isOrderVisible, getItems, allCompleted, onToggleItem, onBump, onFocus, isFullscreen }: StationColumnProps) {
+function StationColumn({ station, orders, completedItems, isOrderVisible, getItems, allCompleted, onToggleItem, onBump, onFocus, isFullscreen, getOrderProgress }: StationColumnProps) {
   const visibleOrders = orders.filter(o => isOrderVisible(o, station));
 
   return (
@@ -557,6 +670,30 @@ function StationColumn({ station, orders, completedItems, isOrderVisible, getIte
                     </span>
                   </div>
                 </div>
+
+                {/* Cross-Station Progress */}
+                {(() => {
+                  const progress = getOrderProgress(order);
+                  if (progress.length > 1) {
+                    return (
+                      <div className={`px-3 py-1.5 flex items-center gap-1 border-b ${isFullscreen ? 'border-zinc-700 bg-zinc-800/50' : 'border-zinc-50 bg-zinc-25'}`}>
+                        {progress.map((p, i) => (
+                          <div key={i} className="flex items-center gap-1" title={`${p.station}: ${p.done ? 'Done' : 'In progress'}`}>
+                            <div
+                              className={`w-2 h-2 rounded-full transition-all ${p.done ? 'opacity-100' : 'opacity-40'}`}
+                              style={{ backgroundColor: p.color }}
+                            />
+                            <span className={`text-[9px] font-bold ${p.done ? (isFullscreen ? 'text-zinc-300' : 'text-zinc-600') : (isFullscreen ? 'text-zinc-600' : 'text-zinc-300')}`}>
+                              {p.station}
+                            </span>
+                            {i < progress.length - 1 && <span className={`text-[8px] mx-0.5 ${isFullscreen ? 'text-zinc-700' : 'text-zinc-200'}`}>→</span>}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
 
                 {/* Items */}
                 <div className="px-3 py-2 space-y-1">
@@ -640,9 +777,10 @@ interface SingleStationViewProps {
   onToggleItem: (orderId: string, stationId: string, idx: number) => void;
   onBump: (orderId: string, stationId: string) => void;
   isFullscreen: boolean;
+  getOrderProgress: (order: KDSOrder) => { station: string; color: string; done: boolean; itemCount: number }[];
 }
 
-function SingleStationView({ station, orders, completedItems, isOrderVisible, getItems, allCompleted, onToggleItem, onBump, isFullscreen }: SingleStationViewProps) {
+function SingleStationView({ station, orders, completedItems, isOrderVisible, getItems, allCompleted, onToggleItem, onBump, isFullscreen, getOrderProgress }: SingleStationViewProps) {
   const visibleOrders = orders.filter(o => isOrderVisible(o, station));
 
   return (
@@ -694,6 +832,30 @@ function SingleStationView({ station, orders, completedItems, isOrderVisible, ge
                     </span>
                   </div>
                 </div>
+
+                {/* Cross-Station Progress */}
+                {(() => {
+                  const progress = getOrderProgress(order);
+                  if (progress.length > 1) {
+                    return (
+                      <div className={`px-4 py-2 flex items-center gap-2 border-b ${isFullscreen ? 'border-zinc-700 bg-zinc-800/50' : 'border-zinc-50 bg-zinc-50/50'}`}>
+                        {progress.map((p, i) => (
+                          <div key={i} className="flex items-center gap-1.5" title={`${p.station}: ${p.done ? 'Done ✓' : `${p.itemCount} items in progress`}`}>
+                            <div
+                              className={`w-2.5 h-2.5 rounded-full transition-all ${p.done ? 'opacity-100 scale-110' : 'opacity-40'}`}
+                              style={{ backgroundColor: p.color }}
+                            />
+                            <span className={`text-[10px] font-bold ${p.done ? (isFullscreen ? 'text-zinc-300' : 'text-zinc-600') : (isFullscreen ? 'text-zinc-600' : 'text-zinc-300')}`}>
+                              {p.station} {p.done && '✓'}
+                            </span>
+                            {i < progress.length - 1 && <span className={`text-[9px] mx-0.5 ${isFullscreen ? 'text-zinc-700' : 'text-zinc-200'}`}>→</span>}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
 
                 {/* Items */}
                 <div className="px-4 py-3 space-y-1.5">
