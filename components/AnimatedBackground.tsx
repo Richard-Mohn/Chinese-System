@@ -71,12 +71,13 @@ export default function AnimatedBackground() {
 
   // Delay mount so it doesn't compete with initial page paint
   useEffect(() => {
-    const id = requestIdleCallback
+    const hasRIC = typeof requestIdleCallback !== 'undefined';
+    const id = hasRIC
       ? requestIdleCallback(() => setMounted(true))
       : setTimeout(() => setMounted(true), 150);
     return () => {
       if (typeof id === 'number') {
-        if (cancelIdleCallback) cancelIdleCallback(id);
+        if (typeof cancelIdleCallback !== 'undefined') cancelIdleCallback(id);
         else clearTimeout(id);
       }
     };

@@ -212,6 +212,7 @@ export default function Home() {
               { type: 'Chinese Restaurant', slug: 'china-wok-rva', name: 'China Wok', emoji: '🥡', color: 'from-red-500 to-orange-500', description: 'Full-service restaurant with online ordering, delivery, and Quick Order.', pageName: 'Menu', live: true },
               { type: 'Bar & Grill', slug: 'the-copper-tap', name: 'The Copper Tap', emoji: '🍺', color: 'from-purple-500 to-violet-500', description: 'Craft cocktail bar with reservations, jukebox & karaoke, kiosk mode, crypto payments.', pageName: 'Drink Menu', live: true },
               { type: 'Coffee Shop', slug: 'griffin-lounge', name: 'Griffin Lounge', emoji: '☕', color: 'from-amber-600 to-orange-700', description: 'Order-ahead espresso, cold brew, pastries & peer delivery.', pageName: 'Coffee Menu', live: true },
+              { type: 'Church', slug: 'demo/shepherds-gate', name: 'Shepherds Gate Church', emoji: '⛪', color: 'from-emerald-600 to-teal-500', description: 'Service times, giving, events, ministries, and media — built for pastors and ministry teams.', pageName: 'Visit & Give', tags: ['Service Times', 'Giving', 'Events'], live: true },
               /* ─── Coming Soon ─── */
               { type: 'Pizza Shop', slug: '', name: 'Demo Pizza Co.', emoji: '🍕', color: 'from-orange-500 to-yellow-500', description: 'Pizza shop with build-your-own pizzas, sides, and delivery.', pageName: 'Menu', live: false },
               { type: 'Bakery & Café', slug: '', name: 'Sweet Crumb Bakery', emoji: '🧁', color: 'from-pink-500 to-rose-500', description: 'Pre-orders, custom cakes, pastries, and coffee drinks.', pageName: 'Menu', live: false },
@@ -255,8 +256,9 @@ export default function Home() {
 
                     <div className="flex items-center gap-2 text-xs text-zinc-500 font-bold mb-4">
                       <span className="px-2 py-0.5 bg-zinc-100 rounded-full">{store.pageName}</span>
-                      <span className="px-2 py-0.5 bg-zinc-100 rounded-full">Quick Order</span>
-                      <span className="px-2 py-0.5 bg-zinc-100 rounded-full">Cart</span>
+                      {(store.tags ?? ['Quick Order', 'Cart']).map((tag) => (
+                        <span key={tag} className="px-2 py-0.5 bg-zinc-100 rounded-full">{tag}</span>
+                      ))}
                     </div>
 
                     {store.live ? (

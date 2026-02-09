@@ -17,6 +17,37 @@ const DEMO_STORES = [
     live: true,
   },
   {
+    type: 'Bar & Grill',
+    slug: 'the-copper-tap',
+    name: 'The Copper Tap',
+    emoji: '🍺',
+    color: 'from-purple-500 to-violet-500',
+    description: 'Full tenant website, cocktail menu, reservations, jukebox & karaoke, kiosk mode, crypto payments.',
+    pageName: 'Drink Menu',
+    live: true,
+  },
+  {
+    type: 'Coffee Shop',
+    slug: 'griffin-lounge',
+    name: 'Griffin Lounge',
+    emoji: '☕',
+    color: 'from-amber-600 to-orange-700',
+    description: 'Order-ahead espresso, cold brew, pastries, peer delivery & loyalty rewards.',
+    pageName: 'Coffee Menu',
+    live: true,
+  },
+  {
+    type: 'Church',
+    slug: 'demo/shepherds-gate',
+    name: 'Shepherds Gate Church',
+    emoji: '⛪',
+    color: 'from-emerald-600 to-teal-500',
+    description: 'Service times, giving, events, ministries, and media — built for pastors and ministry teams.',
+    pageName: 'Visit & Give',
+    tags: ['Service Times', 'Giving', 'Events'],
+    live: true,
+  },
+  {
     type: 'Pizza Shop',
     slug: '',
     name: 'Demo Pizza Co.',
@@ -45,16 +76,6 @@ const DEMO_STORES = [
     description: 'Mobile food service with QR ordering and GPS location.',
     pageName: 'Menu',
     live: false,
-  },
-  {
-    type: 'Bar & Grill',
-    slug: 'the-copper-tap',
-    name: 'The Copper Tap',
-    emoji: '🍺',
-    color: 'from-purple-500 to-violet-500',
-    description: 'Full tenant website, cocktail menu, reservations, jukebox & karaoke, kiosk mode, crypto payments.',
-    pageName: 'Drink Menu',
-    live: true,
   },
   {
     type: 'Grocery Store',
@@ -95,16 +116,6 @@ const DEMO_STORES = [
     description: 'Snacks, drinks, and essentials with grab-and-go ordering.',
     pageName: 'Quick-Shop',
     live: false,
-  },
-  {
-    type: 'Coffee Shop',
-    slug: 'griffin-lounge',
-    name: 'Griffin Lounge',
-    emoji: '☕',
-    color: 'from-amber-600 to-orange-700',
-    description: 'Order-ahead espresso, cold brew, pastries, peer delivery & loyalty rewards.',
-    pageName: 'Coffee Menu',
-    live: true,
   },
 ];
 
@@ -184,8 +195,9 @@ export default function DemoPage() {
 
                     <div className="flex items-center gap-2 text-xs text-zinc-500 font-bold mb-4">
                       <span className="px-2 py-0.5 bg-zinc-100 rounded-full">{store.pageName}</span>
-                      <span className="px-2 py-0.5 bg-zinc-100 rounded-full">Quick Order</span>
-                      <span className="px-2 py-0.5 bg-zinc-100 rounded-full">Cart</span>
+                      {(store.tags ?? ['Quick Order', 'Cart']).map((tag) => (
+                        <span key={tag} className="px-2 py-0.5 bg-zinc-100 rounded-full">{tag}</span>
+                      ))}
                     </div>
 
                     {store.live ? (

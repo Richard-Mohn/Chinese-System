@@ -142,6 +142,20 @@ const ICON_SETS: Record<string, string[]> = {
     // Cart
     'M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6',
   ],
+  church: [
+    // Church building
+    'M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6',
+    // Cross
+    'M12 4v16M8 8h8',
+    // Bible
+    'M4 6h7a3 3 0 013 3v11H7a3 3 0 00-3 3V6zm10 0h6a2 2 0 012 2v14a3 3 0 00-3-3h-5V6z',
+    // Dove
+    'M4 13c3-5 9-7 16-7-2 5-6 9-11 10-2 1-4 1-5-3z',
+    // Hands / care
+    'M4 14c2-2 4-2 6 0l2 2 2-2c2-2 4-2 6 0',
+    // Calendar
+    'M7 2v4M17 2v4M3 8h18M5 8v12h14V8',
+  ],
   default: [
     'M12 2C6.48 2 2 6.48 2 12l10-10zm0 0c5.52 0 10 4.48 10 10L12 2zm0 20l5-10H7l5 10z',
     'M3 7h18M3 12h18M5 7a7 7 0 0114 0M5 17a7 7 0 0014 0M3 17h18',
@@ -163,6 +177,7 @@ const COLOR_THEMES: Record<string, string> = {
   retail: 'text-amber-400/[0.08]',
   foodtruck: 'text-yellow-400/[0.08]',
   convenience: 'text-blue-400/[0.08]',
+  church: 'text-emerald-400/[0.08]',
   default: 'text-zinc-400/[0.08]',
 };
 
@@ -192,12 +207,13 @@ export default function FloatingStoreIcons({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const id = requestIdleCallback
+    const hasRIC = typeof requestIdleCallback !== 'undefined';
+    const id = hasRIC
       ? requestIdleCallback(() => setMounted(true))
       : setTimeout(() => setMounted(true), 100);
     return () => {
       if (typeof id === 'number') {
-        if (cancelIdleCallback) cancelIdleCallback(id);
+        if (typeof cancelIdleCallback !== 'undefined') cancelIdleCallback(id);
         else clearTimeout(id);
       }
     };

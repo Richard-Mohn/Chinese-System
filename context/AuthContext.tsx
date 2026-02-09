@@ -9,6 +9,8 @@ import {
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence,
+  browserSessionPersistence,
+  inMemoryPersistence,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -51,7 +53,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // On mount, set up auth state listener
   useEffect(() => {
-    setPersistence(auth, browserLocalPersistence).catch(err => {
+    const configurePersistence = async () => {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+      } catch (err) {
+        console.warn('Local persistence unavailable, falling back:', err);
+        try {
+          await setPersistence(auth, browserSessionPersistence);
+        } catch (sessionErr) {
+          console.warn('Session persistence unavailable, using memory:', sessionErr);
+          await setPersistence(auth, inMemoryPersistence);
+        }
+      }
+    };
+
+    configurePersistence().catch((err) => {
       console.error('Persistence setup error:', err);
     });
 
