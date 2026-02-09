@@ -100,13 +100,35 @@ const Footer = () => {
           </div>
 
           <p className="text-[11px] text-zinc-600">
-            <a href="https://mohnmenu.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-orange-500 transition-colors font-bold">
+            <a href="https://MohnMenu.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-orange-500 transition-colors font-bold">
               <span className="w-3.5 h-3.5 rounded bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
                 <span className="text-white font-black text-[6px] leading-none">M</span>
               </span>
               Powered by MohnMenu.com
             </a>
           </p>
+        </div>
+
+        {/* ── Mohn Empire ── */}
+        <div className="mt-8 pt-6 border-t border-zinc-800">
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                <span className="text-white font-black text-[8px]">ME</span>
+              </div>
+              <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em]">A Mohn Empire Company</span>
+            </div>
+            <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5">
+              <span className="text-[11px] font-bold text-orange-400">● MohnMenu</span>
+              <a href="https://mohnsters.com" target="_blank" rel="noopener noreferrer" className="text-[11px] text-zinc-600 hover:text-white transition-colors">MohnSters</a>
+              <a href="https://neighbortechs.com" target="_blank" rel="noopener noreferrer" className="text-[11px] text-zinc-600 hover:text-white transition-colors">NeighborTechs</a>
+              <a href="https://MohnMint.com" target="_blank" rel="noopener noreferrer" className="text-[11px] text-zinc-600 hover:text-white transition-colors">MohnMint</a>
+              <a href="https://mohnmatrix.com" target="_blank" rel="noopener noreferrer" className="text-[11px] text-zinc-600 hover:text-white transition-colors">MohnMatrix</a>
+              <a href="https://flamingsocialmedia.com" target="_blank" rel="noopener noreferrer" className="text-[11px] text-zinc-600 hover:text-white transition-colors">Flaming Social</a>
+              <a href="https://mohnmove.com" target="_blank" rel="noopener noreferrer" className="text-[11px] text-zinc-600 hover:text-white transition-colors">MohnMove</a>
+            </div>
+            <p className="text-[10px] text-zinc-700 mt-1">23 Shore Street, Petersburg, Virginia 23803</p>
+          </div>
         </div>
       </div>
     </footer>
