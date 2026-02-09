@@ -208,8 +208,11 @@ export default function Home() {
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
+              /* ─── 3 Live Demos (top row) ─── */
               { type: 'Chinese Restaurant', slug: 'china-wok-rva', name: 'China Wok', emoji: '🥡', color: 'from-red-500 to-orange-500', description: 'Full-service restaurant with online ordering, delivery, and Quick Order.', pageName: 'Menu', live: true },
               { type: 'Bar & Grill', slug: 'the-copper-tap', name: 'The Copper Tap', emoji: '🍺', color: 'from-purple-500 to-violet-500', description: 'Craft cocktail bar with reservations, jukebox & karaoke, kiosk mode, crypto payments.', pageName: 'Drink Menu', live: true },
+              { type: 'Coffee Shop', slug: 'griffin-lounge', name: 'Griffin Lounge', emoji: '☕', color: 'from-amber-600 to-orange-700', description: 'Order-ahead espresso, cold brew, pastries & peer delivery.', pageName: 'Coffee Menu', live: true },
+              /* ─── Coming Soon ─── */
               { type: 'Pizza Shop', slug: '', name: 'Demo Pizza Co.', emoji: '🍕', color: 'from-orange-500 to-yellow-500', description: 'Pizza shop with build-your-own pizzas, sides, and delivery.', pageName: 'Menu', live: false },
               { type: 'Bakery & Café', slug: '', name: 'Sweet Crumb Bakery', emoji: '🧁', color: 'from-pink-500 to-rose-500', description: 'Pre-orders, custom cakes, pastries, and coffee drinks.', pageName: 'Menu', live: false },
               { type: 'Food Truck', slug: '', name: 'Street Eats RVA', emoji: '🚚', color: 'from-yellow-500 to-orange-500', description: 'Mobile food service with QR ordering and GPS location.', pageName: 'Menu', live: false },
@@ -217,7 +220,6 @@ export default function Home() {
               { type: 'Boutique', slug: '', name: 'Ivy & Thread', emoji: '👗', color: 'from-amber-500 to-orange-500', description: 'Clothing, accessories, and gifts with AI product listings.', pageName: 'Storefront', live: false },
               { type: 'Antique Shop', slug: '', name: 'Timeless Treasures', emoji: '🏺', color: 'from-amber-600 to-yellow-600', description: 'Vintage finds with AI-powered photo-to-listing tool.', pageName: 'Product Gallery', live: false },
               { type: 'Convenience Store', slug: '', name: 'QuickStop Mini Mart', emoji: '🏪', color: 'from-blue-500 to-indigo-500', description: 'Snacks, drinks, and essentials with grab-and-go ordering.', pageName: 'Quick-Shop', live: false },
-              { type: 'Coffee Shop', slug: 'griffin-lounge', name: 'Griffin Lounge', emoji: '☕', color: 'from-amber-600 to-orange-700', description: 'Order-ahead espresso, cold brew, pastries & peer delivery.', pageName: 'Coffee Menu', live: true },
             ].map((store, i) => (
               <motion.div
                 key={store.name}
