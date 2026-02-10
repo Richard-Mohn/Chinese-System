@@ -447,29 +447,62 @@ function KDSPage() {
   return (
     <div ref={containerRef} className={`${isFullscreen ? 'bg-zinc-900 p-4' : ''}`}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className={`text-3xl font-black tracking-tight ${isFullscreen ? 'text-white' : 'text-black'}`}>
-            {isBartenderUser ? 'Bar Display' : isServerUser ? 'Server Display' : 'Kitchen Display'}<span className="text-orange-500">.</span>
-          </h1>
-          <p className={`text-sm font-medium mt-1 ${isFullscreen ? 'text-zinc-400' : 'text-zinc-500'}`}>
-            {orders.length} active {orders.length === 1 ? 'order' : 'orders'} • {stations.length} {stations.length === 1 ? 'station' : 'stations'}
-            {isStaffUser && (
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                isBartenderUser ? 'bg-purple-100 text-purple-700' : isServerUser ? 'bg-emerald-100 text-emerald-700' : 'bg-zinc-100 text-zinc-600'
-              }`}>
-                {roleLabel}
-              </span>
-            )}
-          </p>
+      <div className="flex flex-col gap-3 mb-4 sm:mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className={`text-xl sm:text-3xl font-black tracking-tight ${isFullscreen ? 'text-white' : 'text-black'}`}>
+              {isBartenderUser ? 'Bar Display' : isServerUser ? 'Server Display' : 'Kitchen Display'}<span className="text-orange-500">.</span>
+            </h1>
+            <p className={`text-xs sm:text-sm font-medium mt-0.5 ${isFullscreen ? 'text-zinc-400' : 'text-zinc-500'}`}>
+              {orders.length} active {orders.length === 1 ? 'order' : 'orders'} • {stations.length} {stations.length === 1 ? 'station' : 'stations'}
+              {isStaffUser && (
+                <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                  isBartenderUser ? 'bg-purple-100 text-purple-700' : isServerUser ? 'bg-emerald-100 text-emerald-700' : 'bg-zinc-100 text-zinc-600'
+                }`}>
+                  {roleLabel}
+                </span>
+              )}
+            </p>
+          </div>
+
+          {/* Controls — always visible */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`p-2 sm:p-2.5 rounded-xl transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center ${
+                isFullscreen ? 'bg-zinc-800 text-zinc-400 hover:text-white' : 'bg-zinc-100 text-zinc-500 hover:text-black'
+              }`}
+              title={soundEnabled ? 'Mute alerts' : 'Enable alerts'}
+            >
+              {soundEnabled ? <FaVolumeUp className="text-sm" /> : <FaVolumeMute className="text-sm" />}
+            </button>
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className={`p-2 sm:p-2.5 rounded-xl transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center ${
+                isFullscreen ? 'bg-zinc-800 text-zinc-400 hover:text-white' : 'bg-zinc-100 text-zinc-500 hover:text-black'
+              }`}
+              title="Station settings"
+            >
+              <FaCog className="text-sm" />
+            </button>
+            <button
+              onClick={toggleFullscreen}
+              className={`p-2 sm:p-2.5 rounded-xl transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center ${
+                isFullscreen ? 'bg-zinc-800 text-zinc-400 hover:text-white' : 'bg-zinc-100 text-zinc-500 hover:text-black'
+              }`}
+              title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen (tablet mode)'}
+            >
+              {isFullscreen ? <FaCompress className="text-sm" /> : <FaExpand className="text-sm" />}
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Station Filter Tabs */}
-          <div className={`flex items-center gap-1 p-1 rounded-xl ${isFullscreen ? 'bg-zinc-800' : 'bg-zinc-100'}`}>
+        {/* Station Filter Tabs — scrollable on mobile */}
+        <div className="overflow-x-auto -mx-2 px-2 pb-1">
+          <div className={`flex items-center gap-1 p-1 rounded-xl w-fit ${isFullscreen ? 'bg-zinc-800' : 'bg-zinc-100'}`}>
             <button
               onClick={() => setActiveStation(null)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 sm:px-4 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap min-h-[36px] ${
                 activeStation === null
                   ? 'bg-white text-black shadow-sm'
                   : isFullscreen ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'
@@ -481,7 +514,7 @@ function KDSPage() {
               <button
                 key={station.id}
                 onClick={() => setActiveStation(station.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 sm:px-4 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap min-h-[36px] ${
                   activeStation === station.id
                     ? 'text-white shadow-sm'
                     : isFullscreen ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'
@@ -492,35 +525,6 @@ function KDSPage() {
               </button>
             ))}
           </div>
-
-          {/* Controls */}
-          <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`p-2.5 rounded-xl transition-colors ${
-              isFullscreen ? 'bg-zinc-800 text-zinc-400 hover:text-white' : 'bg-zinc-100 text-zinc-500 hover:text-black'
-            }`}
-            title={soundEnabled ? 'Mute alerts' : 'Enable alerts'}
-          >
-            {soundEnabled ? <FaVolumeUp className="text-sm" /> : <FaVolumeMute className="text-sm" />}
-          </button>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className={`p-2.5 rounded-xl transition-colors ${
-              isFullscreen ? 'bg-zinc-800 text-zinc-400 hover:text-white' : 'bg-zinc-100 text-zinc-500 hover:text-black'
-            }`}
-            title="Station settings"
-          >
-            <FaCog className="text-sm" />
-          </button>
-          <button
-            onClick={toggleFullscreen}
-            className={`p-2.5 rounded-xl transition-colors ${
-              isFullscreen ? 'bg-zinc-800 text-zinc-400 hover:text-white' : 'bg-zinc-100 text-zinc-500 hover:text-black'
-            }`}
-            title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen (tablet mode)'}
-          >
-            {isFullscreen ? <FaCompress className="text-sm" /> : <FaExpand className="text-sm" />}
-          </button>
         </div>
       </div>
 
@@ -554,8 +558,11 @@ function KDSPage() {
           getOrderProgress={getOrderProgress}
         />
       ) : (
-        /* Multi-station columns */
-        <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(stations.length, 4)}, 1fr)` }}>
+        /* Multi-station columns — responsive: 1 col on phone, 2 on tablet, up to station count on desktop */
+        <div className={`grid gap-3 sm:gap-4 grid-cols-1 ${
+          stations.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' :
+          stations.length === 2 ? 'md:grid-cols-2' : ''
+        } ${stations.length >= 4 ? 'xl:grid-cols-4' : ''}`}>
           {stations.map(station => (
             <StationColumn
               key={station.id}
@@ -703,16 +710,16 @@ function StationColumn({ station, orders, completedItems, isOrderVisible, getIte
                       <button
                         key={idx}
                         onClick={() => onToggleItem(order.id, station.id, idx)}
-                        className={`w-full text-left flex items-center gap-2 py-1.5 px-2 rounded-lg transition-all ${
+                        className={`w-full text-left flex items-center gap-2 py-2.5 px-2 rounded-lg transition-all min-h-[44px] ${
                           done
                             ? 'bg-emerald-50 line-through opacity-60'
-                            : isFullscreen ? 'hover:bg-zinc-800' : 'hover:bg-zinc-50'
+                            : isFullscreen ? 'hover:bg-zinc-800 active:bg-zinc-700' : 'hover:bg-zinc-50 active:bg-zinc-100'
                         }`}
                       >
-                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                        <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
                           done ? 'bg-emerald-500 border-emerald-500' : 'border-zinc-300'
                         }`}>
-                          {done && <FaCheck className="text-white text-[8px]" />}
+                          {done && <FaCheck className="text-white text-[9px]" />}
                         </div>
                         <span className={`font-bold text-sm flex-1 ${isFullscreen ? 'text-white' : 'text-black'}`}>
                           {item.quantity}x {item.name}
@@ -735,7 +742,7 @@ function StationColumn({ station, orders, completedItems, isOrderVisible, getIte
                 {/* Bump Button */}
                 <button
                   onClick={() => onBump(order.id, station.id)}
-                  className={`w-full py-2.5 font-black text-xs uppercase tracking-widest transition-all ${
+                  className={`w-full py-3 sm:py-2.5 font-black text-xs uppercase tracking-widest transition-all min-h-[44px] ${
                     allDone
                       ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                       : isFullscreen
@@ -865,10 +872,10 @@ function SingleStationView({ station, orders, completedItems, isOrderVisible, ge
                       <button
                         key={idx}
                         onClick={() => onToggleItem(order.id, station.id, idx)}
-                        className={`w-full text-left flex items-center gap-3 py-2 px-3 rounded-xl transition-all ${
+                        className={`w-full text-left flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all min-h-[48px] ${
                           done
                             ? 'bg-emerald-50 line-through opacity-60'
-                            : isFullscreen ? 'hover:bg-zinc-800' : 'hover:bg-zinc-50'
+                            : isFullscreen ? 'hover:bg-zinc-800 active:bg-zinc-700' : 'hover:bg-zinc-50 active:bg-zinc-100'
                         }`}
                       >
                         <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
@@ -898,7 +905,7 @@ function SingleStationView({ station, orders, completedItems, isOrderVisible, ge
                 {/* Bump */}
                 <button
                   onClick={() => onBump(order.id, station.id)}
-                  className={`w-full py-3.5 font-black text-sm uppercase tracking-widest transition-all ${
+                  className={`w-full py-4 sm:py-3.5 font-black text-sm uppercase tracking-widest transition-all min-h-[48px] ${
                     allDone
                       ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                       : isFullscreen

@@ -208,6 +208,67 @@ All plans include 14-day free trial. Zero per-order commissions.
 
 ### Planned 📋
 
+**Driver Platform (Compete with Uber/DoorDash):**
+> Vision: A standalone driver-facing experience where delivery drivers can leave platforms like Uber/DoorDash and work independently through MohnMenu businesses. Zero commission to drivers — they keep 100% of delivery fees + tips.
+
+- [x] Driver dashboard with status toggling (offline/online/on_delivery/on_break) — `app/driver/page.tsx`
+- [x] Real-time GPS tracking and active delivery management
+- [x] Available orders list and courier profile (vehicle, radius, earnings, rating)
+- [ ] **Driver Demo Page** — standalone `/demo/driver/` showcase for recruiting drivers
+- [ ] **Camera Feature** — driver takes photo of delivery (proof of delivery / dispute resolution)
+- [ ] **Google/Local Ads Integration** — businesses run local ads with MohnMenu revenue split
+- [ ] **KDS Module for Drivers** — simplified order view showing prep status
+- [ ] **Book-a-Ride** — reuse Quick Order Modal pattern for ride booking (non-food delivery)
+- [ ] **Tipping System** — in-app tips with $MOHN option (tip in crypto, driver keeps it all)
+- [ ] **Bitcoin/Crypto Payment** — NOWPayments for ride payments
+- [ ] **Insurance & Proof Docs** — driver uploads insurance, vehicle registration, background check
+- [ ] **Custom Mapbox Integration** — replace Leaflet with Mapbox for premium route optimization, ETA
+- [ ] **Scheduled Rides/Deliveries** — advance booking with time slots
+- [ ] **Driver Earnings Dashboard** — weekly/monthly breakdowns, Stripe payout history, tax documents
+- [ ] **Driver Onboarding Flow** — multi-step signup: personal info → vehicle → documents → background check → approval
+- [ ] **Driver Rating System** — customer rates driver, driver rates customer (two-way)
+- [ ] **Multi-Stop Deliveries** — batch orders from same restaurant to nearby addresses
+
+**Music Store & Artist Platform:**
+> Vision: Full music artist storefront where artists sell merch, promote tours, and fans can listen/preview tracks. Demo store so potential artist customers can see what their fans would experience.
+
+- [x] Music artist landing page (`/for-music-artists/`) — industry pitch page
+- [x] Artist storefront music tab (`/{slug}/music/`) — Spotify/YouTube links, genre themes, tour dates, merch
+- [x] Jukebox feature (`/{slug}/jukebox/`) — credit-based song queue, karaoke mode, requests
+- [x] Now Playing display (`/{slug}/now-playing/`) — TV display for current songs
+- [ ] **Music Demo Store** — `/demo/music/` or `/demo/artist/` with sample artist (fake band, sample tracks)
+- [ ] **Features Page for Music** — `/features/music/` dedicated feature breakdown for artists
+- [ ] **Spotify API Integration** — embed actual player widgets, show top tracks, follower counts
+- [ ] **YouTube Embed** — music video previews inline on artist page
+- [ ] **Merch Storefront** — t-shirts, vinyl, posters with Stripe checkout
+- [ ] **Tour Date Calendar** — interactive map of upcoming shows + ticket links
+- [ ] **Fan Mailing List** — email capture for artist updates (per-artist)
+- [ ] **Artist Analytics** — plays, merch sales, fan demographics (Growth+ tier)
+
+**Mobile Responsiveness Overhaul:**
+> Priority: ALL screens must work on any device — phones, tablets, laptops. Bartenders/chefs use phones as backup KDS. Everything must be touch-friendly.
+
+- [ ] **KDS Mobile Optimization** (`app/owner/kds/page.tsx`)
+  - Compact order cards for small screens
+  - Larger tap targets (44px minimum per WCAG)
+  - Swipe gestures (swipe right = done, swipe left = bump)
+  - Landscape tablet support (iPad as kitchen display)
+  - Phone-as-KDS backup mode (simplified single-column layout)
+- [ ] **Login/Auth Responsiveness** — auth modal + login pages adapt to phone screens
+- [ ] **Owner Dashboard Mobile** — collapsible sidebar, touch-friendly charts, responsive tables
+- [ ] **Driver Dashboard Tablet** — optimized for car-mounted tablets
+- [ ] **Customer Order Tracking Mobile** — full PWA experience with push notifications
+
+**Demo Platform Scalability:**
+> Concern: When MohnMenu grows to 1000+ simultaneous demos, current Firestore-backed demo system may hit limits.
+
+- [x] 10 demo store definitions, 4 live (China Wok, Copper Tap, Griffin Lounge, Shepherds Gate)
+- [ ] **Subdomain Strategy** — `demo.mohnmenu.com` for isolated demo environment
+- [ ] **Ephemeral Demos** — auto-expire after 30 min, seeded from templates, no persistent storage
+- [ ] **Demo Isolation** — each demo gets its own Firestore namespace or RTDB path
+- [ ] **Demo Analytics** — track which demos convert to signups
+- [ ] **One-Click Demo** — no account required, instant access to full demo experience
+
 **Peer Delivery System:**
 - [x] Peer delivery feature page (`/features/peer-delivery/`)
 - [x] Peer delivery settings schema: `{ enabled, discountAmount, maxDistance }`
