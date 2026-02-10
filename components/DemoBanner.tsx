@@ -21,7 +21,7 @@ import {
   FaPlay, FaInfoCircle,
 } from 'react-icons/fa';
 
-interface DemoAccount {
+export interface DemoAccount {
   role: string;
   label: string;
   email: string;
@@ -30,6 +30,12 @@ interface DemoAccount {
   description: string;
   /** Use {slug} as placeholder — replaced at runtime */
   dashboardPath: string;
+}
+
+export interface DemoQuickLink {
+  label: string;
+  href: string;
+  icon?: React.ComponentType<{ className?: string }>;
 }
 
 const DEMO_ACCOUNTS: DemoAccount[] = [
@@ -82,7 +88,25 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
 
 const DEMO_PASSWORD = 'DemoPass123!';
 
-export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
+interface DemoBannerProps {
+  businessSlug: string;
+  demoAccounts?: DemoAccount[];
+  demoPassword?: string;
+  welcomeTitle?: string;
+  welcomeSubtitle?: string;
+  roleQuickLinks?: Record<string, DemoQuickLink[]>;
+  backLinkHref?: string;
+}
+
+export default function DemoBanner({
+  businessSlug,
+  demoAccounts,
+  demoPassword,
+  welcomeTitle,
+  welcomeSubtitle,
+  roleQuickLinks,
+  backLinkHref,
+}: DemoBannerProps) {
   const { user, MohnMenuUser, loginWithEmail, logout, loading } = useAuth();
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
@@ -90,9 +114,15 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
   const [loggingIn, setLoggingIn] = useState<string | null>(null);
   const [loginError, setLoginError] = useState('');
 
+  const accounts = demoAccounts ?? DEMO_ACCOUNTS;
+  const password = demoPassword ?? DEMO_PASSWORD;
+  const bannerTitle = welcomeTitle ?? 'Welcome to The Copper Tap demo! Click any role below to instantly log in and explore the platform.';
+  const bannerSubtitle = welcomeSubtitle ?? 'Each role shows a different perspective — owner sees the full dashboard, staff receives orders, customers can browse & order.';
+  const backHref = backLinkHref ?? `/${businessSlug}`;
+
   // Detect if current user is a demo account
-  const isDemoUser = user?.email?.endsWith('@coppertap.demo') ?? false;
-  const currentDemoAccount = DEMO_ACCOUNTS.find(a => a.email === user?.email);
+  const currentDemoAccount = accounts.find(a => a.email === user?.email);
+  const isDemoUser = Boolean(currentDemoAccount);
 
   /** Resolve {slug} placeholder in dashboard paths */
   const resolvePath = useCallback((path: string) => path.replace(/\{slug\}/g, businessSlug), [businessSlug]);
@@ -116,7 +146,7 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
         // Small delay for auth state to clear
         await new Promise(r => setTimeout(r, 500));
       }
-      await loginWithEmail(account.email, DEMO_PASSWORD);
+      await loginWithEmail(account.email, password);
       setExpanded(false);
 
       // Auto-navigate to the role's dashboard
@@ -128,7 +158,7 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
     } finally {
       setLoggingIn(null);
     }
-  }, [user, loginWithEmail, logout, resolvePath, router]);
+  }, [user, loginWithEmail, logout, resolvePath, router, password]);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -221,10 +251,10 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
                 <FaInfoCircle className="text-purple-500 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-bold text-zinc-800">
-                    Welcome to The Copper Tap demo! Click any role below to instantly log in and explore the platform.
+                    {bannerTitle}
                   </p>
                   <p className="text-xs text-zinc-500 mt-0.5">
-                    Each role shows a different perspective — owner sees the full dashboard, staff receives orders, customers can browse & order.
+                    {bannerSubtitle}
                   </p>
                 </div>
               </div>
@@ -237,7 +267,7 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
 
               {/* Role Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                {DEMO_ACCOUNTS.map((account) => {
+                {accounts.map((account) => {
                   const Icon = account.icon;
                   const isActive = currentDemoAccount?.role === account.role && isDemoUser;
                   const isLoading = loggingIn === account.role;
@@ -277,7 +307,18 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
                 <div className="mt-4 pt-4 border-t border-zinc-100">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-bold text-zinc-500">Quick links:</span>
-                    {currentDemoAccount.role === 'owner' && (
+                    {roleQuickLinks ? (
+                      (roleQuickLinks[currentDemoAccount.role] || roleQuickLinks.default || []).map((link) => (
+                        <a
+                          key={link.label}
+                          href={link.href}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors"
+                        >
+                          {link.icon && <link.icon className="text-[10px]" />}
+                          {link.label}
+                        </a>
+                      ))
+                    ) : currentDemoAccount.role === 'owner' && (
                       <>
                         <a href="/owner" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 rounded-full text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors">
                           <FaTachometerAlt className="text-[10px]" /> Dashboard
@@ -331,7 +372,7 @@ export default function DemoBanner({ businessSlug }: { businessSlug: string }) {
                       </>
                     )}
                     <a
-                      href={`/${businessSlug}`}
+                      href={backHref}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 rounded-full text-xs font-bold text-purple-700 hover:bg-purple-200 transition-colors"
                     >
                       ← Back to Storefront

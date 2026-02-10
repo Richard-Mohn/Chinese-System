@@ -18,7 +18,7 @@ import { useAuth } from '@/context/AuthContext';
 import type { MohnMenuBusiness } from '@/lib/types';
 import {
   FaShoppingCart, FaUser, FaStar, FaReceipt, FaArrowRight,
-  FaCalendarAlt, FaMusic,
+  FaCalendarAlt, FaMusic, FaGlobe,
 } from 'react-icons/fa';
 
 const QuickOrderModal = dynamic(() => import('./QuickOrderModal'), { ssr: false });
@@ -44,6 +44,7 @@ export default function TenantHeroActions({
   const isBarType = BAR_TYPES.includes(business.type);
   const hasReservations = (business as any).features?.reservations || (business as any).reservationSettings?.enabled;
   const hasEntertainment = (business as any).entertainment?.jukeboxEnabled;
+  const hasChineseInfo = business.type === 'chinese_restaurant';
   const slug = business.slug;
 
   return (
@@ -105,6 +106,17 @@ export default function TenantHeroActions({
               Jukebox
             </a>
           )}
+        </div>
+      )}
+
+      {hasChineseInfo && (
+        <div className="flex items-center justify-center mb-4">
+          <a
+            href={`/${slug}/zh`}
+            className="px-7 py-3 rounded-full border border-red-200 bg-red-50 text-red-700 font-bold text-sm flex items-center gap-2 hover:bg-red-100 transition-all"
+          >
+            <FaGlobe className="text-xs" /> 中文介绍 · Click to learn more
+          </a>
         </div>
       )}
 

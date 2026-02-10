@@ -11,6 +11,7 @@ import {
   FaShoppingCart, FaUtensils, FaCoffee, FaDesktop, FaTruck,
   FaClipboardList, FaGlobe, FaBirthdayCake, FaShoppingBasket,
   FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt, FaUserTie, FaMusic,
+  FaChurch,
   FaMugHot
 } from 'react-icons/fa';
 import { useAuthModal } from '@/context/AuthModalContext';
@@ -25,6 +26,8 @@ const solutions = [
   { href: '/for-convenience-stores', icon: FaCoffee, label: 'Convenience Stores', desc: 'QR ordering, inventory & grab-and-go' },
   { href: '/for-retail-shops', icon: FaStore, label: 'Shops & Boutiques', desc: 'AI product listing & online storefront' },
   { href: '/for-coffee-shops', icon: FaMugHot, label: 'Coffee Shops', desc: 'Order-ahead, loyalty & peer delivery' },
+  { href: '/for-churches', icon: FaChurch, label: 'Churches', desc: 'Giving, events, volunteers & streaming' },
+  { href: '/for-music-artists', icon: FaMusic, label: 'Music & Artists', desc: 'Tickets, merch, drops & fan clubs' },
 ];
 
 const featureItems = [

@@ -18,6 +18,8 @@ import { getServerBasePath, getServerOrderPath } from '@/lib/tenant-links';
 import TenantHeroActions from '@/components/TenantHeroActions';
 import TenantCTA from '@/components/TenantCTA';
 import LiveStaffSection from '@/components/LiveStaffSection';
+import DemoBanner, { type DemoAccount, type DemoQuickLink } from '@/components/DemoBanner';
+import { FaUserTie, FaConciergeBell, FaUtensils, FaTruck, FaClipboardList, FaTachometerAlt } from 'react-icons/fa';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -78,6 +80,68 @@ async function getFeaturedMenuItems(businessId: string): Promise<FeaturedItem[]>
 
 const BAR_TYPES = ['bar_grill', 'restaurant', 'chinese_restaurant'];
 
+const CHINESE_DEMO_ACCOUNTS: DemoAccount[] = [
+  {
+    role: 'owner',
+    label: 'Owner / Admin',
+    email: 'owner@chinawok.demo',
+    icon: FaUserTie,
+    color: 'from-red-500 to-orange-500',
+    description: 'Full dashboard, menu management, orders, analytics.',
+    dashboardPath: '/owner',
+  },
+  {
+    role: 'kitchen',
+    label: 'Kitchen Lead',
+    email: 'kitchen@chinawok.demo',
+    icon: FaUtensils,
+    color: 'from-amber-500 to-yellow-500',
+    description: 'Kitchen display, order queue, prep status.',
+    dashboardPath: '/owner/kds',
+  },
+  {
+    role: 'server',
+    label: 'Server',
+    email: 'server@chinawok.demo',
+    icon: FaConciergeBell,
+    color: 'from-emerald-500 to-teal-500',
+    description: 'Table service, order updates, customer help.',
+    dashboardPath: '/owner/kds',
+  },
+  {
+    role: 'driver',
+    label: 'Driver',
+    email: 'driver@chinawok.demo',
+    icon: FaTruck,
+    color: 'from-blue-500 to-cyan-500',
+    description: 'Delivery dashboard, pickups, route status.',
+    dashboardPath: '/driver',
+  },
+];
+
+const CHINESE_DEMO_QUICK_LINKS: Record<string, DemoQuickLink[]> = {
+  owner: [
+    { label: 'Dashboard', href: '/owner', icon: FaTachometerAlt },
+    { label: 'Orders', href: '/owner/orders', icon: FaClipboardList },
+    { label: 'Menu', href: '/owner/menu', icon: FaUtensils },
+  ],
+  kitchen: [
+    { label: 'KDS', href: '/owner/kds', icon: FaUtensils },
+    { label: 'Orders', href: '/owner/orders', icon: FaClipboardList },
+  ],
+  server: [
+    { label: 'KDS', href: '/owner/kds', icon: FaUtensils },
+    { label: 'Storefront', href: '/china-wok-rva', icon: FaConciergeBell },
+  ],
+  driver: [
+    { label: 'Driver', href: '/driver', icon: FaTruck },
+  ],
+  default: [
+    { label: 'Menu', href: '/china-wok-rva/menu', icon: FaUtensils },
+    { label: 'Orders', href: '/order/china-wok-rva', icon: FaClipboardList },
+  ],
+};
+
 export default async function TenantHomePage({
   params,
 }: {
@@ -104,6 +168,7 @@ export default async function TenantHomePage({
   const website = business.website;
   const content = website.content || {};
   const isBarType = BAR_TYPES.includes(business.type);
+  const isChineseDemo = business.slug === 'china-wok-rva';
   const hasEntertainment = (business as any).entertainment?.jukeboxEnabled;
   const hasReservations = (business as any).features?.reservations || (business as any).reservationSettings?.enabled;
   const specialties = website.specialties || [];
@@ -115,6 +180,16 @@ export default async function TenantHomePage({
 
   return (
     <div className="bg-white">
+      {isChineseDemo && (
+        <DemoBanner
+          businessSlug={businessSlug}
+          demoAccounts={CHINESE_DEMO_ACCOUNTS}
+          welcomeTitle="Welcome to the China Wok demo! Click any role below to instantly log in and explore the platform."
+          welcomeSubtitle="Owner, kitchen, server, and driver views are ready for demo access."
+          roleQuickLinks={CHINESE_DEMO_QUICK_LINKS}
+          backLinkHref={`/${businessSlug}`}
+        />
+      )}
       {/* ─── Hero Section ──────────────────────────────────────── */}
       <section className="relative pt-24 pb-32 px-4 overflow-hidden">
         <div className="container mx-auto max-w-6xl relative z-10 text-center">

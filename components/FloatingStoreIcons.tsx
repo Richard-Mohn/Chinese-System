@@ -156,6 +156,20 @@ const ICON_SETS: Record<string, string[]> = {
     // Calendar
     'M7 2v4M17 2v4M3 8h18M5 8v12h14V8',
   ],
+  music: [
+    // Music note
+    'M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z',
+    // Microphone
+    'M12 2a3 3 0 013 3v6a3 3 0 01-6 0V5a3 3 0 013-3zM5 11a7 7 0 0014 0M12 18v4',
+    // Headphones
+    'M4 13a8 8 0 0116 0v5a2 2 0 01-2 2h-1v-6h3M4 13v7a2 2 0 002 2h1v-6H4',
+    // Vinyl
+    'M12 2a10 10 0 100 20 10 10 0 000-20zm0 6a4 4 0 100 8 4 4 0 000-8z',
+    // Wave
+    'M3 12c2 0 2-4 4-4s2 4 4 4 2-4 4-4 2 4 4 4',
+    // Stage lights
+    'M6 2l4 6-4 6M18 2l-4 6 4 6',
+  ],
   default: [
     'M12 2C6.48 2 2 6.48 2 12l10-10zm0 0c5.52 0 10 4.48 10 10L12 2zm0 20l5-10H7l5 10z',
     'M3 7h18M3 12h18M5 7a7 7 0 0114 0M5 17a7 7 0 0014 0M3 17h18',
@@ -178,6 +192,7 @@ const COLOR_THEMES: Record<string, string> = {
   foodtruck: 'text-yellow-400/[0.08]',
   convenience: 'text-blue-400/[0.08]',
   church: 'text-emerald-400/[0.08]',
+  music: 'text-indigo-400/[0.08]',
   default: 'text-zinc-400/[0.08]',
 };
 

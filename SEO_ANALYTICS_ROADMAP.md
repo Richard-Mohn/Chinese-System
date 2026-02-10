@@ -44,6 +44,8 @@
 | **For Bars** | "bar ordering system", "nightclub ordering app" | Commercial |
 | **For C-Stores** | "convenience store ordering system", "corner store delivery" | Commercial |
 | **For Retail** | "retail shop ordering system", "boutique online store" | Commercial |
+| **For Churches** | "church management platform", "church giving and events" | Commercial |
+| **For Music & Artists** | "artist merch platform", "music ticketing and livestream" | Commercial |
 | **Features** | "restaurant POS features", "QR code ordering system" | Informational |
 | **FAQ** | "commission free ordering FAQ", "how does MohnMenu work" | Informational |
 | **Demo** | "restaurant ordering demo", "try ordering platform" | Transactional |
@@ -554,6 +556,12 @@ Step 4: Data streams to their dashboard
 - [ ] ROI calculator on pricing page
 - [ ] Automated SEO audit reports for tenants
 - [ ] Competitive analysis features
+
+### Phase 7: Industry Expansion (Church + Music)
+- [ ] Publish church and music industry landing pages with unique metadata
+- [ ] Expand demo content: church projector mode, streaming hub, and role-based views
+- [ ] Define keyword clusters for church and music use-cases
+- [ ] Add structured data variants for non-restaurant industries
 
 ---
 

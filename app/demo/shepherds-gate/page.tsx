@@ -15,8 +15,13 @@ import {
   FaMusic,
   FaBible,
   FaDonate,
+  FaTv,
+  FaUserTie,
+  FaVideo,
+  FaDesktop,
 } from 'react-icons/fa';
 import FloatingStoreIcons from '@/components/FloatingStoreIcons';
+import DemoBanner, { type DemoAccount, type DemoQuickLink } from '@/components/DemoBanner';
 
 const SERVICE_TIMES = [
   { day: 'Sunday', time: '9:00 AM', label: 'Classic Service' },
@@ -45,6 +50,90 @@ const FEATURES = [
   { icon: FaHandsHelping, title: 'Volunteer Scheduling', desc: 'Automated rotations and reminders for every team.' },
   { icon: FaBible, title: 'Sermon Library', desc: 'Series, notes, and discussion guides organized.' },
 ];
+
+const CHURCH_DEMO_ACCOUNTS: DemoAccount[] = [
+  {
+    role: 'pastor',
+    label: 'Pastor Admin',
+    email: 'pastor@shepherdsgate.demo',
+    icon: FaUserTie,
+    color: 'from-emerald-500 to-teal-600',
+    description: 'Dashboard, giving insights, events, and member care.',
+    dashboardPath: '/owner',
+  },
+  {
+    role: 'media',
+    label: 'Media / AV',
+    email: 'media@shepherdsgate.demo',
+    icon: FaVideo,
+    color: 'from-indigo-500 to-sky-500',
+    description: 'Streaming console, run of service, and media cues.',
+    dashboardPath: '/owner/kds',
+  },
+  {
+    role: 'volunteer',
+    label: 'Volunteer Lead',
+    email: 'volunteers@shepherdsgate.demo',
+    icon: FaHandsHelping,
+    color: 'from-amber-500 to-orange-500',
+    description: 'Schedules, rotations, and team communication.',
+    dashboardPath: '/owner/staff',
+  },
+  {
+    role: 'care',
+    label: 'Care Team',
+    email: 'care@shepherdsgate.demo',
+    icon: FaHeart,
+    color: 'from-pink-500 to-rose-500',
+    description: 'Prayer requests, follow-ups, and care workflows.',
+    dashboardPath: '/owner/website',
+  },
+  {
+    role: 'finance',
+    label: 'Finance / Giving',
+    email: 'finance@shepherdsgate.demo',
+    icon: FaDonate,
+    color: 'from-emerald-600 to-green-500',
+    description: 'Giving campaigns, receipts, and reporting.',
+    dashboardPath: '/owner/analytics',
+  },
+];
+
+const CHURCH_QUICK_LINKS: Record<string, DemoQuickLink[]> = {
+  pastor: [
+    { label: 'Dashboard', href: '/owner', icon: FaUserTie },
+    { label: 'Giving', href: '#giving', icon: FaDonate },
+    { label: 'Events', href: '#events', icon: FaCalendarAlt },
+  ],
+  media: [
+    { label: 'Projector', href: '/demo/shepherds-gate/menu-board', icon: FaTv },
+    { label: 'KDS', href: '/owner/kds', icon: FaDesktop },
+    { label: 'Stream Hub', href: '#streaming', icon: FaBroadcastTower },
+  ],
+  volunteer: [
+    { label: 'Teams', href: '/owner/staff', icon: FaHandsHelping },
+    { label: 'Events', href: '#events', icon: FaCalendarAlt },
+  ],
+  care: [
+    { label: 'Member Care', href: '#ministries', icon: FaUsers },
+    { label: 'Prayer Requests', href: '#events', icon: FaHeart },
+  ],
+  finance: [
+    { label: 'Giving', href: '#giving', icon: FaDonate },
+    { label: 'Analytics', href: '/owner/analytics', icon: FaDesktop },
+  ],
+  default: [
+    { label: 'Donate', href: '#giving', icon: FaDonate },
+    { label: 'Events', href: '#events', icon: FaCalendarAlt },
+    { label: 'Projector', href: '/demo/shepherds-gate/menu-board', icon: FaTv },
+  ],
+};
+
+const DEMO_ACCOUNTS = CHURCH_DEMO_ACCOUNTS.map((acct) => ({
+  role: acct.label,
+  email: acct.email,
+  desc: acct.description,
+}));
 
 export default function ShepherdsGateDemoPage() {
   return (
@@ -90,10 +179,10 @@ export default function ShepherdsGateDemoPage() {
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               <Link
-                href="/demo/shepherds-gate"
+                href="#roles"
                 className="px-8 py-4 bg-emerald-400 text-emerald-950 rounded-full font-bold text-lg flex items-center gap-3 hover:bg-emerald-300 transition-all"
               >
-                <FaPlay className="text-sm" /> View Demo
+                <FaPlay className="text-sm" /> Try Demo Roles
               </Link>
               <Link
                 href="/register"
@@ -155,8 +244,17 @@ export default function ShepherdsGateDemoPage() {
         </div>
       </section>
 
+      <DemoBanner
+        businessSlug="shepherds-gate"
+        demoAccounts={CHURCH_DEMO_ACCOUNTS}
+        welcomeTitle="Welcome to the Shepherds Gate demo! Click any role below to instantly log in and explore the platform."
+        welcomeSubtitle="Each role highlights a church team: admin, media, volunteers, care, and finance."
+        roleQuickLinks={CHURCH_QUICK_LINKS}
+        backLinkHref="/demo/shepherds-gate"
+      />
+
       {/* Events + Giving */}
-      <section className="py-24 px-4">
+      <section id="events" className="py-24 px-4">
         <div className="container mx-auto max-w-6xl grid lg:grid-cols-2 gap-12 items-start">
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Upcoming Events</p>
@@ -176,7 +274,7 @@ export default function ShepherdsGateDemoPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-[2.5rem] p-10 text-white shadow-2xl">
+          <div id="giving" className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-[2.5rem] p-10 text-white shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-emerald-100">Digital Giving</p>
@@ -211,7 +309,7 @@ export default function ShepherdsGateDemoPage() {
       </section>
 
       {/* Ministries */}
-      <section className="py-24 px-4 bg-zinc-50">
+      <section id="ministries" className="py-24 px-4 bg-zinc-50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Ministries</p>
@@ -261,7 +359,7 @@ export default function ShepherdsGateDemoPage() {
       </section>
 
       {/* Media + Worship */}
-      <section className="py-24 px-4 bg-gradient-to-br from-slate-950 via-zinc-950 to-emerald-950 text-white">
+      <section id="streaming" className="py-24 px-4 bg-gradient-to-br from-slate-950 via-zinc-950 to-emerald-950 text-white">
         <div className="container mx-auto max-w-6xl grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-emerald-300">Worship & Media</p>
@@ -274,6 +372,7 @@ export default function ShepherdsGateDemoPage() {
               <div className="px-5 py-3 rounded-full bg-white/10 border border-white/15 text-sm font-bold">Live Stream Hub</div>
               <div className="px-5 py-3 rounded-full bg-white/10 border border-white/15 text-sm font-bold">Sermon Library</div>
               <div className="px-5 py-3 rounded-full bg-white/10 border border-white/15 text-sm font-bold">Worship Planning</div>
+              <Link href="/demo/shepherds-gate/menu-board" className="px-5 py-3 rounded-full bg-emerald-400/20 border border-emerald-300/40 text-sm font-bold">Projector Mode</Link>
             </div>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8">
@@ -302,6 +401,33 @@ export default function ShepherdsGateDemoPage() {
               </div>
             </div>
             <button className="mt-6 w-full py-3 rounded-full bg-emerald-400 text-emerald-950 font-black">Watch Live</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Accounts */}
+      <section id="roles" className="py-24 px-4 bg-white">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Role Switcher</p>
+            <h2 className="text-4xl md:text-5xl font-black mt-3">Log in as any role.</h2>
+            <p className="text-zinc-500 text-lg mt-4">
+              Demo accounts use password: <span className="font-mono font-bold text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded">DemoPass123!</span>
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {DEMO_ACCOUNTS.map((acct) => (
+              <div key={acct.email} className="bg-white border border-zinc-100 rounded-2xl p-6 hover:border-emerald-200 hover:shadow-lg transition-all">
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3 bg-emerald-50 text-emerald-700">
+                  {acct.role}
+                </span>
+                <p className="font-mono text-sm text-zinc-900 font-bold mb-1">{acct.email}</p>
+                <p className="text-xs text-zinc-500 mb-4">{acct.desc}</p>
+                <Link href="/login" className="inline-flex items-center gap-2 text-sm font-bold text-emerald-700 hover:text-emerald-600">
+                  Go to Login <FaArrowRight className="text-xs" />
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
