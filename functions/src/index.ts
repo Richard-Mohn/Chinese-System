@@ -185,8 +185,9 @@ export const onOrderStatusUpdate = onDocumentUpdated(
       }
     }
 
-    // ── Award Loyalty Points ───────────────────────────────
-    // 1 point per $1 spent, awarded when order is delivered or completed
+    // ── Award Loyalty Points + $MOHN Tokens ─────────────
+    // Loyalty: 1 point per $1 spent
+    // $MOHN: 5 tokens per completed order (unified ecosystem reward)
     const isCompleted =
       (orderAfter.currentStatus === "Delivered" || orderAfter.currentStatus === "Completed") &&
       orderBefore.currentStatus !== "Delivered" &&
@@ -195,13 +196,26 @@ export const onOrderStatusUpdate = onDocumentUpdated(
     if (isCompleted && orderAfter.customerId && !orderAfter.loyaltyPointsAwarded) {
       const orderTotal = orderAfter.total || orderAfter.subtotal || 0;
       const pointsEarned = Math.floor(orderTotal); // 1 point per $1
+      const mohnEarned = 5; // 5 $MOHN per completed order
 
       if (pointsEarned > 0) {
         const customerRef = db.collection("users").doc(orderAfter.customerId);
         await customerRef.update({
           loyaltyPoints: admin.firestore.FieldValue.increment(pointsEarned),
           loyaltyPointsLifetime: admin.firestore.FieldValue.increment(pointsEarned),
+          mohnBalance: admin.firestore.FieldValue.increment(mohnEarned),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        // Log $MOHN reward event for audit trail
+        await db.collection("mohn_rewards").add({
+          action: "food_order",
+          points: mohnEarned,
+          userId: orderAfter.customerId,
+          description: "Completed a food order",
+          platform: "mohnmenu",
+          metadata: { orderId, businessId, orderTotal },
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
         // Mark order so we don't double-award
@@ -212,14 +226,141 @@ export const onOrderStatusUpdate = onDocumentUpdated(
           .doc(orderId)
           .update({
             loyaltyPointsAwarded: pointsEarned,
+            mohnAwarded: mohnEarned,
           });
 
         console.log(
-          `Awarded ${pointsEarned} loyalty points to customer ${orderAfter.customerId} for order ${orderId}.`
+          `Awarded ${pointsEarned} loyalty points + ${mohnEarned} $MOHN to customer ${orderAfter.customerId} for order ${orderId}.`
         );
       }
+    }
+
+    // ── Award $MOHN to Driver ──────────────────────────────
+    // Drivers earn 5 $MOHN per delivery completed
+    if (isCompleted && orderAfter.driverId && !orderAfter.driverMohnAwarded) {
+      const driverMohn = 5;
+      const driverRef = db.collection("users").doc(orderAfter.driverId);
+      await driverRef.update({
+        mohnBalance: admin.firestore.FieldValue.increment(driverMohn),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await db.collection("mohn_rewards").add({
+        action: "driver_delivery",
+        points: driverMohn,
+        userId: orderAfter.driverId,
+        description: "Completed a delivery as driver",
+        platform: "mohnmenu",
+        metadata: { orderId, businessId },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await db
+        .collection("businesses")
+        .doc(businessId)
+        .collection("orders")
+        .doc(orderId)
+        .update({ driverMohnAwarded: driverMohn });
+
+      console.log(
+        `Awarded ${driverMohn} $MOHN to driver ${orderAfter.driverId} for delivery of order ${orderId}.`
+      );
     }
 
     return null;
   }
 );
+
+// ════════════════════════════════════════════════════════════
+// $MOHN REWARDS — Wallet Transfer Trigger
+// Awards $MOHN for P2P transfers & pay-for-friend actions
+// ════════════════════════════════════════════════════════════
+export const awardMohnOnWalletTransfer = functions.firestore
+  .document("wallet_transfers/{transferId}")
+  .onCreate(async (snap) => {
+    const transfer = snap.data();
+    if (!transfer || transfer.mohnAwarded) return null;
+
+    const senderId = transfer.senderId;
+    if (!senderId) return null;
+
+    let mohnAmount = 0;
+    let action = "";
+
+    if (transfer.type === "p2p_transfer") {
+      mohnAmount = 2; // 2 $MOHN per P2P transfer
+      action = "p2p_transfer";
+    } else if (transfer.type === "pay_for_friend") {
+      mohnAmount = 5; // 5 $MOHN for paying a friend's order
+      action = "pay_for_friend";
+    }
+
+    if (mohnAmount > 0) {
+      const senderRef = db.collection("users").doc(senderId);
+      await senderRef.update({
+        mohnBalance: admin.firestore.FieldValue.increment(mohnAmount),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await db.collection("mohn_rewards").add({
+        action,
+        points: mohnAmount,
+        userId: senderId,
+        description:
+          action === "p2p_transfer"
+            ? "Sent a P2P transfer"
+            : "Paid for a friend's order",
+        platform: "mohnmenu",
+        metadata: { transferId: snap.id },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await snap.ref.update({ mohnAwarded: mohnAmount });
+
+      console.log(
+        `Awarded ${mohnAmount} $MOHN to ${senderId} for ${action} (transfer ${snap.id}).`
+      );
+    }
+
+    return null;
+  });
+
+// ════════════════════════════════════════════════════════════
+// $MOHN REWARDS — Wallet Top-Up Trigger  
+// Awards 3 $MOHN per wallet top-up (triggered by Stripe webhook)
+// ════════════════════════════════════════════════════════════
+export const awardMohnOnWalletTopup = functions.firestore
+  .document("wallet_topups/{topupId}")
+  .onCreate(async (snap) => {
+    const topup = snap.data();
+    if (!topup || topup.mohnAwarded) return null;
+
+    const userId = topup.userId || topup.firebaseUid;
+    if (!userId) return null;
+
+    const mohnAmount = 3; // 3 $MOHN per top-up
+
+    const userRef = db.collection("users").doc(userId);
+    await userRef.update({
+      mohnBalance: admin.firestore.FieldValue.increment(mohnAmount),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await db.collection("mohn_rewards").add({
+      action: "wallet_topup",
+      points: mohnAmount,
+      userId,
+      description: "Topped up wallet balance",
+      platform: "mohnmenu",
+      metadata: { topupId: snap.id, amount: topup.amount },
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await snap.ref.update({ mohnAwarded: mohnAmount });
+
+    console.log(
+      `Awarded ${mohnAmount} $MOHN to ${userId} for wallet top-up (${snap.id}).`
+    );
+
+    return null;
+  });

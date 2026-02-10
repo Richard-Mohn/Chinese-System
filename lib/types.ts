@@ -102,6 +102,14 @@ export interface MohnMenuUser {
 
   // Wallet balance in cents (for P2P transfers / credits)
   walletBalance?: number;
+
+  // $MOHN token balance — unified across MohnSter ecosystem
+  // Earned through food orders, P2P transfers, referrals, etc.
+  mohnBalance?: number;
+
+  // Loyalty points (legacy — 1 point per $1 spent, separate from $MOHN)
+  loyaltyPoints?: number;
+  loyaltyPointsLifetime?: number;
   
   createdAt: string;
   updatedAt: string;

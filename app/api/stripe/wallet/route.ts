@@ -164,6 +164,8 @@ export async function POST(request: NextRequest) {
         transferId,
         message: `$${(amount / 100).toFixed(2)} sent to ${recipientEmail}`,
       });
+
+      // $MOHN awarded via Cloud Function trigger on wallet_transfers collection
     }
 
     // ─── Pay for Friend's Order ──────────────

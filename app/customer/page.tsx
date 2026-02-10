@@ -2,10 +2,12 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaPizzaSlice, FaHistory, FaGift, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
+import { FaPizzaSlice, FaHistory, FaGift, FaUserCircle, FaSignOutAlt, FaCoins } from 'react-icons/fa';
 
 interface StatCardProps {
   title: string;
@@ -54,12 +56,32 @@ const NavCard = ({ icon: Icon, title, description, href, delay }: NavCardProps) 
 export default function CustomerDashboard() {
   const { user, MohnMenuUser, loading, isCustomer, logout } = useAuth();
   const router = useRouter();
+  const [loyaltyPoints, setLoyaltyPoints] = useState(0);
+  const [mohnBalance, setMohnBalance] = useState(0);
 
   useEffect(() => {
     if (!loading && (!user || !isCustomer())) {
       router.push('/login');
     }
   }, [user, loading, isCustomer, router]);
+
+  // Fetch real stats from Firestore
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!user) return;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setLoyaltyPoints(data?.loyaltyPoints || 0);
+          setMohnBalance(data?.mohnBalance || 0);
+        }
+      } catch (err) {
+        console.error('Error fetching user stats:', err);
+      }
+    };
+    if (user) fetchStats();
+  }, [user]);
 
   if (loading) {
     return (
@@ -98,10 +120,10 @@ export default function CustomerDashboard() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
-          <StatCard title="Loyalty Points" value="450" color="text-orange-600" delay={0.1} />
-          <StatCard title="Total Orders" value="18" color="text-emerald-600" delay={0.2} />
-          <StatCard title="Total Spent" value="$342" color="text-black" delay={0.3} />
-          <StatCard title="Membership" value="6mo" color="text-orange-500" delay={0.4} />
+          <StatCard title="Loyalty Points" value={loyaltyPoints.toLocaleString()} color="text-orange-600" delay={0.1} />
+          <StatCard title="$MOHN Tokens" value={mohnBalance.toLocaleString()} color="text-indigo-600" delay={0.2} />
+          <StatCard title="Total Orders" value="—" color="text-emerald-600" delay={0.3} />
+          <StatCard title="Wallet Balance" value="—" color="text-black" delay={0.4} />
         </div>
 
         {/* Navigation Grid */}

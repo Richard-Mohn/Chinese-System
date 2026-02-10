@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AnimatedBackground from "@/components/AnimatedBackground";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import TawkChat from "@/components/TawkChat";
 import {
   ORGANIZATION_JSONLD,
   SOFTWARE_APP_JSONLD,
@@ -101,6 +102,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <TawkChat />
             </CartProvider>
           </AuthModalProvider>
         </AuthProvider>
