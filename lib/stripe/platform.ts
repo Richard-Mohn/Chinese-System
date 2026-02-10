@@ -185,6 +185,8 @@ export interface CreatePaymentParams {
   orderId: string;
   businessId: string;
   customerEmail?: string;
+  /** Stripe Customer ID — attach to PaymentIntent for saved cards + history */
+  stripeCustomerId?: string;
   description?: string;
   /** Whether this is a courier delivery (flat $0.25 fee instead of percentage) */
   isCourierDelivery?: boolean;
@@ -216,6 +218,8 @@ export async function createDestinationCharge(params: CreatePaymentParams) {
     transfer_data: {
       destination: params.ownerStripeAccountId,
     },
+    // Attach Stripe Customer for saved cards + payment history
+    ...(params.stripeCustomerId && { customer: params.stripeCustomerId }),
     metadata: {
       mohn_order_id: params.orderId,
       mohn_business_id: params.businessId,
@@ -335,4 +339,105 @@ export async function getRecentPayouts(accountId: string, limit = 10) {
     method: p.method,
     description: p.description,
   }));
+}
+
+// ─── Customer Management ─────────────────────────────────────
+
+/**
+ * Create a Stripe Customer or retrieve existing one by email.
+ * This is the correct 2026 flow: collect info → create customer → create payment.
+ *
+ * The Customer object enables:
+ * - Saved payment methods for returning customers
+ * - Full payment history in Stripe Dashboard
+ * - Linking PaymentIntents to a customer for receipts
+ * - Future off-session payments (subscriptions, reorders)
+ */
+export async function createOrGetStripeCustomer(params: {
+  email: string;
+  name?: string;
+  phone?: string;
+  firebaseUid: string;
+  /** If user already has a stripeCustomerId, we just verify it exists */
+  existingCustomerId?: string;
+}) {
+  const stripe = getStripe();
+
+  // If they already have a customer ID, verify it
+  if (params.existingCustomerId) {
+    try {
+      const existing = await stripe.customers.retrieve(params.existingCustomerId);
+      if (!existing.deleted) return { customerId: existing.id, created: false };
+    } catch {
+      // Customer deleted or invalid — create a new one
+    }
+  }
+
+  // Check if a customer already exists for this email (dedup)
+  const search = await stripe.customers.list({ email: params.email, limit: 1 });
+  if (search.data.length > 0 && !search.data[0].deleted) {
+    return { customerId: search.data[0].id, created: false };
+  }
+
+  // Create new
+  const customer = await stripe.customers.create({
+    email: params.email,
+    name: params.name || undefined,
+    phone: params.phone || undefined,
+    metadata: {
+      firebase_uid: params.firebaseUid,
+      platform: 'mohnmenu',
+    },
+  });
+
+  return { customerId: customer.id, created: true };
+}
+
+/**
+ * List saved payment methods for a Stripe Customer.
+ */
+export async function listCustomerPaymentMethods(customerId: string) {
+  const stripe = getStripe();
+  const methods = await stripe.customers.listPaymentMethods(customerId, {
+    type: 'card',
+    limit: 10,
+  });
+  return methods.data.map(m => ({
+    id: m.id,
+    brand: m.card?.brand,
+    last4: m.card?.last4,
+    expMonth: m.card?.exp_month,
+    expYear: m.card?.exp_year,
+  }));
+}
+
+// ─── Wallet / P2P Transfers ──────────────────────────────────
+
+/**
+ * Create a PaymentIntent for a customer adding funds to their MohnMenu wallet.
+ * Money goes to the platform account (no destination charge).
+ */
+export async function createWalletTopUp(params: {
+  amountCents: number;
+  stripeCustomerId: string;
+  firebaseUid: string;
+}) {
+  const stripe = getStripe();
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: params.amountCents,
+    currency: CURRENCY,
+    customer: params.stripeCustomerId,
+    automatic_payment_methods: { enabled: true },
+    metadata: {
+      type: 'wallet_topup',
+      firebase_uid: params.firebaseUid,
+      platform: 'mohnmenu',
+    },
+    description: `MohnMenu Wallet Top-Up`,
+  });
+
+  return {
+    clientSecret: paymentIntent.client_secret,
+    paymentIntentId: paymentIntent.id,
+  };
 }

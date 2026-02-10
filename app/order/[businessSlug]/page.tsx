@@ -529,6 +529,7 @@ export default function OrderPage({
         await createDineInBooking(docRef.id, business.businessId);
 
         // Create PaymentIntent via API (with owner's Stripe Connect account if available)
+        // 2026 flow: customer info → Stripe Customer → PaymentIntent with customer attached
         const amountCents = Math.round(total * 100);
         const res = await authFetch('/api/stripe/create-payment-intent', {
           method: 'POST',
@@ -539,6 +540,8 @@ export default function OrderPage({
             businessId: business.businessId,
             ownerStripeAccountId: business.stripeAccountId || undefined,
             customerEmail: email,
+            customerName: customerName,
+            customerPhone: phone,
           }),
         });
 

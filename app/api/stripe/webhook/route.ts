@@ -15,7 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/platform';
-import { doc, updateDoc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -94,6 +94,23 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   // Domain purchases
   if (type === 'domain_purchase') {
     console.log(`[Stripe Webhook] Domain purchase confirmed: ${paymentIntent.id}`);
+    return;
+  }
+
+  // Wallet top-ups — credit the user's wallet balance
+  if (type === 'wallet_topup') {
+    const firebaseUid = paymentIntent.metadata?.firebase_uid;
+    if (firebaseUid) {
+      try {
+        await updateDoc(doc(db, 'users', firebaseUid), {
+          walletBalance: increment(paymentIntent.amount),
+          updatedAt: new Date().toISOString(),
+        });
+        console.log(`[Stripe Webhook] Wallet top-up: ${paymentIntent.amount} cents for user ${firebaseUid}`);
+      } catch (err) {
+        console.error(`[Stripe Webhook] Failed to credit wallet for ${firebaseUid}:`, err);
+      }
+    }
     return;
   }
 

@@ -16,6 +16,8 @@ env:
     secret: NEXT_PUBLIC_OWNER_SECRET_CODE
   - variable: STRIPE_SECRET_KEY
     secret: STRIPE_SECRET_KEY
+  - variable: STRIPE_WEBHOOK_SECRET
+    secret: STRIPE_WEBHOOK_SECRET
   - variable: NOWPAYMENTS_API_KEY
     secret: NOWPAYMENTS_API_KEY
   - variable: NOWPAYMENTS_IPN_SECRET

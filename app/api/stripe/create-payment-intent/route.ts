@@ -12,10 +12,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   createDestinationCharge,
+  createOrGetStripeCustomer,
 } from '@/lib/stripe/platform';
 import { MINIMUM_ORDER_AMOUNT } from '@/lib/stripe/config';
 import { verifyApiAuth } from '@/lib/apiAuth';
 import { paymentLimiter } from '@/lib/rateLimit';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +31,7 @@ export async function POST(request: NextRequest) {
     if (auth.error) return auth.error;
 
     const body = await request.json();
-    const { amount, orderId, businessId, ownerStripeAccountId, customerEmail, deliveryProvider } = body;
+    const { amount, orderId, businessId, ownerStripeAccountId, customerEmail, customerName, customerPhone, deliveryProvider } = body;
 
     if (!amount || !orderId || !businessId) {
       return NextResponse.json(
@@ -44,10 +47,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // ─── Step 1: Create or retrieve Stripe Customer ─────────
+    // This is the correct 2026 flow: customer info → Stripe Customer → PaymentIntent
+    let stripeCustomerId: string | undefined;
+    const firebaseUid = auth.uid;
+
+    if (firebaseUid && customerEmail) {
+      try {
+        // Check if user already has a Stripe Customer
+        const userDoc = await getDoc(doc(db, 'users', firebaseUid));
+        const existingCustomerId = userDoc.exists()
+          ? userDoc.data()?.stripeCustomerId
+          : undefined;
+
+        const { customerId, created } = await createOrGetStripeCustomer({
+          email: customerEmail,
+          name: customerName,
+          phone: customerPhone,
+          firebaseUid,
+          existingCustomerId,
+        });
+
+        stripeCustomerId = customerId;
+
+        // Persist to user's Firestore doc if new
+        if (created || !existingCustomerId) {
+          await updateDoc(doc(db, 'users', firebaseUid), {
+            stripeCustomerId: customerId,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to create Stripe Customer (continuing without):', err);
+      }
+    }
+
     // If the business owner has a Stripe connected account, use destination charges.
     // Otherwise fall back to a direct charge (money stays in platform account).
     if (ownerStripeAccountId) {
-      // For courier deliveries, use the flat $0.25 platform fee instead of the percentage
       const isCourierDelivery = deliveryProvider === 'community';
       const result = await createDestinationCharge({
         amountCents: amount,
@@ -55,9 +92,10 @@ export async function POST(request: NextRequest) {
         orderId,
         businessId,
         customerEmail,
+        stripeCustomerId,
         isCourierDelivery,
       });
-      return NextResponse.json(result);
+      return NextResponse.json({ ...result, stripeCustomerId });
     }
 
     // Fallback: direct charge (owner hasn't connected Stripe yet)
@@ -67,6 +105,7 @@ export async function POST(request: NextRequest) {
       amount,
       currency: 'usd',
       automatic_payment_methods: { enabled: true },
+      ...(stripeCustomerId && { customer: stripeCustomerId }),
       metadata: {
         mohn_order_id: orderId,
         mohn_business_id: businessId,

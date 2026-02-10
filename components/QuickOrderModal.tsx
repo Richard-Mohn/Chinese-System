@@ -487,6 +487,8 @@ export default function QuickOrderModal({
             businessId: business.businessId,
             ownerStripeAccountId: business.stripeAccountId || undefined,
             customerEmail: email,
+            customerName: name,
+            customerPhone: phone,
           }),
         });
         const data = await res.json();

@@ -85,6 +85,7 @@ export interface MohnMenuUser {
   email: string;
   displayName: string;
   profileImage?: string;
+  phone?: string;
   role: UserRole;
   
   // Which business(es) is this user associated with?
@@ -95,6 +96,12 @@ export interface MohnMenuUser {
   
   // For drivers: which businesses can they drive for?
   allowedBusinessIds?: string[];
+
+  // Stripe Customer ID — created on first checkout
+  stripeCustomerId?: string;
+
+  // Wallet balance in cents (for P2P transfers / credits)
+  walletBalance?: number;
   
   createdAt: string;
   updatedAt: string;
