@@ -26,6 +26,8 @@ import {
   createDashboardLink,
   getAccountBalance,
   createOnboardingLink,
+  getRecentPayments,
+  getRecentPayouts,
 } from '@/lib/stripe/platform';
 import { verifyApiAuth } from '@/lib/apiAuth';
 import { standardLimiter } from '@/lib/rateLimit';
@@ -127,6 +129,16 @@ export async function GET(request: NextRequest) {
     if (action === 'balance') {
       const balance = await getAccountBalance(accountId);
       return NextResponse.json(balance);
+    }
+
+    if (action === 'payments') {
+      const payments = await getRecentPayments(accountId, 20);
+      return NextResponse.json({ payments });
+    }
+
+    if (action === 'payouts') {
+      const payouts = await getRecentPayouts(accountId, 20);
+      return NextResponse.json({ payouts });
     }
 
     // Default: return status

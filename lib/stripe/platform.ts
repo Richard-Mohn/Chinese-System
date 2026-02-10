@@ -211,6 +211,7 @@ export async function createDestinationCharge(params: CreatePaymentParams) {
   const paymentIntent = await stripe.paymentIntents.create({
     amount: params.amountCents,
     currency: CURRENCY,
+    automatic_payment_methods: { enabled: true },
     application_fee_amount: applicationFee,
     transfer_data: {
       destination: params.ownerStripeAccountId,
@@ -289,4 +290,49 @@ export async function getAccountBalance(accountId: string) {
     .reduce((sum, b) => sum + b.amount, 0);
 
   return { availableCents: available, pendingCents: pending };
+}
+
+// ─── Recent Payments & Payouts ────────────────────────────────
+
+/**
+ * Get recent payments (charges) for a connected account.
+ * Returns the last N successful payments.
+ */
+export async function getRecentPayments(accountId: string, limit = 10) {
+  const stripe = getStripe();
+  const charges = await stripe.charges.list(
+    { limit },
+    { stripeAccount: accountId },
+  );
+  return charges.data.map(c => ({
+    id: c.id,
+    amount: c.amount,
+    currency: c.currency,
+    status: c.status,
+    created: c.created,
+    description: c.description,
+    receiptEmail: c.receipt_email,
+    metadata: c.metadata,
+  }));
+}
+
+/**
+ * Get recent payouts for a connected account.
+ */
+export async function getRecentPayouts(accountId: string, limit = 10) {
+  const stripe = getStripe();
+  const payouts = await stripe.payouts.list(
+    { limit },
+    { stripeAccount: accountId },
+  );
+  return payouts.data.map(p => ({
+    id: p.id,
+    amount: p.amount,
+    currency: p.currency,
+    status: p.status,
+    arrivalDate: p.arrival_date,
+    created: p.created,
+    method: p.method,
+    description: p.description,
+  }));
 }

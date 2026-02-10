@@ -21,7 +21,7 @@ import {
   FaCopy, FaUtensils, FaCalendarAlt, FaUserTie, FaUsers, FaStar,
 } from 'react-icons/fa';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { QRCodeSVG } from 'qrcode.react';
 
 // ─── Supported Crypto Options (client-side display config) ──
@@ -1713,45 +1713,30 @@ function StripeForm({
     setProcessing(true);
     onError('');
 
-    const card = elements.getElement(CardElement);
-    if (!card) {
-      onError('Card not found');
-      setProcessing(false);
-      return;
-    }
-
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: { card },
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.href,
+      },
+      redirect: 'if_required',
     });
 
     if (error) {
       onError(error.message || 'Payment failed');
       setProcessing(false);
-    } else if (paymentIntent?.status === 'succeeded') {
-      onSuccess();
     } else {
-      onError('Payment not completed.');
-      setProcessing(false);
+      onSuccess();
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="p-3 border border-zinc-200 rounded-xl bg-zinc-50">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontSize: '14px',
-                color: '#09090b',
-                fontFamily: 'system-ui, sans-serif',
-                '::placeholder': { color: '#a1a1aa' },
-              },
-              invalid: { color: '#ef4444' },
-            },
-          }}
-        />
-      </div>
+      <PaymentElement
+        options={{
+          layout: 'tabs',
+          paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
+        }}
+      />
       <button
         type="submit"
         disabled={!stripe || processing}

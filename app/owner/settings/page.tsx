@@ -741,15 +741,26 @@ function StripeConnectSection({
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [balance, setBalance] = useState<{ availableCents: number; pendingCents: number } | null>(null);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [payouts, setPayouts] = useState<any[]>([]);
+  const [showTab, setShowTab] = useState<'overview' | 'payments' | 'payouts'>('overview');
 
-  // Check status on mount if we have an account
+  // Check status + balance on mount if we have an account
   useEffect(() => {
     if (!accountId) return;
     setChecking(true);
-    authFetch(`/api/stripe/connect-account?accountId=${accountId}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.chargesEnabled !== undefined) setStatus(data);
+    Promise.all([
+      authFetch(`/api/stripe/connect-account?accountId=${accountId}`).then(r => r.json()),
+      authFetch(`/api/stripe/connect-account?accountId=${accountId}&action=balance`).then(r => r.json()),
+      authFetch(`/api/stripe/connect-account?accountId=${accountId}&action=payments`).then(r => r.json()),
+      authFetch(`/api/stripe/connect-account?accountId=${accountId}&action=payouts`).then(r => r.json()),
+    ])
+      .then(([statusData, balanceData, paymentsData, payoutsData]) => {
+        if (statusData.chargesEnabled !== undefined) setStatus(statusData);
+        if (balanceData.availableCents !== undefined) setBalance(balanceData);
+        if (paymentsData.payments) setPayments(paymentsData.payments);
+        if (payoutsData.payouts) setPayouts(payoutsData.payouts);
       })
       .catch(() => {})
       .finally(() => setChecking(false));
@@ -770,7 +781,6 @@ function StripeConnectSection({
       });
       const data = await res.json();
       if (data.accountId) {
-        // Save to Firestore
         await updateDoc(doc(db, 'businesses', businessId), {
           stripeAccountId: data.accountId,
         });
@@ -797,6 +807,9 @@ function StripeConnectSection({
     }
   };
 
+  const fmt = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const fmtDate = (ts: number) => new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
   const isConnected = status?.chargesEnabled && status?.payoutsEnabled;
 
   return (
@@ -808,23 +821,145 @@ function StripeConnectSection({
       {checking ? (
         <div className="flex items-center gap-3 text-sm text-zinc-400">
           <div className="w-4 h-4 border-2 border-zinc-300 border-t-transparent rounded-full animate-spin" />
-          Checking payment status...
+          Loading payment data...
         </div>
       ) : isConnected ? (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald-500" />
-            <span className="font-bold text-emerald-700 text-sm">Stripe Connected</span>
+        <div className="space-y-5">
+          {/* Status + Dashboard link */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-emerald-500" />
+              <span className="font-bold text-emerald-700 text-sm">Stripe Connected</span>
+              <span className="text-[10px] text-zinc-400 ml-1">{accountId.slice(0, 12)}...</span>
+            </div>
+            <button
+              onClick={handleDashboard}
+              className="bg-indigo-500 text-white px-4 py-2 rounded-xl font-bold text-xs hover:bg-indigo-600 transition-colors cursor-pointer"
+            >
+              Open Stripe Dashboard
+            </button>
           </div>
-          <p className="text-xs text-zinc-400">
-            Account: {accountId.slice(0, 12)}... · Payments and payouts enabled.
-          </p>
-          <button
-            onClick={handleDashboard}
-            className="bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-600 transition-colors cursor-pointer"
-          >
-            Open Stripe Dashboard
-          </button>
+
+          {/* Balance cards */}
+          {balance && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1">Available</p>
+                <p className="text-2xl font-black text-emerald-900">{fmt(balance.availableCents)}</p>
+                <p className="text-[10px] text-emerald-600 mt-1">Ready to pay out</p>
+              </div>
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-1">Pending</p>
+                <p className="text-2xl font-black text-amber-900">{fmt(balance.pendingCents)}</p>
+                <p className="text-[10px] text-amber-600 mt-1">Processing (1-2 days)</p>
+              </div>
+            </div>
+          )}
+
+          {/* Tabs */}
+          <div className="flex gap-1 bg-zinc-100 rounded-xl p-1">
+            {(['overview', 'payments', 'payouts'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setShowTab(tab)}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold capitalize transition-colors ${
+                  showTab === tab ? 'bg-white text-black shadow-sm' : 'text-zinc-500 hover:text-zinc-700'
+                }`}
+              >
+                {tab === 'overview' ? 'Overview' : tab === 'payments' ? `Payments (${payments.length})` : `Payouts (${payouts.length})`}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          {showTab === 'overview' && (
+            <div className="space-y-3">
+              <div className="bg-zinc-50 rounded-xl p-4 space-y-2">
+                <p className="text-xs font-bold text-zinc-600">Payment Flow</p>
+                <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+                  <span className="px-2 py-0.5 bg-white border rounded-lg">Customer pays</span>
+                  <span>→</span>
+                  <span className="px-2 py-0.5 bg-white border rounded-lg">Stripe processes</span>
+                  <span>→</span>
+                  <span className="px-2 py-0.5 bg-emerald-100 border border-emerald-200 rounded-lg text-emerald-700 font-bold">You receive 99%</span>
+                </div>
+                <p className="text-[10px] text-zinc-400 mt-2">
+                  MohnMenu keeps a 1% platform fee. Stripe charges ~2.9% + $0.30 processing fee. Payouts are daily.
+                </p>
+              </div>
+              {payments.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-zinc-500 mb-2">Latest Payment</p>
+                  <div className="bg-zinc-50 rounded-xl p-3 flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-black text-sm">{fmt(payments[0].amount)}</p>
+                      <p className="text-[10px] text-zinc-400">{fmtDate(payments[0].created)}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                      payments[0].status === 'succeeded' ? 'bg-emerald-100 text-emerald-700' : 'bg-zinc-200 text-zinc-600'
+                    }`}>
+                      {payments[0].status}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {showTab === 'payments' && (
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {payments.length === 0 ? (
+                <p className="text-center text-sm text-zinc-400 py-8">No payments yet</p>
+              ) : payments.map(p => (
+                <div key={p.id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl">
+                  <div className="min-w-0">
+                    <p className="font-bold text-black text-sm">{fmt(p.amount)}</p>
+                    <p className="text-[10px] text-zinc-400 truncate">
+                      {p.description || p.receiptEmail || p.id.slice(0, 20)}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0 ml-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                      p.status === 'succeeded' ? 'bg-emerald-100 text-emerald-700'
+                      : p.status === 'pending' ? 'bg-amber-100 text-amber-700'
+                      : 'bg-red-100 text-red-700'
+                    }`}>
+                      {p.status}
+                    </span>
+                    <p className="text-[10px] text-zinc-400 mt-1">{fmtDate(p.created)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {showTab === 'payouts' && (
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {payouts.length === 0 ? (
+                <p className="text-center text-sm text-zinc-400 py-8">No payouts yet — payments arrive daily</p>
+              ) : payouts.map(p => (
+                <div key={p.id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl">
+                  <div className="min-w-0">
+                    <p className="font-bold text-black text-sm">{fmt(p.amount)}</p>
+                    <p className="text-[10px] text-zinc-400">
+                      Arrives {fmtDate(p.arrivalDate)} · {p.method}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0 ml-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                      p.status === 'paid' ? 'bg-emerald-100 text-emerald-700'
+                      : p.status === 'in_transit' ? 'bg-blue-100 text-blue-700'
+                      : p.status === 'pending' ? 'bg-amber-100 text-amber-700'
+                      : 'bg-zinc-200 text-zinc-600'
+                    }`}>
+                      {p.status === 'in_transit' ? 'In Transit' : p.status}
+                    </span>
+                    <p className="text-[10px] text-zinc-400 mt-1">{fmtDate(p.created)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : accountId ? (
         <div className="space-y-3">

@@ -25,7 +25,7 @@ import {
   FaConciergeBell, FaGlassCheers,
 } from 'react-icons/fa';
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { QRCodeSVG } from 'qrcode.react';
 import LiveStaffSection from '@/components/LiveStaffSection';
 import DemoBanner from '@/components/DemoBanner';
@@ -1995,7 +1995,7 @@ export default function OrderPage({
   );
 }
 
-// ─── Stripe Card Form Component ──────────────────────────────
+// ─── Stripe Payment Form Component (PaymentElement) ─────────
 
 function StripeCardForm({
   clientSecret,
@@ -2019,45 +2019,30 @@ function StripeCardForm({
     setProcessing(true);
     onError('');
 
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
-      onError('Card element not found');
-      setProcessing(false);
-      return;
-    }
-
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: { card: cardElement },
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.href,
+      },
+      redirect: 'if_required',
     });
 
     if (error) {
       onError(error.message || 'Payment failed');
       setProcessing(false);
-    } else if (paymentIntent?.status === 'succeeded') {
-      onSuccess();
     } else {
-      onError('Payment was not completed. Please try again.');
-      setProcessing(false);
+      onSuccess();
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="p-4 border border-zinc-200 rounded-xl bg-zinc-50">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#09090b',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-                '::placeholder': { color: '#a1a1aa' },
-              },
-              invalid: { color: '#ef4444' },
-            },
-          }}
-        />
-      </div>
+      <PaymentElement
+        options={{
+          layout: 'tabs',
+          paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
+        }}
+      />
       <button
         type="submit"
         disabled={!stripe || processing}
