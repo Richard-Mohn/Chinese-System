@@ -34,11 +34,10 @@ import {
   increment,
 } from 'firebase/firestore';
 import { getEmpireAuth, getEmpireDb } from './firebase';
-import { EMPIRE_COLLECTIONS } from './config';
+import { EMPIRE_COLLECTIONS, type PlatformId } from './config';
 import {
   type MohnEmpireUser,
   type EmpireAuthState,
-  type PlatformId,
   generateReferralCode,
   calculateTier,
   POINTS_RULES,
