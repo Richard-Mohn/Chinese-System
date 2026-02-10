@@ -42,8 +42,8 @@ export async function startDriverTracking(
 
   const watchOptions = {
     enableHighAccuracy: true, // Use GPS for accuracy
-    maximumAge: 0, // Don't use cached location
-    timeout: 5000,
+    maximumAge: 2000, // Allow slightly cached location on first read
+    timeout: 15000, // 15s timeout to avoid premature failures
   };
 
   watchId = navigator.geolocation.watchPosition(
@@ -63,9 +63,9 @@ export async function startDriverTracking(
         lat: latitude,
         lng: longitude,
         timestamp,
-        accuracy,
-        speed: speed || undefined,
-        heading: heading || undefined,
+        accuracy: accuracy || 0,
+        speed: speed != null ? speed : 0,
+        heading: heading != null ? heading : 0,
       };
 
       // Update Firebase Realtime DB (ultra-fast, no polling needed)
@@ -253,9 +253,9 @@ export async function startCourierTracking(
         lat: latitude,
         lng: longitude,
         timestamp: position.timestamp,
-        accuracy,
-        speed: speed || undefined,
-        heading: heading || undefined,
+        accuracy: accuracy || 0,
+        speed: speed != null ? speed : 0,
+        heading: heading != null ? heading : 0,
       };
 
       const locationRef = ref(realtimeDb, `couriers/${courierId}/location`);
@@ -264,7 +264,7 @@ export async function startCourierTracking(
       if (onLocationUpdate) onLocationUpdate(location);
     },
     (error) => console.error('Geolocation error:', error),
-    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+    { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
   );
 
   // Mark online

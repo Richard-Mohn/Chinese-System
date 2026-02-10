@@ -517,6 +517,22 @@ function SeoTab({ data, loading, error, onRefresh, slug }: {
 
   return (
     <div className="space-y-6">
+      {/* Demo data badge */}
+      {(data as any).demoData && (
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center">
+              <FaChartLine className="text-indigo-500 text-sm" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-indigo-800">Sample Analytics Data</p>
+              <p className="text-[10px] text-indigo-500">Real data patterns powered by <a href="https://neighbortechs.com" target="_blank" rel="noopener noreferrer" className="underline font-bold">NeighborTechs.com</a></p>
+            </div>
+          </div>
+          <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">Demo</span>
+        </div>
+      )}
+
       {/* Header with refresh */}
       <div className="flex items-center justify-between">
         <p className="text-xs text-zinc-400 font-medium">
@@ -654,6 +670,22 @@ function TrafficTab({ data, loading, error, onRefresh }: {
 
   return (
     <div className="space-y-6">
+      {/* Demo data badge */}
+      {(data as any).demoData && (
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center">
+              <FaGlobe className="text-indigo-500 text-sm" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-indigo-800">Sample Traffic Data</p>
+              <p className="text-[10px] text-indigo-500">Real data patterns powered by <a href="https://neighbortechs.com" target="_blank" rel="noopener noreferrer" className="underline font-bold">NeighborTechs.com</a></p>
+            </div>
+          </div>
+          <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">Demo</span>
+        </div>
+      )}
+
       {/* Refresh */}
       <div className="flex items-center justify-between">
         <p className="text-xs text-zinc-400 font-medium">Data from Google Analytics 4</p>

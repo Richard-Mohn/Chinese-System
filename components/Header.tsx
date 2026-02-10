@@ -117,8 +117,11 @@ const Header = () => {
     return () => window.removeEventListener('scroll', h);
   }, []);
 
-  // Hide global header on order pages (they have their own nav)
-  const hideHeader = pathname?.startsWith('/order/');
+  // Hide global header on dashboard and order pages (they have their own nav)
+  const hideHeader = pathname?.startsWith('/order/') || 
+    pathname?.startsWith('/owner') || 
+    pathname?.startsWith('/driver') || 
+    pathname?.startsWith('/customer');
   if (hideHeader) return null;
 
   const closeMobile = () => setMobileOpen(false);

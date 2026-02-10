@@ -97,6 +97,34 @@ service cloud.firestore {
         allow write: if isUser(driverId) && belongsToBusiness(businessId);
       }
 
+      // ─── Jukebox Queue Subcollection ───────────────────────
+      // Public read (customers see the queue)
+      // Authenticated users can add songs, business members manage
+      match /jukeboxQueue/{songId} {
+        allow read: if true;
+        allow create: if isAuthenticated();
+        allow update: if isBusinessMember(businessId);
+        allow delete: if isBusinessOwner(businessId);
+      }
+
+      // ─── Staff On Duty Subcollection ───────────────────────
+      // Business members can read/write staff duty status
+      match /staffOnDuty/{staffId} {
+        allow read: if isBusinessMember(businessId);
+        allow create: if isBusinessOwner(businessId);
+        allow update: if isBusinessMember(businessId);
+        allow delete: if isBusinessOwner(businessId);
+      }
+
+      // ─── KDS Stations Subcollection ────────────────────────
+      // Business members can read/write kitchen display stations
+      match /kdsStations/{stationId} {
+        allow read: if isBusinessMember(businessId);
+        allow create: if isBusinessOwner(businessId);
+        allow update: if isBusinessMember(businessId);
+        allow delete: if isBusinessOwner(businessId);
+      }
+
       // ─── Invite Codes Subcollection ────────────────────────
       // Public read (for driver/staff signup), owner write
       match /inviteCodes/{codeId} {

@@ -179,8 +179,9 @@ export default function JukeboxPage() {
     );
   }
 
-  // Tier gate: entertainment requires professional
-  if (!tierMeetsRequirement(business.tier, FEATURE_REGISTRY['entertainment'].minTier)) {
+  // Tier gate: entertainment requires professional (skip for demo businesses)
+  const isDemo = business.slug?.startsWith('demo-') || business.businessId?.startsWith('demo-');
+  if (!isDemo && !tierMeetsRequirement(business.tier, FEATURE_REGISTRY['entertainment'].minTier)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
         <div className="text-center max-w-sm">

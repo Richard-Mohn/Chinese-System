@@ -219,6 +219,36 @@ export default async function TenantHomePage({
         </div>
       </section>
 
+      {business.type === 'chinese_restaurant' && (
+        <section className="py-10 px-4 bg-red-50">
+          <div className="container mx-auto max-w-5xl">
+            <div className="bg-white border border-red-100 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-red-500">中文专区</p>
+                <h2 className="text-2xl md:text-3xl font-black text-zinc-900 mt-2">中文介绍页面已准备好</h2>
+                <p className="text-zinc-600 mt-3">
+                  我们专门为中文用户准备了详细说明页面，帮助您了解 MohnMenu 如何帮助中餐馆接单、收款、管理菜单与配送。
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={`/${business.slug}/zh`}
+                  className="px-6 py-3 rounded-full bg-red-600 text-white font-bold"
+                >
+                  中文说明
+                </a>
+                <a
+                  href={`/${business.slug}`}
+                  className="px-6 py-3 rounded-full border border-red-200 text-red-700 font-bold"
+                >
+                  返回主页
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── Specialties / What We're Known For ─────────────── */}
       {specialties.length > 0 && (
         <section className="py-6 bg-zinc-950 text-white border-y border-zinc-800">

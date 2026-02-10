@@ -200,36 +200,58 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Mobile Topbar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-zinc-100 z-40 flex items-center justify-between px-4 h-14">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-zinc-100 z-40 flex items-center justify-between px-4 h-14 shadow-sm">
         <Link href="/owner" className="font-black text-black">
           MohnMenu<span className="text-orange-500">.</span>
         </Link>
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 text-black"
-          aria-label="Toggle menu"
-        >
-          {sidebarOpen ? <FaTimes /> : <FaBars />}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/owner/settings#subscription"
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${tierBadge.color}`}
+          >
+            <FaCrown className="text-[7px]" />
+            {tierBadge.label}
+          </Link>
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2.5 bg-black text-white rounded-xl shadow-lg"
+            aria-label="Toggle menu"
+          >
+            {sidebarOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-0 bg-black/30 z-40"
+            className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="lg:hidden fixed top-14 left-0 bottom-0 w-72 bg-white z-50 border-r border-zinc-100 overflow-y-auto">
-            <div className="p-4 border-b border-zinc-100">
-              {currentBusiness && (
-                <p className="text-sm font-bold text-black truncate">
-                  {currentBusiness.name}
-                </p>
-              )}
+          <aside className="lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-white z-50 border-r border-zinc-100 overflow-y-auto shadow-2xl transition-transform">
+            <div className="p-4 pt-5 border-b border-zinc-100 flex items-center justify-between">
+              <div>
+                <Link href="/owner" className="font-black text-black text-lg">
+                  MohnMenu<span className="text-orange-500">.</span>
+                </Link>
+                {currentBusiness && (
+                  <p className="text-xs font-bold text-zinc-400 mt-1 truncate">
+                    {currentBusiness.name}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-zinc-400 hover:text-black rounded-xl hover:bg-zinc-100 transition-colors"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className="p-3 border-b border-zinc-100">
               <Link
                 href="/owner/settings#subscription"
-                className={`inline-flex items-center gap-1.5 px-3 py-1 mt-2 rounded-full text-[10px] font-black uppercase tracking-widest ${tierBadge.color}`}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${tierBadge.color}`}
               >
                 <FaCrown className="text-[8px]" />
                 {tierBadge.label}

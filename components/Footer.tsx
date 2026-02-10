@@ -10,8 +10,13 @@ const Footer = () => {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
-  // Hide footer on order pages (standalone ordering experience)
-  if (pathname?.startsWith('/order/')) return null;
+  // Hide footer on dashboard and order pages (standalone experience)
+  if (
+    pathname?.startsWith('/order/') ||
+    pathname?.startsWith('/owner') ||
+    pathname?.startsWith('/driver') ||
+    pathname?.startsWith('/customer')
+  ) return null;
 
   return (
     <footer className="bg-zinc-950 text-white pt-20 pb-10">

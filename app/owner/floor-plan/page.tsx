@@ -188,44 +188,39 @@ function OwnerFloorPlanPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="bg-zinc-900/50 border-b border-zinc-800 px-4 py-3">
-        <div className="container mx-auto max-w-6xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/owner" className="text-zinc-400 hover:text-white"><FaChevronLeft /></Link>
-            <div>
-              <h1 className="text-lg font-black">Floor Plan Manager</h1>
-              <p className="text-xs text-zinc-500">Drag tables to arrange your layout</p>
-            </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-black">Floor Plan Manager</h1>
+          <p className="text-sm text-zinc-400 mt-1">Drag tables to arrange your layout. Click a table to edit properties.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right mr-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Total Capacity</p>
+            <p className="text-xl font-black text-black">{totalCapacity} seats</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="text-right mr-4">
-              <p className="text-xs text-zinc-500">Total Capacity</p>
-              <p className="text-lg font-black text-white">{totalCapacity} seats</p>
-            </div>
-            <button
-              onClick={saveFloorPlan}
-              disabled={saving}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-sm font-bold shadow-lg disabled:opacity-50 transition-all"
-            >
-              {saved ? <><FaCheck /> Saved!</> : saving ? 'Saving...' : <><FaSave /> Save</>}
-            </button>
-          </div>
+          <button
+            onClick={saveFloorPlan}
+            disabled={saving}
+            className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-xl text-sm font-bold shadow-lg disabled:opacity-50 transition-all hover:bg-zinc-800"
+          >
+            {saved ? <><FaCheck /> Saved!</> : saving ? 'Saving...' : <><FaSave /> Save</>}
+          </button>
         </div>
       </div>
 
-      <div className="container mx-auto max-w-6xl px-4 py-4 flex gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Left sidebar — add tables */}
-        <div className="w-56 shrink-0 space-y-4">
-          <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+        <div className="lg:w-56 shrink-0 space-y-4">
+          <div className="bg-white rounded-2xl p-4 border border-zinc-100">
             <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Add Table</h3>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
               {Object.entries(ZONE_COLORS).map(([zone, config]) => (
                 <button
                   key={zone}
                   onClick={() => addTable(zone as TableItem['zone'])}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 ${config.bg} border ${config.border} rounded-xl text-sm font-bold text-white hover:opacity-80 transition-all`}
+                  className={`flex items-center gap-2 px-3 py-2.5 ${config.bg} border ${config.border} rounded-xl text-sm font-bold text-black hover:opacity-80 transition-all`}
                 >
                   <FaPlus className="text-xs" /> {config.label}
                 </button>
@@ -234,16 +229,16 @@ function OwnerFloorPlanPage() {
           </div>
 
           {/* Zone summary */}
-          <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+          <div className="bg-white rounded-2xl p-4 border border-zinc-100">
             <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Zones</h3>
             <div className="space-y-2">
               {Object.entries(ZONE_COLORS).map(([zone, config]) => (
                 <div key={zone} className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2 text-zinc-400">
+                  <span className="flex items-center gap-2 text-zinc-500">
                     <span className={`w-3 h-3 rounded-full ${config.bg} border ${config.border}`} />
                     {config.label}
                   </span>
-                  <span className="font-bold text-white">{zoneCounts[zone] || 0}</span>
+                  <span className="font-bold text-black">{zoneCounts[zone] || 0}</span>
                 </div>
               ))}
             </div>
@@ -251,7 +246,7 @@ function OwnerFloorPlanPage() {
 
           {/* Selected table properties */}
           {selectedTable && (
-            <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800 space-y-3">
+            <div className="bg-white rounded-2xl p-4 border border-zinc-100 space-y-3">
               <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest">Table Properties</h3>
 
               <div>
@@ -260,7 +255,7 @@ function OwnerFloorPlanPage() {
                   type="text"
                   value={selectedTable.label}
                   onChange={e => updateTable(selectedTable.id, { label: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-800 rounded-lg text-white text-sm font-bold focus:ring-2 focus:ring-purple-500 outline-none"
+                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-black text-sm font-bold focus:ring-2 focus:ring-black outline-none"
                 />
               </div>
 
@@ -269,14 +264,14 @@ function OwnerFloorPlanPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => updateTable(selectedTable.id, { seats: Math.max(1, selectedTable.seats - 1) })}
-                    className="p-2 bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                    className="p-2 bg-zinc-100 rounded-lg text-zinc-500 hover:text-black transition-colors"
                   >
                     <FaMinus className="text-xs" />
                   </button>
-                  <span className="text-lg font-black flex-1 text-center">{selectedTable.seats}</span>
+                  <span className="text-lg font-black flex-1 text-center text-black">{selectedTable.seats}</span>
                   <button
                     onClick={() => updateTable(selectedTable.id, { seats: selectedTable.seats + 1 })}
-                    className="p-2 bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                    className="p-2 bg-zinc-100 rounded-lg text-zinc-500 hover:text-black transition-colors"
                   >
                     <FaPlus className="text-xs" />
                   </button>
@@ -296,8 +291,8 @@ function OwnerFloorPlanPage() {
                       })}
                       className={`py-2 rounded-lg text-xs font-bold transition-all ${
                         selectedTable.shape === shape
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                          ? 'bg-black text-white'
+                          : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
                       }`}
                     >
                       {shape === 'circle' ? '○' : shape === 'square' ? '□' : '▬'}
@@ -311,7 +306,7 @@ function OwnerFloorPlanPage() {
                 <select
                   value={selectedTable.zone}
                   onChange={e => updateTable(selectedTable.id, { zone: e.target.value as TableItem['zone'] })}
-                  className="w-full px-3 py-2 bg-zinc-800 rounded-lg text-white text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-black text-sm focus:ring-2 focus:ring-black outline-none"
                 >
                   {Object.entries(ZONE_COLORS).map(([zone, config]) => (
                     <option key={zone} value={zone}>{config.label}</option>
@@ -322,13 +317,13 @@ function OwnerFloorPlanPage() {
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => duplicateTable(selectedTable.id)}
-                  className="flex-1 py-2 bg-zinc-800 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition-colors"
+                  className="flex-1 py-2 bg-zinc-100 rounded-lg text-xs font-bold text-zinc-500 hover:text-black transition-colors"
                 >
                   Duplicate
                 </button>
                 <button
                   onClick={() => removeTable(selectedTable.id)}
-                  className="flex-1 py-2 bg-red-600/20 rounded-lg text-xs font-bold text-red-400 hover:bg-red-600 hover:text-white transition-all"
+                  className="flex-1 py-2 bg-red-50 rounded-lg text-xs font-bold text-red-500 hover:bg-red-100 transition-all"
                 >
                   Delete
                 </button>
@@ -338,21 +333,21 @@ function OwnerFloorPlanPage() {
         </div>
 
         {/* Canvas */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div
             ref={canvasRef}
-            className="bg-zinc-900/50 rounded-2xl border border-zinc-800 relative overflow-hidden select-none"
-            style={{ height: '70vh', cursor: dragId ? 'grabbing' : 'default' }}
+            className="bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-200 relative overflow-hidden select-none"
+            style={{ height: 'calc(70vh - 60px)', minHeight: '400px', cursor: dragId ? 'grabbing' : 'default' }}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
             onClick={() => setSelectedId(null)}
           >
             {/* Grid dots */}
-            <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none">
+            <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
               <defs>
                 <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <circle cx="20" cy="20" r="1" fill="white" />
+                  <circle cx="20" cy="20" r="1" fill="#a1a1aa" />
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#grid)" />
@@ -366,7 +361,7 @@ function OwnerFloorPlanPage() {
                 <div
                   key={table.id}
                   className={`absolute flex flex-col items-center justify-center cursor-grab active:cursor-grabbing transition-shadow ${
-                    isSelected ? 'z-20' : 'z-10'
+                    isSelected ? 'z-20 ring-2 ring-black ring-offset-2 rounded-full' : 'z-10'
                   }`}
                   style={{
                     left: table.x,
@@ -376,16 +371,17 @@ function OwnerFloorPlanPage() {
                     transform: `rotate(${table.rotation}deg)`,
                   }}
                   onMouseDown={e => handleMouseDown(e, table.id)}
+                  onClick={e => { e.stopPropagation(); setSelectedId(table.id); }}
                 >
                   <div
                     className={`w-full h-full ${zoneConfig.bg} border-2 ${
-                      isSelected ? 'border-white shadow-lg shadow-white/20' : zoneConfig.border
+                      isSelected ? 'border-black shadow-xl' : zoneConfig.border
                     } flex flex-col items-center justify-center transition-all hover:scale-105 ${
                       table.shape === 'circle' ? 'rounded-full' : table.shape === 'square' ? 'rounded-xl' : 'rounded-xl'
                     }`}
                   >
-                    <span className="text-xs font-black text-white">{table.label}</span>
-                    <span className="text-[10px] text-zinc-400 flex items-center gap-1">
+                    <span className="text-xs font-black text-black">{table.label}</span>
+                    <span className="text-[10px] text-zinc-500 flex items-center gap-1">
                       <FaChair className="text-[8px]" /> {table.seats}
                     </span>
                   </div>
@@ -397,9 +393,9 @@ function OwnerFloorPlanPage() {
             {tables.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center text-center">
                 <div>
-                  <FaChair className="text-5xl text-zinc-700 mx-auto mb-4" />
-                  <p className="text-zinc-500 font-bold mb-2">No tables yet</p>
-                  <p className="text-zinc-600 text-sm">Use the sidebar to add tables to your floor plan</p>
+                  <FaChair className="text-5xl text-zinc-300 mx-auto mb-4" />
+                  <p className="text-zinc-400 font-bold mb-2">No tables yet</p>
+                  <p className="text-zinc-400 text-sm">Use the sidebar to add tables to your floor plan</p>
                 </div>
               </div>
             )}

@@ -404,50 +404,59 @@ export default function OrderPage({
   }, [showItemModal, selectedSize, itemQty, specialInstructions, addToCart]);
 
   // ── Build order data object ──
-  const buildOrderData = () => ({
-    businessId: business!.businessId,
-    customerName,
-    customerEmail: email,
-    customerPhone: phone,
-    items: cart.map(item => ({
-      menuItemId: item.id.split('-')[0],
-      name: item.name,
-      quantity: item.quantity,
-      unitPrice: item.price,
-      priceSize: item.options?.find(o => !o.startsWith('Note:')) || 'order',
-      options: item.options?.filter(o => !o.startsWith('Note:')) || [],
-      specialInstructions: item.options?.find(o => o.startsWith('Note:'))?.replace('Note: ', '') || '',
-      lineTotal: item.price * item.quantity,
-    })),
-    orderType,
-    status: 'pending',
-    deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
-    deliveryInstructions: orderType === 'delivery' ? deliveryInstructions : undefined,
-    deliveryProvider: orderType === 'delivery' ? deliveryProvider : undefined,
-    // Dine-in reservation fields
-    ...(orderType === 'dine-in' ? {
-      reservation: {
+  const buildOrderData = () => {
+    const data: Record<string, any> = {
+      businessId: business!.businessId,
+      customerName,
+      customerEmail: email,
+      customerPhone: phone,
+      items: cart.map(item => ({
+        menuItemId: item.id.split('-')[0],
+        name: item.name,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        priceSize: item.options?.find(o => !o.startsWith('Note:')) || 'order',
+        options: item.options?.filter(o => !o.startsWith('Note:')) || [],
+        specialInstructions: item.options?.find(o => o.startsWith('Note:'))?.replace('Note: ', '') || '',
+        lineTotal: item.price * item.quantity,
+      })),
+      orderType,
+      status: 'pending',
+      subtotal,
+      taxAmount,
+      taxRate,
+      deliveryFee,
+      tip,
+      total,
+      paymentMethod,
+      paymentStatus: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Only include delivery fields when order type is delivery
+    if (orderType === 'delivery') {
+      if (deliveryAddress) data.deliveryAddress = deliveryAddress;
+      if (deliveryInstructions) data.deliveryInstructions = deliveryInstructions;
+      if (deliveryProvider) data.deliveryProvider = deliveryProvider;
+    }
+
+    // Include dine-in fields when applicable
+    if (orderType === 'dine-in') {
+      data.reservation = {
         date: reservationDate,
         time: reservationTime,
         partySize,
         seatingPreference: seatingPreference || 'no preference',
-        occasion: reservationOccasion || undefined,
+        ...(reservationOccasion ? { occasion: reservationOccasion } : {}),
         isVIP,
-      },
-      assignedStaffId: selectedStaffId || undefined,
-      assignedStaffName: selectedStaffName || undefined,
-    } : {}),
-    subtotal,
-    taxAmount,
-    taxRate,
-    deliveryFee,
-    tip,
-    total,
-    paymentMethod,
-    paymentStatus: 'pending',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
+      };
+      if (selectedStaffId) data.assignedStaffId = selectedStaffId;
+      if (selectedStaffName) data.assignedStaffName = selectedStaffName;
+    }
+
+    return data;
+  };
 
   // ── Create tracking link for customer order tracking ──
   const createTrackingLink = async (oId: string, bizId: string) => {

@@ -129,6 +129,15 @@ export default async function sitemap({
       priority: 0.8,
     });
 
+    if (business.type === 'chinese_restaurant') {
+      entries.push({
+        url: `${BASE_URL}/${slug}/zh/`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
+    }
+
     // Service pages
     const services = business.website?.selectedServices || [];
     for (const service of services) {

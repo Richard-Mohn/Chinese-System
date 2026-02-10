@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { authFetch } from '@/lib/authFetch';
+import Link from 'next/link';
 
 /** Reusable iOS-style toggle switch */
 function Toggle({ checked, onChange, color = 'bg-emerald-500' }: { checked: boolean; onChange: () => void; color?: string }) {
@@ -639,8 +640,8 @@ export default function OwnerSettingsPage() {
         </div>
       </section>
 
-      {/* ── Subscription Info (read-only) ───────────────────── */}
-      <section className="bg-white rounded-2xl border border-zinc-100 p-6 space-y-4">
+      {/* ── Subscription Info ───────────────────────────────── */}
+      <section id="subscription" className="bg-white rounded-2xl border border-zinc-100 p-6 space-y-4">
         <h2 className="text-xs font-black uppercase tracking-widest text-zinc-400">
           Subscription
         </h2>
@@ -656,6 +657,36 @@ export default function OwnerSettingsPage() {
               <p className="font-bold text-black text-sm mt-1">{item.value}</p>
             </div>
           ))}
+        </div>
+
+        {/* Subscription Actions */}
+        <div className="border-t border-zinc-100 pt-4 space-y-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p className="font-bold text-black text-sm">Change Plan</p>
+              <p className="text-xs text-zinc-400">
+                Upgrade or downgrade your subscription tier.
+              </p>
+            </div>
+            <Link
+              href="/pricing"
+              className="px-5 py-2.5 bg-black text-white rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors"
+            >
+              View Plans
+            </Link>
+          </div>
+
+          {currentBusiness.tier && currentBusiness.tier !== 'free' && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-red-50 border border-red-100 rounded-xl p-4">
+              <div>
+                <p className="font-bold text-red-800 text-sm">Cancel Subscription</p>
+                <p className="text-xs text-red-500">
+                  You&apos;ll keep access until the end of your billing period. After that, your account will revert to Free.
+                </p>
+              </div>
+              <CancelSubscriptionButton businessId={currentBusiness.businessId} />
+            </div>
+          )}
         </div>
       </section>
 
@@ -828,5 +859,68 @@ function StripeConnectSection({
         </div>
       )}
     </section>
+  );
+}
+
+// ── Cancel Subscription Button ────────────────────────────────
+
+function CancelSubscriptionButton({ businessId }: { businessId: string }) {
+  const [confirming, setConfirming] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
+
+  const handleCancel = async () => {
+    setCancelling(true);
+    try {
+      // Update business document to schedule cancellation
+      await updateDoc(doc(db, 'businesses', businessId), {
+        subscriptionStatus: 'cancelling',
+        cancelledAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      setCancelled(true);
+      setConfirming(false);
+    } catch (err) {
+      alert('Failed to cancel. Please contact support.');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  if (cancelled) {
+    return (
+      <div className="px-5 py-2.5 bg-zinc-100 text-zinc-500 rounded-xl text-sm font-bold">
+        Cancellation Requested
+      </div>
+    );
+  }
+
+  if (confirming) {
+    return (
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          onClick={handleCancel}
+          disabled={cancelling}
+          className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
+        >
+          {cancelling ? 'Cancelling...' : 'Confirm Cancel'}
+        </button>
+        <button
+          onClick={() => setConfirming(false)}
+          className="px-4 py-2 bg-zinc-200 text-zinc-600 rounded-xl text-xs font-bold hover:bg-zinc-300 transition-colors"
+        >
+          Keep Plan
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setConfirming(true)}
+      className="px-5 py-2.5 border-2 border-red-200 text-red-600 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors shrink-0"
+    >
+      Cancel Plan
+    </button>
   );
 }
