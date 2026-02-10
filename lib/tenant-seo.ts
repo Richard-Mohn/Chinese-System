@@ -41,6 +41,8 @@ function getSchemaType(businessType: string): string {
     boutique: 'Store',
     antique_shop: 'Store',
     market: 'GroceryStore',
+    music_artist: 'MusicGroup',
+    church: 'Church',
     other: 'LocalBusiness',
   };
   return typeMap[businessType] || 'LocalBusiness';

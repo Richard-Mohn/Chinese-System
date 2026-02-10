@@ -511,9 +511,37 @@ function SeoTab({ data, loading, error, onRefresh, slug }: {
   onRefresh: () => void;
   slug: string;
 }) {
+  const [querySort, setQuerySort] = useState<'clicks' | 'impressions' | 'ctr' | 'position'>('clicks');
+  const [querySortDir, setQuerySortDir] = useState<'asc' | 'desc'>('desc');
+  const [queryFilter, setQueryFilter] = useState('');
+  const [pageSort, setPageSort] = useState<'clicks' | 'impressions' | 'ctr' | 'position'>('clicks');
+  const [showAllQueries, setShowAllQueries] = useState(false);
+  const [showAllPages, setShowAllPages] = useState(false);
+
   if (loading) return <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{[...Array(4)].map((_, i) => <LoadingCard key={i} />)}</div>;
   if (error) return <SetupNotice error={error} onRefresh={onRefresh} />;
   if (!data) return <SetupNotice error="No data available. Try refreshing." onRefresh={onRefresh} />;
+
+  // Sort & filter queries
+  const sortedQueries = [...(data.topQueries || [])]
+    .filter(q => !queryFilter || q.query.toLowerCase().includes(queryFilter.toLowerCase()))
+    .sort((a, b) => {
+      const aVal = a[querySort];
+      const bVal = b[querySort];
+      return querySortDir === 'desc' ? (bVal as number) - (aVal as number) : (aVal as number) - (bVal as number);
+    });
+
+  const displayQueries = showAllQueries ? sortedQueries : sortedQueries.slice(0, 10);
+
+  // Sort pages
+  const sortedPages = [...(data.topPages || [])]
+    .sort((a, b) => (b[pageSort] as number) - (a[pageSort] as number));
+  const displayPages = showAllPages ? sortedPages : sortedPages.slice(0, 10);
+
+  const toggleQuerySort = (field: typeof querySort) => {
+    if (querySort === field) setQuerySortDir(d => d === 'desc' ? 'asc' : 'desc');
+    else { setQuerySort(field); setQuerySortDir('desc'); }
+  };
 
   return (
     <div className="space-y-6">
@@ -525,11 +553,20 @@ function SeoTab({ data, loading, error, onRefresh, slug }: {
               <FaChartLine className="text-indigo-500 text-sm" />
             </div>
             <div>
-              <p className="text-sm font-bold text-indigo-800">Sample Analytics Data</p>
-              <p className="text-[10px] text-indigo-500">Real data patterns powered by <a href="https://neighbortechs.com" target="_blank" rel="noopener noreferrer" className="underline font-bold">NeighborTechs.com</a></p>
+              <p className="text-sm font-bold text-indigo-800">
+                {(data as any).demoSite ? `Live SEO Data — ${(data as any).demoSite}` : 'Sample Analytics Data'}
+              </p>
+              <p className="text-[10px] text-indigo-500">
+                {(data as any).demoSite
+                  ? <>Real Google Search Console data · <strong>{data.topQueries?.length || 0} ranked keywords</strong> · {data.clicks} clicks in past 7 days</>
+                  : <>Real data patterns powered by <a href="https://neighbortechs.com" target="_blank" rel="noopener noreferrer" className="underline font-bold">NeighborTechs.com</a></>
+                }
+              </p>
             </div>
           </div>
-          <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">Demo</span>
+          <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+            {(data as any).demoSite ? 'Live' : 'Demo'}
+          </span>
         </div>
       )}
 
@@ -568,40 +605,97 @@ function SeoTab({ data, loading, error, onRefresh, slug }: {
       {/* Top Queries + Top Pages */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-zinc-100 p-6">
-          <h2 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4 flex items-center gap-2">
-            <FaSearch className="text-zinc-300" /> Top Search Queries
-          </h2>
-          {data.topQueries.length === 0 ? (
-            <p className="text-zinc-400 text-sm">No query data yet. It takes 3-5 days for data to appear after your site is indexed.</p>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
+              <FaSearch className="text-zinc-300" /> Top Search Queries ({sortedQueries.length})
+            </h2>
+          </div>
+
+          {/* Filter input */}
+          <input
+            type="text"
+            value={queryFilter}
+            onChange={e => setQueryFilter(e.target.value)}
+            placeholder="Filter keywords…"
+            className="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+
+          {/* Sort headers */}
+          <div className="flex items-center justify-between py-2 border-b border-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+            <span className="flex-1">Keyword</span>
+            <div className="flex items-center gap-3 shrink-0">
+              {([
+                { key: 'impressions' as const, label: 'Imp' },
+                { key: 'clicks' as const, label: 'Clicks' },
+                { key: 'position' as const, label: 'Pos' },
+              ]).map(col => (
+                <button
+                  key={col.key}
+                  onClick={() => toggleQuerySort(col.key)}
+                  className={`px-2 py-1 rounded transition-colors ${querySort === col.key ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-zinc-100'}`}
+                >
+                  {col.label} {querySort === col.key && (querySortDir === 'desc' ? '↓' : '↑')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {sortedQueries.length === 0 ? (
+            <p className="text-zinc-400 text-sm py-4">No query data yet. It takes 3-5 days for data to appear after your site is indexed.</p>
           ) : (
-            <div className="space-y-2">
-              {data.topQueries.slice(0, 10).map((q, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-zinc-50 last:border-0">
+            <div className="space-y-0">
+              {displayQueries.map((q, i) => (
+                <div key={i} className="flex items-center justify-between py-2.5 border-b border-zinc-50 last:border-0 hover:bg-zinc-50 rounded-lg px-1 transition-colors">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-[10px] font-black text-zinc-400 w-5 shrink-0">{i + 1}</span>
                     <span className="font-medium text-sm text-black truncate">{q.query}</span>
                   </div>
                   <div className="flex items-center gap-4 shrink-0 ml-4">
-                    <span className="text-xs text-zinc-400">{q.impressions} imp</span>
-                    <span className="text-xs font-bold text-emerald-600">{q.clicks} clicks</span>
-                    <span className="text-[10px] text-zinc-400">#{q.position.toFixed(0)}</span>
+                    <span className="text-xs text-zinc-400 w-14 text-right">{q.impressions}</span>
+                    <span className="text-xs font-bold text-emerald-600 w-12 text-right">{q.clicks}</span>
+                    <span className="text-[10px] text-zinc-400 w-8 text-right">#{q.position.toFixed(0)}</span>
                   </div>
                 </div>
               ))}
+              {sortedQueries.length > 10 && (
+                <button
+                  onClick={() => setShowAllQueries(!showAllQueries)}
+                  className="w-full py-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors mt-2"
+                >
+                  {showAllQueries ? 'Show less' : `Show all ${sortedQueries.length} keywords`}
+                </button>
+              )}
             </div>
           )}
         </div>
 
         <div className="bg-white rounded-2xl border border-zinc-100 p-6">
-          <h2 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4 flex items-center gap-2">
-            <FaClipboardList className="text-zinc-300" /> Top Pages
-          </h2>
-          {data.topPages.length === 0 ? (
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
+              <FaClipboardList className="text-zinc-300" /> Top Pages ({sortedPages.length})
+            </h2>
+            <div className="flex items-center gap-1 text-[10px]">
+              {([
+                { key: 'clicks' as const, label: 'Clicks' },
+                { key: 'impressions' as const, label: 'Imp' },
+                { key: 'position' as const, label: 'Pos' },
+              ]).map(col => (
+                <button
+                  key={col.key}
+                  onClick={() => setPageSort(col.key)}
+                  className={`px-2 py-1 rounded font-black uppercase tracking-widest transition-colors ${pageSort === col.key ? 'bg-indigo-100 text-indigo-700' : 'text-zinc-400 hover:bg-zinc-100'}`}
+                >
+                  {col.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {sortedPages.length === 0 ? (
             <p className="text-zinc-400 text-sm">No page data yet.</p>
           ) : (
-            <div className="space-y-2">
-              {data.topPages.slice(0, 10).map((p, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-zinc-50 last:border-0">
+            <div className="space-y-0">
+              {displayPages.map((p, i) => (
+                <div key={i} className="flex items-center justify-between py-2.5 border-b border-zinc-50 last:border-0 hover:bg-zinc-50 rounded-lg px-1 transition-colors">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-[10px] font-black text-zinc-400 w-5 shrink-0">{i + 1}</span>
                     <span className="font-medium text-xs text-black truncate">
@@ -609,11 +703,20 @@ function SeoTab({ data, loading, error, onRefresh, slug }: {
                     </span>
                   </div>
                   <div className="flex items-center gap-4 shrink-0 ml-4">
-                    <span className="text-xs text-zinc-400">{p.impressions} imp</span>
-                    <span className="text-xs font-bold text-emerald-600">{p.clicks} clicks</span>
+                    <span className="text-xs text-zinc-400 w-14 text-right">{p.impressions}</span>
+                    <span className="text-xs font-bold text-emerald-600 w-12 text-right">{p.clicks}</span>
+                    <span className="text-[10px] text-zinc-400 w-8 text-right">#{p.position.toFixed(0)}</span>
                   </div>
                 </div>
               ))}
+              {sortedPages.length > 10 && (
+                <button
+                  onClick={() => setShowAllPages(!showAllPages)}
+                  className="w-full py-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors mt-2"
+                >
+                  {showAllPages ? 'Show less' : `Show all ${sortedPages.length} pages`}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -678,11 +781,20 @@ function TrafficTab({ data, loading, error, onRefresh }: {
               <FaGlobe className="text-indigo-500 text-sm" />
             </div>
             <div>
-              <p className="text-sm font-bold text-indigo-800">Sample Traffic Data</p>
-              <p className="text-[10px] text-indigo-500">Real data patterns powered by <a href="https://neighbortechs.com" target="_blank" rel="noopener noreferrer" className="underline font-bold">NeighborTechs.com</a></p>
+              <p className="text-sm font-bold text-indigo-800">
+                {(data as any).demoSite ? `Live Traffic Data — ${(data as any).demoSite}` : 'Sample Traffic Data'}
+              </p>
+              <p className="text-[10px] text-indigo-500">
+                {(data as any).demoSite
+                  ? <>Real Google Analytics data · <strong>{o.sessions.toLocaleString()} sessions</strong> · {o.totalUsers.toLocaleString()} users in past 7 days</>
+                  : <>Real data patterns powered by <a href="https://neighbortechs.com" target="_blank" rel="noopener noreferrer" className="underline font-bold">NeighborTechs.com</a></>
+                }
+              </p>
             </div>
           </div>
-          <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">Demo</span>
+          <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+            {(data as any).demoSite ? 'Live' : 'Demo'}
+          </span>
         </div>
       )}
 

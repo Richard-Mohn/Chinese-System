@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSearchConsoleData, daysAgo, today } from '@/lib/google-analytics';
+import { getSearchConsoleData, getDemoSiteSearchConsoleData, DEMO_SHOWCASE_SITES, daysAgo, today } from '@/lib/google-analytics';
 import { verifyApiAuth } from '@/lib/apiAuth';
 
 // Demo Search Console data with realistic local business patterns
@@ -13,18 +13,18 @@ function generateDemoSearchConsoleData(slug: string, days: number) {
     ctr: parseFloat(((clicks / impressions)).toFixed(3)),
     position: 14.2,
     topQueries: [
-      { query: `${slug.replace(/-/g, ' ')} menu`, impressions: Math.floor(820 * multiplier), clicks: Math.floor(95 * multiplier), ctr: 11.6, position: 3.2 },
-      { query: `${slug.replace(/-/g, ' ')} order online`, impressions: Math.floor(540 * multiplier), clicks: Math.floor(72 * multiplier), ctr: 13.3, position: 5.1 },
-      { query: `restaurants near me richmond`, impressions: Math.floor(1800 * multiplier), clicks: Math.floor(45 * multiplier), ctr: 2.5, position: 18.5 },
-      { query: `best food delivery richmond va`, impressions: Math.floor(920 * multiplier), clicks: Math.floor(38 * multiplier), ctr: 4.1, position: 12.8 },
-      { query: `${slug.replace(/-/g, ' ')} hours`, impressions: Math.floor(310 * multiplier), clicks: Math.floor(42 * multiplier), ctr: 13.5, position: 2.8 },
-      { query: `${slug.replace(/-/g, ' ')} delivery`, impressions: Math.floor(280 * multiplier), clicks: Math.floor(35 * multiplier), ctr: 12.5, position: 4.5 },
-      { query: `local food ordering no commission`, impressions: Math.floor(150 * multiplier), clicks: Math.floor(18 * multiplier), ctr: 12.0, position: 8.3 },
+      { query: `${slug.replace(/-/g, ' ')} menu`, impressions: Math.floor(820 * multiplier), clicks: Math.floor(95 * multiplier), ctr: 0.116, position: 3.2 },
+      { query: `${slug.replace(/-/g, ' ')} order online`, impressions: Math.floor(540 * multiplier), clicks: Math.floor(72 * multiplier), ctr: 0.133, position: 5.1 },
+      { query: `restaurants near me richmond`, impressions: Math.floor(1800 * multiplier), clicks: Math.floor(45 * multiplier), ctr: 0.025, position: 18.5 },
+      { query: `best food delivery richmond va`, impressions: Math.floor(920 * multiplier), clicks: Math.floor(38 * multiplier), ctr: 0.041, position: 12.8 },
+      { query: `${slug.replace(/-/g, ' ')} hours`, impressions: Math.floor(310 * multiplier), clicks: Math.floor(42 * multiplier), ctr: 0.135, position: 2.8 },
+      { query: `${slug.replace(/-/g, ' ')} delivery`, impressions: Math.floor(280 * multiplier), clicks: Math.floor(35 * multiplier), ctr: 0.125, position: 4.5 },
+      { query: `local food ordering no commission`, impressions: Math.floor(150 * multiplier), clicks: Math.floor(18 * multiplier), ctr: 0.12, position: 8.3 },
     ],
     topPages: [
-      { page: `https://mohnmenu.com/${slug}`, impressions: Math.floor(2100 * multiplier), clicks: Math.floor(210 * multiplier), ctr: 10.0, position: 8.5 },
-      { page: `https://mohnmenu.com/${slug}/menu`, impressions: Math.floor(1200 * multiplier), clicks: Math.floor(98 * multiplier), ctr: 8.2, position: 11.2 },
-      { page: `https://mohnmenu.com/order/${slug}`, impressions: Math.floor(600 * multiplier), clicks: Math.floor(52 * multiplier), ctr: 8.7, position: 14.3 },
+      { page: `https://mohnmenu.com/${slug}`, impressions: Math.floor(2100 * multiplier), clicks: Math.floor(210 * multiplier), ctr: 0.10, position: 8.5 },
+      { page: `https://mohnmenu.com/${slug}/menu`, impressions: Math.floor(1200 * multiplier), clicks: Math.floor(98 * multiplier), ctr: 0.082, position: 11.2 },
+      { page: `https://mohnmenu.com/order/${slug}`, impressions: Math.floor(600 * multiplier), clicks: Math.floor(52 * multiplier), ctr: 0.087, position: 14.3 },
     ],
     devices: [
       { device: 'MOBILE', impressions: Math.floor(impressions * 0.68), clicks: Math.floor(clicks * 0.72) },
@@ -37,7 +37,21 @@ function generateDemoSearchConsoleData(slug: string, days: number) {
 }
 
 /**
+ * Pick a demo showcase site deterministically based on slug hash.
+ */
+function selectDemoSite(slug: string) {
+  const sites = Object.entries(DEMO_SHOWCASE_SITES);
+  if (sites.length === 0) return null;
+  const hash = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const [key, config] = sites[hash % sites.length];
+  return { key, config };
+}
+
+/**
  * GET /api/tenant-seo/search-console?slug=xxx&days=28
+ *
+ * For demo businesses (slug starts with "demo-"), attempts to serve
+ * REAL Search Console data from NeighborTechs.com or FlamingSocialMedia.com.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -51,9 +65,30 @@ export async function GET(request: NextRequest) {
     if (!slug) {
       return NextResponse.json({ error: 'Missing slug parameter' }, { status: 400 });
     }
-
     if (days < 1 || days > 90) {
       return NextResponse.json({ error: 'Days must be between 1 and 90' }, { status: 400 });
+    }
+
+    const isDemo = slug.startsWith('demo-') || slug.startsWith('demo_');
+
+    // For demo businesses, try real data from our showcase sites
+    if (isDemo) {
+      try {
+        const demoSite = selectDemoSite(slug);
+        if (demoSite) {
+          const startDate = daysAgo(Math.min(days, 7));
+          const endDate = today();
+          const data = await getDemoSiteSearchConsoleData(demoSite.config.siteUrl, startDate, endDate);
+          return NextResponse.json({
+            success: true,
+            data: { ...data, demoData: true, demoSite: demoSite.config.label, poweredBy: `Real Google Search Console data from ${demoSite.config.label}` },
+            cached: false,
+            generatedAt: new Date().toISOString(),
+          });
+        }
+      } catch (err) {
+        console.warn('[Demo SEO] Failed to fetch real SC data, falling back:', err);
+      }
     }
 
     try {
@@ -62,7 +97,6 @@ export async function GET(request: NextRequest) {
       const data = await getSearchConsoleData(slug, startDate, endDate);
       return NextResponse.json({ success: true, data, cached: false, generatedAt: new Date().toISOString() });
     } catch {
-      // Fallback to demo data when Google APIs aren't configured
       const data = generateDemoSearchConsoleData(slug, days);
       return NextResponse.json({ success: true, data, cached: false, generatedAt: new Date().toISOString() });
     }

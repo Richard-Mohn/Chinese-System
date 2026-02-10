@@ -18,6 +18,8 @@ export type BusinessType =
   | 'boutique'
   | 'antique_shop'
   | 'market'
+  | 'music_artist'
+  | 'church'
   | 'other';
 
 // Subscription tiers that determine feature access & pricing

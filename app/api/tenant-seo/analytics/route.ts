@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAnalyticsData, daysAgo, today } from '@/lib/google-analytics';
+import { getAnalyticsData, getDemoSiteAnalyticsData, DEMO_SHOWCASE_SITES, daysAgo, today } from '@/lib/google-analytics';
 import { verifyApiAuth } from '@/lib/apiAuth';
 
 // Demo analytics data powered by real NeighborTechs.com patterns
@@ -68,6 +68,9 @@ function generateDemoAnalyticsData(slug: string, days: number) {
 
 /**
  * GET /api/tenant-seo/analytics?slug=xxx&days=28
+ *
+ * For demo businesses, attempts to serve REAL GA4 traffic data
+ * from NeighborTechs.com or FlamingSocialMedia.com.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -84,6 +87,32 @@ export async function GET(request: NextRequest) {
 
     if (days < 1 || days > 90) {
       return NextResponse.json({ error: 'Days must be between 1 and 90' }, { status: 400 });
+    }
+
+    const isDemo = slug.startsWith('demo-') || slug.startsWith('demo_');
+
+    // For demo businesses, try real analytics from our showcase sites
+    if (isDemo) {
+      try {
+        const sites = Object.entries(DEMO_SHOWCASE_SITES);
+        if (sites.length > 0) {
+          const hash = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+          const [, config] = sites[hash % sites.length];
+          if (config.ga4PropertyId) {
+            const startDate = daysAgo(Math.min(days, 7));
+            const endDate = today();
+            const data = await getDemoSiteAnalyticsData(config.ga4PropertyId, startDate, endDate);
+            return NextResponse.json({
+              success: true,
+              data: { ...data, demoData: true, demoSite: config.label, poweredBy: `Real Google Analytics data from ${config.label}` },
+              cached: false,
+              generatedAt: new Date().toISOString(),
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('[Demo Analytics] Failed to fetch real data, falling back:', err);
+      }
     }
 
     try {
