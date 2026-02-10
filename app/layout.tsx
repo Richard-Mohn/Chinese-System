@@ -10,6 +10,8 @@ import Footer from '@/components/Footer';
 import AnimatedBackground from "@/components/AnimatedBackground";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import TawkChat from "@/components/TawkChat";
+import { MohnEmpireProvider } from '@/lib/mohn-empire/auth-context';
+import { EmpireFooterBar } from '@/lib/mohn-empire/components/EmpireFooterBar';
 import {
   ORGANIZATION_JSONLD,
   SOFTWARE_APP_JSONLD,
@@ -94,6 +96,7 @@ export default function RootLayout({
         />
         <AnimatedBackground />
         <AuthProvider>
+          <MohnEmpireProvider platformId="mohnmenu">
           <AuthModalProvider>
             <GoogleAnalytics />
             <CartProvider>
@@ -102,9 +105,11 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <EmpireFooterBar currentPlatform="mohnmenu" />
               <TawkChat />
             </CartProvider>
           </AuthModalProvider>
+          </MohnEmpireProvider>
         </AuthProvider>
       </body>
     </html>
