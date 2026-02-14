@@ -11,7 +11,7 @@ import {
   FaUsers, FaStore, FaShoppingCart, FaBicycle,
   FaCog, FaChartBar, FaArrowRight, FaCheck, FaTimes,
   FaWalking, FaCar, FaMotorcycle, FaPhone, FaEnvelope,
-  FaClock, FaEye,
+  FaClock, FaEye, FaLifeRing, FaTools,
 } from 'react-icons/fa';
 
 interface PlatformStats {
@@ -198,6 +198,8 @@ export default function AdminDashboardPage() {
     { label: 'Owner Dashboard', href: '/owner', icon: FaStore, desc: 'Manage business settings' },
     { label: 'Analytics', href: '/owner/analytics', icon: FaChartBar, desc: 'SEO & traffic data' },
     { label: 'Settings', href: '/owner/settings', icon: FaCog, desc: 'Platform configuration' },
+    { label: 'Tenant Console', href: '/admin/super', icon: FaTools, desc: 'Cross-tenant oversight and support context' },
+    { label: 'Support Queue', href: '/admin/support', icon: FaLifeRing, desc: 'Support tickets and assist workflows' },
   ];
 
   return (
@@ -350,6 +352,7 @@ export default function AdminDashboardPage() {
                             setSelectedCourier(isExpanded ? null : courier);
                             setAdminNotes(courier.adminNotes || '');
                           }}
+                          title={isExpanded ? 'Hide applicant details' : 'View applicant details'}
                           className="p-2.5 bg-zinc-100 rounded-xl hover:bg-zinc-200 transition-all text-zinc-500"
                         >
                           <FaEye className="text-sm" />
@@ -359,6 +362,7 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => handleCourierAction(courier.id, 'approved')}
                               disabled={actionLoading === courier.id}
+                              title="Approve courier application"
                               className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-all disabled:opacity-50"
                             >
                               <FaCheck className="text-sm" />
@@ -366,6 +370,7 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => handleCourierAction(courier.id, 'rejected')}
                               disabled={actionLoading === courier.id}
+                              title="Reject courier application"
                               className="p-2.5 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-all disabled:opacity-50"
                             >
                               <FaTimes className="text-sm" />

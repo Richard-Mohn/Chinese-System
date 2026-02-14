@@ -2,13 +2,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FaArrowRight, FaCheckCircle } from 'react-icons/fa';
 import { ECOSYSTEM_ROLES, getRoleBySlug } from '@/lib/careers/roles';
+import QuickApplyButton from '@/components/QuickApplyButton';
 
 export function generateStaticParams() {
   return ECOSYSTEM_ROLES.map(role => ({ roleSlug: role.slug }));
 }
 
-export default function ApplyRolePage({ params }: { params: { roleSlug: string } }) {
-  const role = getRoleBySlug(params.roleSlug);
+export default async function ApplyRolePage({ params }: { params: Promise<{ roleSlug: string }> }) {
+  const { roleSlug } = await params;
+  const role = getRoleBySlug(roleSlug);
   if (!role) notFound();
 
   return (
@@ -24,11 +26,12 @@ export default function ApplyRolePage({ params }: { params: { roleSlug: string }
           <p className="text-xl text-zinc-500 leading-relaxed font-medium mb-8">{role.details}</p>
 
           <div className="flex flex-wrap gap-4">
+            <QuickApplyButton roleSlug={role.slug} variant="primary" />
             <Link
               href={role.applyHref}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-black text-white font-bold hover:bg-zinc-800"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-zinc-200 text-zinc-700 font-bold hover:border-zinc-400"
             >
-              Apply Now <FaArrowRight className="text-xs" />
+              Full Application <FaArrowRight className="text-xs" />
             </Link>
             <Link
               href="/apply"

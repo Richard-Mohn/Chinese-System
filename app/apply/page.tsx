@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { FaArrowRight, FaBriefcase, FaGamepad } from 'react-icons/fa';
 import { ECOSYSTEM_ROLES } from '@/lib/careers/roles';
+import QuickApplyButton from '@/components/QuickApplyButton';
 
 const CATEGORY_LABELS = {
   hospitality: 'Hospitality',
@@ -45,6 +46,9 @@ export default function ApplyHubPage() {
               >
                 View Role Details <FaArrowRight className="text-[11px]" />
               </Link>
+              <div className="mt-4">
+                <QuickApplyButton roleSlug={role.slug} variant="secondary" />
+              </div>
             </div>
           ))}
         </div>
