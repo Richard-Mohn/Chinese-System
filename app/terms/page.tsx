@@ -14,7 +14,7 @@ export default function Terms() {
           <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter text-zinc-900">
             Terms<span className="text-orange-500">.</span>
           </h1>
-          <p className="text-sm font-black uppercase tracking-widest text-zinc-400 mb-12">Last Updated: February 2026</p>
+          <p className="text-sm font-black uppercase tracking-widest text-zinc-400 mb-12">Last Updated: February 14, 2026</p>
           
           <div className="bg-white p-8 md:p-12 rounded-[3rem] border border-zinc-100 shadow-[0_10px_50px_rgba(0,0,0,0.02)] space-y-10 text-zinc-600 font-medium leading-relaxed">
             
@@ -90,40 +90,53 @@ export default function Terms() {
             <section>
               <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">08. Delivery &amp; Driver Operations</h2>
               <p>
-                If you use MohnMenu&apos;s GPS fleet tracking module, you are responsible for managing your delivery drivers, complying with all local employment and labor laws, and ensuring adequate insurance coverage. Marketplace drivers (shared pool) operate as independent contractors. MohnMenu facilitates matching but does not employ, direct, or control any delivery personnel. Delivery disputes between businesses, drivers, and customers are the responsibility of the parties involved.
+                If you use MohnMenu&apos;s delivery modules, you are responsible for complying with all applicable local, state, and federal labor, transportation, licensing, and insurance laws. Marketplace drivers may be treated as independent contractors only where supported by applicable law and actual operating practices. Labels in contracts do not override legal classification standards. MohnMenu provides technology workflows, but each business remains responsible for role classification, staffing practices, and lawful operation.
+              </p>
+              <p className="mt-4">
+                For delivery and handoff integrity, participating drivers and teams may be required to submit completion evidence such as proof-of-delivery photos, timestamped completion confirmations, and pickup verification events. Businesses using store pickup workflows are responsible for pickup release controls, order identity checks, and local compliance requirements.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">09. Intellectual Property</h2>
+              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">09. Applications, Screening &amp; Background Checks</h2>
+              <p>
+                MohnMenu may offer role-based application workflows for drivers, hospitality staff, operations personnel, and other role categories. By submitting an application, applicants agree that MohnMenu and/or participating businesses may review the submission for hiring, contracting, eligibility, safety, fraud-prevention, and compliance purposes.
+              </p>
+              <p className="mt-4">
+                Where permitted by law and required for role eligibility, MohnMenu or participating businesses may request identity verification details and run background checks through approved screening workflows. Sensitive identifiers, including Social Security Number data when legally required, are collected only with consent and only through approved secure workflows. Sensitive data is not sold and is processed solely for legitimate screening, compliance, and risk management purposes.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">10. Intellectual Property</h2>
               <p>
                 MohnMenu retains all rights, title, and interest in the platform, software, branding, and documentation. You retain full ownership of your business content — menus, logos, photos, and customer data — uploaded to the platform. By creating a MohnMenu storefront, you grant us a limited license to display your content for the purpose of operating the Service on your behalf.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">10. Limitation of Liability</h2>
+              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">11. Limitation of Liability</h2>
               <p>
                 To the maximum extent permitted by law, MohnMenu shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to lost profits, lost revenue, or business interruption, arising from your use of the Service. Our total liability for any claim shall not exceed the amount you paid to MohnMenu in the twelve (12) months preceding the claim.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">11. Dispute Resolution</h2>
+              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">12. Dispute Resolution</h2>
               <p>
                 Any disputes arising from or relating to these Terms or the Service shall be resolved through good-faith negotiation. If negotiation fails, disputes shall be settled by binding arbitration in accordance with the rules of the American Arbitration Association, conducted in Petersburg, Virginia. These Terms are governed by the laws of the Commonwealth of Virginia, without regard to conflict-of-law principles.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">12. Termination</h2>
+              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">13. Termination</h2>
               <p>
                 Either party may terminate the relationship at any time. You may delete your account from your dashboard settings. We reserve the right to suspend or terminate accounts that violate these Terms, engage in fraudulent activity, or remain inactive for more than 12 months. Upon termination, we will provide you with a 30-day window to export your data before it is permanently deleted.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">13. Changes to Terms</h2>
+              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">14. Changes to Terms</h2>
               <p>
                 We may update these Terms from time to time. Material changes will be communicated via email to the address associated with your account at least 30 days before taking effect. Your continued use of the Service after changes become effective constitutes acceptance of the updated Terms. If you do not agree to the updated Terms, you must discontinue use of the Service.
               </p>

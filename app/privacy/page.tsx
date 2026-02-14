@@ -15,7 +15,7 @@ export default function Privacy() {
           <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter text-zinc-900">
             Privacy<span className="text-orange-500">.</span>
           </h1>
-          <p className="text-sm font-black uppercase tracking-widest text-zinc-400 mb-12">Last Updated: February 2026</p>
+          <p className="text-sm font-black uppercase tracking-widest text-zinc-400 mb-12">Last Updated: February 14, 2026</p>
           
           <div className="bg-white p-8 md:p-12 rounded-[3rem] border border-zinc-100 shadow-[0_10px_50px_rgba(0,0,0,0.02)] space-y-10 text-zinc-600 font-medium leading-relaxed">
             
@@ -36,6 +36,9 @@ export default function Privacy() {
                 <li><strong>Location Data:</strong> GPS coordinates collected from delivery drivers who opt into the live tracking feature during active deliveries only.</li>
                 <li><strong>Usage Data:</strong> Pages visited, features used, browser type, device type, and IP address for analytics and security purposes.</li>
               </ul>
+              <p className="mt-4">
+                <strong>Sensitive screening data:</strong> For role-based applications, we may process screening and identity-verification data where legally permitted and necessary. This may include background-check eligibility data and, when required by law or screening provider workflow, sensitive identifiers such as Social Security Number data. Sensitive identifiers are requested only in secure screening workflows and not for general marketing use.
+              </p>
             </section>
 
             <section>
@@ -47,7 +50,20 @@ export default function Privacy() {
                 <li>To provide customer support and resolve disputes.</li>
                 <li>To send essential service communications (order confirmations, payout notifications).</li>
                 <li>To detect and prevent fraud, chargebacks, and unauthorized access.</li>
+                <li>To process role applications, screening, and compliance checks where enabled.</li>
                 <li>To improve platform functionality, performance, and reliability.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">03A. Screening, Proof-of-Delivery &amp; Pickup Evidence</h2>
+              <p className="mb-4">
+                Businesses and delivery operators may use MohnMenu workflows that capture operational evidence, including proof-of-delivery photos, pickup verification events, geolocation/time metadata, and handoff confirmations.
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-2">
+                <li>Evidence is used for fulfillment integrity, customer protection, dispute resolution, fraud prevention, and legal compliance.</li>
+                <li>Operational evidence is access-controlled and limited to authorized personnel with business need.</li>
+                <li>Sensitive screening records are segregated from general customer analytics and are not sold.</li>
               </ul>
             </section>
 
@@ -73,6 +89,9 @@ export default function Privacy() {
               <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">06. Data Retention</h2>
               <p>
                 Active account data is retained for the duration of your account. Order history and transaction records are retained for 7 years to comply with tax and financial reporting obligations. If you delete your account, personal identifiers are removed within 30 days while anonymized transaction records may be retained for compliance purposes.
+              </p>
+              <p className="mt-4">
+                Screening and operational evidence records are retained according to legal requirements, dispute windows, and internal risk-control policies. Where not legally required, sensitive screening artifacts are minimized and deleted according to retention schedules.
               </p>
             </section>
 

@@ -60,6 +60,13 @@ const mohnStersItems = [
   { href: '/mohnsters/church-live', icon: FaVideo, label: 'Church Live Experience', desc: 'Attend live seminars from inside the game world' },
 ];
 
+const aboutItems = [
+  { href: '/about', label: 'About', desc: 'Learn about MohnMenu and our mission' },
+  { href: '/comparison', label: 'Compare', desc: 'See how we stack up against alternatives' },
+  { href: '/careers', label: 'Careers', desc: 'Explore open roles and opportunities' },
+  { href: '/contact', label: 'Contact', desc: 'Reach support, sales, and partnerships' },
+];
+
 /* ─── Dropdown wrapper ─── */
 interface DropdownProps {
   label: string;
@@ -210,11 +217,11 @@ const Header = () => {
           </NavDropdown>
 
           <Link href="/pricing" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Pricing</Link>
-          <Link href="/apply" className="px-5 py-2 bg-black text-white rounded-full text-sm font-bold hover:bg-zinc-800 transition-colors">Apply</Link>
-          <Link href="/comparison" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Compare</Link>
-          <Link href="/about" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">About</Link>
-          <Link href="/careers" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Careers</Link>
-          <Link href="/contact" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Contact</Link>
+          <NavDropdown label="About" open={openMenu === 'about'} onToggle={() => toggle('about')} onClose={closeDropdown}>
+            <div className="space-y-1 min-w-[340px]">
+              {aboutItems.map(item => <DropLink key={item.href} {...item} onClick={closeDropdown} />)}
+            </div>
+          </NavDropdown>
         </nav>
 
         {/* Right Actions */}
@@ -235,6 +242,7 @@ const Header = () => {
             </div>
           ) : (
             <div className="hidden sm:flex items-center gap-3">
+              <Link href="/apply" className="px-5 py-2.5 bg-black text-white rounded-full text-sm font-bold hover:bg-zinc-800 transition-colors">Apply</Link>
               <NavDropdown label="Mohnsters" open={openMenu === 'mohnsters'} onToggle={() => toggle('mohnsters')} onClose={closeDropdown} variant="game">
                 <div className="space-y-1 min-w-[340px]">
                   <div className="px-3 pt-2 pb-3 border-b border-purple-500/10 mb-2">
@@ -261,9 +269,16 @@ const Header = () => {
               <div className="relative" onMouseLeave={closeDropdown}>
                 <button
                   onClick={() => toggle('mohnsters-mobile')}
-                  className="h-9 flex items-center gap-1.5 px-3 rounded-full text-xs font-bold text-white bg-linear-to-r from-orange-500 via-purple-500 to-violet-600 shadow-lg shadow-purple-500/20"
+                  className="h-9 flex items-center gap-1.5 px-3 rounded-full text-xs font-bold text-white bg-linear-to-r from-emerald-500 via-cyan-500 to-violet-600 shadow-lg shadow-cyan-500/20"
                 >
-                  <FaGamepad className="text-white text-xs" /> Game
+                  <FaGamepad className="text-white text-xs" />
+                  <span className="tracking-wide">
+                    <span className="text-lime-100">Mohn</span><span className="text-white">Sters</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 ml-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-lime-200/90" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-100/90" />
+                  </span>
                   <FaChevronDown className={cn('text-[9px] transition-transform duration-200', openMenu === 'mohnsters-mobile' && 'rotate-180')} />
                 </button>
                 <AnimatePresence>
@@ -282,6 +297,12 @@ const Header = () => {
                   )}
                 </AnimatePresence>
               </div>
+              <Link
+                href="/driver"
+                className="h-9 px-3.5 inline-flex items-center text-xs font-bold text-black border border-zinc-200 rounded-full hover:border-zinc-400 transition-colors"
+              >
+                Drivers
+              </Link>
               <button
                 onClick={() => openAuthModal('signup')}
                 className="h-9 px-3.5 text-xs font-bold text-black border border-zinc-200 rounded-full hover:border-zinc-400 transition-colors"
@@ -349,10 +370,30 @@ const Header = () => {
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-3 ml-1">Platform</p>
               <Link href="/pricing" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Pricing</Link>
               <Link href="/apply" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Apply</Link>
-              <Link href="/comparison" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Compare</Link>
-              <Link href="/about" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">About</Link>
               <Link href="/faq" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">FAQ</Link>
-              <Link href="/contact" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Contact</Link>
+
+              <button
+                onClick={() => toggle('about-mobile')}
+                className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors flex items-center justify-between"
+              >
+                About
+                <FaChevronDown className={cn('text-[10px] transition-transform duration-200', openMenu === 'about-mobile' && 'rotate-180')} />
+              </button>
+              <AnimatePresence initial={false}>
+                {openMenu === 'about-mobile' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden pl-4"
+                  >
+                    <Link href="/about" onClick={closeMobile} className="block px-3 py-2 font-semibold text-zinc-700 hover:text-orange-600 transition-colors">About MohnMenu</Link>
+                    <Link href="/comparison" onClick={closeMobile} className="block px-3 py-2 font-semibold text-zinc-700 hover:text-orange-600 transition-colors">Compare</Link>
+                    <Link href="/careers" onClick={closeMobile} className="block px-3 py-2 font-semibold text-zinc-700 hover:text-orange-600 transition-colors">Careers</Link>
+                    <Link href="/contact" onClick={closeMobile} className="block px-3 py-2 font-semibold text-zinc-700 hover:text-orange-600 transition-colors">Contact</Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <div className="h-px bg-zinc-100 my-4" />
               {!user && (
