@@ -201,7 +201,7 @@ export default function OwnerDashboard() {
             </div>
           </div>
           <Link
-            href="/owner/drivers"
+            href="/owner/settings"
             className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-orange-500/20 transition-all whitespace-nowrap"
           >
             Connect Stripe →
@@ -399,7 +399,7 @@ export default function OwnerDashboard() {
           { label: 'Website', active: websiteLive },
           {
             label: 'Payments',
-            active: true, // Stripe always connected
+            active: !!currentBusiness.stripeAccountId,
           },
         ].map(sys => (
           <div key={sys.label} className="flex items-center gap-2">
