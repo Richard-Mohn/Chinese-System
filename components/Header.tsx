@@ -11,8 +11,8 @@ import {
   FaShoppingCart, FaUtensils, FaCoffee, FaDesktop, FaTruck,
   FaClipboardList, FaGlobe, FaBirthdayCake, FaShoppingBasket,
   FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt, FaUserTie, FaMusic,
-  FaChurch,
-  FaMugHot
+  FaChurch, FaMugHot, FaCar, FaWrench,
+  FaGamepad, FaDragon, FaCoins, FaUsers, FaGift
 } from 'react-icons/fa';
 import { useAuthModal } from '@/context/AuthModalContext';
 
@@ -26,6 +26,7 @@ const solutions = [
   { href: '/for-convenience-stores', icon: FaCoffee, label: 'Convenience Stores', desc: 'QR ordering, inventory & grab-and-go' },
   { href: '/for-retail-shops', icon: FaStore, label: 'Shops & Boutiques', desc: 'AI product listing & online storefront' },
   { href: '/for-coffee-shops', icon: FaMugHot, label: 'Coffee Shops', desc: 'Order-ahead, loyalty & peer delivery' },
+  { href: '/for-uber-drivers', icon: FaCar, label: 'Uber Drivers', desc: 'Extra earnings with delivery + roadside help' },
   { href: '/for-churches', icon: FaChurch, label: 'Churches', desc: 'Giving, events, volunteers & streaming' },
   { href: '/for-music-artists', icon: FaMusic, label: 'Music & Artists', desc: 'Tickets, merch, drops & fan clubs' },
 ];
@@ -43,6 +44,19 @@ const featureItems = [
   { href: '/features/staff-marketplace', icon: FaUserTie, label: 'Staff Marketplace', desc: 'Bartender & server multi-venue work' },
   { href: '/features/bar-entertainment', icon: FaMusic, label: 'Bar Entertainment', desc: 'Jukebox, karaoke & kiosk ordering' },
   { href: '/features/peer-delivery', icon: FaBicycle, label: 'Peer Delivery', desc: 'Customers deliver for each other' },
+  { href: '/features/offerwall-rewards', icon: FaGift, label: 'Offerwall Rewards', desc: 'Customers earn via games/apps/videos and spend at your business' },
+  { href: '/features/roadside-assistance', icon: FaWrench, label: 'Roadside Assistance', desc: 'Jump starts, lockouts, tire help by nearby drivers' },
+];
+
+/* ─── MohnSters game menu data ─── */
+const mohnStersItems = [
+  { href: '/mohnsters', icon: FaDragon, label: 'What is MohnSters?', desc: 'The game that brings your business to life' },
+  { href: '/mohnsters/business-growth', icon: FaStore, label: 'Business Growth Playbook', desc: 'How restaurants, bars, and shops earn more with gameplay' },
+  { href: '/mohnsters/earn', icon: FaCoins, label: 'Earn While You Work', desc: 'How drivers & businesses earn in-game rewards' },
+  { href: '/mohnsters/feed', icon: FaUtensils, label: 'Feed the Creatures', desc: 'Real food orders power up digital companions' },
+  { href: '/mohnsters/community', icon: FaUsers, label: 'Community & Faith', desc: 'Churches, artists & local businesses in the game' },
+  { href: '/mohnsters/world-ordering', icon: FaMapMarkerAlt, label: 'In-World Ordering', desc: 'Players order in-game and track real deliveries live' },
+  { href: '/mohnsters/church-live', icon: FaVideo, label: 'Church Live Experience', desc: 'Attend live seminars from inside the game world' },
 ];
 
 /* ─── Dropdown wrapper ─── */
@@ -52,16 +66,27 @@ interface DropdownProps {
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
+  variant?: 'default' | 'game';
 }
 
-const NavDropdown = ({ label, children, open, onToggle, onClose }: DropdownProps) => (
+const NavDropdown = ({ label, children, open, onToggle, onClose, variant = 'default' }: DropdownProps) => (
   <div className="relative" onMouseLeave={onClose}>
     <button
       onClick={onToggle}
       onMouseEnter={onToggle}
-      className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors"
+      className={cn(
+        'flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-colors',
+        variant === 'game'
+          ? 'text-white rounded-full bg-linear-to-r from-orange-500 via-purple-500 to-violet-600 hover:brightness-110 shadow-lg shadow-purple-500/20'
+          : 'text-zinc-600 hover:text-black'
+      )}
     >
-      {label}
+      {variant === 'game' ? (
+        <span className="flex items-center gap-1.5">
+          <FaGamepad className="text-white" />
+          {label}
+        </span>
+      ) : label}
       <FaChevronDown className={cn('text-[9px] transition-transform duration-200', open && 'rotate-180')} />
     </button>
     <AnimatePresence>
@@ -73,7 +98,12 @@ const NavDropdown = ({ label, children, open, onToggle, onClose }: DropdownProps
           transition={{ duration: 0.15 }}
           className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50"
         >
-          <div className="bg-white rounded-2xl shadow-2xl border border-zinc-100 p-3 min-w-[320px]">
+          <div className={cn(
+            'rounded-2xl shadow-2xl border p-3 min-w-[320px]',
+            variant === 'game'
+              ? 'bg-[#0a0a0f] border-purple-500/20 shadow-purple-500/10'
+              : 'bg-white border-zinc-100'
+          )}>
             {children}
           </div>
         </motion.div>
@@ -88,16 +118,25 @@ interface DropLinkProps {
   label: string;
   desc: string;
   onClick?: () => void;
+  variant?: 'default' | 'game';
 }
 
-const DropLink = ({ href, icon: Icon, label, desc, onClick }: DropLinkProps) => (
-  <Link href={href} onClick={onClick} className="flex items-start gap-3 p-3 rounded-xl hover:bg-zinc-50 transition-colors group">
-    <div className="w-9 h-9 rounded-lg bg-zinc-100 group-hover:bg-black group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
+const DropLink = ({ href, icon: Icon, label, desc, onClick, variant = 'default' }: DropLinkProps) => (
+  <Link href={href} onClick={onClick} className={cn(
+    'flex items-start gap-3 p-3 rounded-xl transition-colors group',
+    variant === 'game' ? 'hover:bg-purple-500/10' : 'hover:bg-zinc-50'
+  )}>
+    <div className={cn(
+      'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors',
+      variant === 'game'
+        ? 'bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white'
+        : 'bg-zinc-100 group-hover:bg-black group-hover:text-white'
+    )}>
       <Icon className="text-sm" />
     </div>
     <div>
-      <div className="text-sm font-bold text-black">{label}</div>
-      <div className="text-xs text-zinc-400 leading-snug">{desc}</div>
+      <div className={cn('text-sm font-bold', variant === 'game' ? 'text-white' : 'text-black')}>{label}</div>
+      <div className={cn('text-xs leading-snug', variant === 'game' ? 'text-zinc-500' : 'text-zinc-400')}>{desc}</div>
     </div>
   </Link>
 );
@@ -162,9 +201,20 @@ const Header = () => {
             </div>
           </NavDropdown>
 
+          <NavDropdown label="Mohnsters" open={openMenu === 'mohnsters'} onToggle={() => toggle('mohnsters')} onClose={closeDropdown} variant="game">
+            <div className="space-y-1 min-w-[340px]">
+              <div className="px-3 pt-2 pb-3 border-b border-purple-500/10 mb-2">
+                <div className="text-xs font-black uppercase tracking-[0.2em] text-purple-400">🎮 The Game</div>
+                <div className="text-[10px] text-zinc-600 mt-0.5">Where your real business meets the digital world</div>
+              </div>
+              {mohnStersItems.map(s => <DropLink key={s.href} {...s} onClick={closeDropdown} variant="game" />)}
+            </div>
+          </NavDropdown>
+
           <Link href="/pricing" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Pricing</Link>
+          <Link href="/apply" className="px-5 py-2 bg-black text-white rounded-full text-sm font-bold hover:bg-zinc-800 transition-colors">Apply</Link>
           <Link href="/comparison" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Compare</Link>
-          <Link href="/quick-delivery" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">📦 Send</Link>
+          <Link href="/quick-delivery" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">📦 Packages</Link>
           <Link href="/about" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">About</Link>
           <Link href="/careers" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Careers</Link>
           <Link href="/contact" className="px-4 py-2 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Contact</Link>
@@ -248,9 +298,23 @@ const Header = () => {
               ))}
 
               <div className="h-px bg-zinc-100 my-4" />
+              <div className="bg-gradient-to-br from-[#0a0a0f] to-[#1a1a24] rounded-2xl p-4 border border-purple-500/20">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-400 mb-3 ml-1 flex items-center gap-2">
+                  <FaGamepad className="text-purple-500" /> Mohnsters
+                </p>
+                {mohnStersItems.map(s => (
+                  <Link key={s.href} href={s.href} onClick={closeMobile} className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-purple-500/10">
+                    <s.icon className="text-purple-400" /><span className="font-bold text-white">{s.label}</span>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="h-px bg-zinc-100 my-4" />
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-3 ml-1">Platform</p>
               <Link href="/pricing" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Pricing</Link>
+              <Link href="/apply" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Apply</Link>
               <Link href="/comparison" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Compare</Link>
+              <Link href="/quick-delivery" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Packages</Link>
               <Link href="/about" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">About</Link>
               <Link href="/faq" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">FAQ</Link>
               <Link href="/contact" onClick={closeMobile} className="px-3 py-2.5 font-bold text-black hover:text-orange-600 transition-colors">Contact</Link>

@@ -8,6 +8,7 @@
 import { setGlobalOptions } from "firebase-functions";
 import { onRequest } from "firebase-functions/v2/https";
 import { onDocumentUpdated } from "firebase-functions/v2/firestore";
+import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
 import cors from "cors";
@@ -277,7 +278,7 @@ export const onOrderStatusUpdate = onDocumentUpdated(
 // ════════════════════════════════════════════════════════════
 export const awardMohnOnWalletTransfer = functions.firestore
   .document("wallet_transfers/{transferId}")
-  .onCreate(async (snap) => {
+  .onCreate(async (snap: functions.firestore.QueryDocumentSnapshot) => {
     const transfer = snap.data();
     if (!transfer || transfer.mohnAwarded) return null;
 
@@ -331,7 +332,7 @@ export const awardMohnOnWalletTransfer = functions.firestore
 // ════════════════════════════════════════════════════════════
 export const awardMohnOnWalletTopup = functions.firestore
   .document("wallet_topups/{topupId}")
-  .onCreate(async (snap) => {
+  .onCreate(async (snap: functions.firestore.QueryDocumentSnapshot) => {
     const topup = snap.data();
     if (!topup || topup.mohnAwarded) return null;
 

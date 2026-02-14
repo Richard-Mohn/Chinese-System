@@ -8,7 +8,7 @@ import {
   FaMapMarkerAlt, FaVideo, FaRocket, FaShieldAlt, FaArrowRight, FaCheck,
   FaTruck, FaBitcoin, FaCreditCard, FaBrain, FaChartLine, FaStore,
   FaGoogle, FaLock, FaBolt, FaUtensils, FaBirthdayCake, FaShoppingBasket,
-  FaGlassCheers, FaCoffee, FaShoppingCart, FaPlay, FaMugHot
+  FaGlassCheers, FaCoffee, FaShoppingCart, FaPlay, FaMugHot, FaCar, FaWrench
 } from 'react-icons/fa';
 
 import { useAuthModal } from '@/context/AuthModalContext';
@@ -155,6 +155,12 @@ export default function Home() {
               >
                 Sign In
               </button>
+              <Link
+                href="/apply"
+                className="px-8 py-4 md:px-10 md:py-5 bg-emerald-50 text-emerald-700 border-2 border-emerald-200 rounded-full font-bold text-base md:text-lg hover:border-emerald-400 transition-all"
+              >
+                Apply
+              </Link>
 
               {/* Quick Order Try-It Button — inline 3rd CTA */}
               <div className="relative group">
@@ -213,14 +219,16 @@ export default function Home() {
               { type: 'Bar & Grill', slug: 'the-copper-tap', name: 'The Copper Tap', emoji: '🍺', color: 'from-purple-500 to-violet-500', description: 'Craft cocktail bar with reservations, jukebox & karaoke, kiosk mode, crypto payments.', pageName: 'Drink Menu', live: true },
               { type: 'Coffee Shop', slug: 'griffin-lounge', name: 'Griffin Lounge', emoji: '☕', color: 'from-amber-600 to-orange-700', description: 'Order-ahead espresso, cold brew, pastries & peer delivery.', pageName: 'Coffee Menu', live: true },
               { type: 'Church', slug: 'demo/shepherds-gate', name: 'Shepherds Gate Church', emoji: '⛪', color: 'from-emerald-600 to-teal-500', description: 'Service times, giving, events, ministries, and media — built for pastors and ministry teams.', pageName: 'Visit & Give', tags: ['Service Times', 'Giving', 'Events'], live: true },
-              /* ─── Coming Soon ─── */
-              { type: 'Pizza Shop', slug: '', name: 'Demo Pizza Co.', emoji: '🍕', color: 'from-orange-500 to-yellow-500', description: 'Pizza shop with build-your-own pizzas, sides, and delivery.', pageName: 'Menu', live: false },
-              { type: 'Bakery & Café', slug: '', name: 'Sweet Crumb Bakery', emoji: '🧁', color: 'from-pink-500 to-rose-500', description: 'Pre-orders, custom cakes, pastries, and coffee drinks.', pageName: 'Menu', live: false },
-              { type: 'Food Truck', slug: '', name: 'Street Eats RVA', emoji: '🚚', color: 'from-yellow-500 to-orange-500', description: 'Mobile food service with QR ordering and GPS location.', pageName: 'Menu', live: false },
-              { type: 'Grocery Store', slug: '', name: 'Fresh Valley Market', emoji: '🛒', color: 'from-green-500 to-emerald-500', description: 'Online product catalog with curbside pickup & delivery.', pageName: 'Product Catalog', live: false },
-              { type: 'Boutique', slug: '', name: 'Ivy & Thread', emoji: '👗', color: 'from-amber-500 to-orange-500', description: 'Clothing, accessories, and gifts with AI product listings.', pageName: 'Storefront', live: false },
-              { type: 'Antique Shop', slug: '', name: 'Timeless Treasures', emoji: '🏺', color: 'from-amber-600 to-yellow-600', description: 'Vintage finds with AI-powered photo-to-listing tool.', pageName: 'Product Gallery', live: false },
-              { type: 'Convenience Store', slug: '', name: 'QuickStop Mini Mart', emoji: '🏪', color: 'from-blue-500 to-indigo-500', description: 'Snacks, drinks, and essentials with grab-and-go ordering.', pageName: 'Quick-Shop', live: false },
+              { type: 'Music Artist', slug: 'demo/music', name: 'Neon Voltage', emoji: '🎵', color: 'from-violet-500 to-purple-600', description: 'Artist page demo with tracks, merch, events, and fan engagement tools.', pageName: 'Artist Demo', tags: ['Tracks', 'Merch', 'Tour'], live: true },
+              { type: 'Food Truck', slug: 'demo/food-truck', name: 'Street Eats RVA', emoji: '🚚', color: 'from-yellow-500 to-orange-500', description: 'Mobile food service with QR ordering and GPS location.', pageName: 'Menu', tags: ['QR Ordering', 'GPS'], live: true },
+              { type: 'Driver Marketplace', slug: 'demo/driver', name: 'RVA Uber Driver Hub', emoji: '🚘', color: 'from-indigo-500 to-purple-600', description: 'Drivers pick up extra delivery gigs and roadside requests between rides.', pageName: 'Driver Demo', tags: ['Driver App', 'Live Jobs'], live: true },
+              { type: 'Roadside Assistance', slug: 'demo/roadside', name: 'QuickJump Assist', emoji: '🔋', color: 'from-orange-500 to-amber-500', description: 'Jump starts, lockouts, and tire help dispatched from nearby marketplace drivers.', pageName: 'Service Demo', tags: ['Jump Start', 'SOS Dispatch'], live: true },
+              { type: 'Pizza Shop', slug: 'demo/pizza', name: 'Demo Pizza Co.', emoji: '🍕', color: 'from-orange-500 to-yellow-500', description: 'Pizza shop with build-your-own pizzas, sides, and delivery.', pageName: 'Menu', tags: ['Build Your Own', 'Combos'], live: true },
+              { type: 'Bakery & Café', slug: 'demo/bakery', name: 'Sweet Crumb Bakery', emoji: '🧁', color: 'from-pink-500 to-rose-500', description: 'Pre-orders, custom cakes, pastries, and coffee drinks.', pageName: 'Menu', tags: ['Pre-Order', 'Custom Cakes'], live: true },
+              { type: 'Grocery Store', slug: 'demo/grocery', name: 'Fresh Valley Market', emoji: '🛒', color: 'from-green-500 to-emerald-500', description: 'Online product catalog with curbside pickup & delivery.', pageName: 'Product Catalog', tags: ['Pickup', 'Delivery'], live: true },
+              { type: 'Boutique', slug: 'demo/boutique', name: 'Ivy & Thread', emoji: '👗', color: 'from-amber-500 to-orange-500', description: 'Clothing, accessories, and gifts with AI product listings.', pageName: 'Storefront', tags: ['Apparel', 'Accessories'], live: true },
+              { type: 'Antique Shop', slug: 'demo/antique', name: 'Timeless Treasures', emoji: '🏺', color: 'from-amber-600 to-yellow-600', description: 'Vintage finds with AI-powered photo-to-listing tool.', pageName: 'Product Gallery', tags: ['Vintage', 'Collectibles'], live: true },
+              { type: 'Convenience Store', slug: 'demo/convenience', name: 'QuickStop Mini Mart', emoji: '🏪', color: 'from-blue-500 to-indigo-500', description: 'Snacks, drinks, and essentials with grab-and-go ordering.', pageName: 'Quick-Shop', tags: ['Grab & Go', 'Essentials'], live: true },
             ].map((store, i) => (
               <motion.div
                 key={store.name}
@@ -267,14 +275,16 @@ export default function Home() {
                           href={`/${store.slug}`}
                           className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-900 text-white rounded-full font-bold text-sm hover:bg-black transition-colors"
                         >
-                          <FaPlay className="text-[10px]" /> View Storefront
+                          <FaPlay className="text-[10px]" /> {store.slug.startsWith('demo/') ? 'View Demo' : 'View Storefront'}
                         </Link>
-                        <Link
-                          href={`/order/${store.slug}`}
-                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-bold text-sm hover:shadow-lg hover:shadow-orange-500/20 transition-all"
-                        >
-                          <FaShoppingCart className="text-[10px]" /> Order Page
-                        </Link>
+                        {!store.slug.startsWith('demo/') && (
+                          <Link
+                            href={`/order/${store.slug}`}
+                            className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-bold text-sm hover:shadow-lg hover:shadow-orange-500/20 transition-all"
+                          >
+                            <FaShoppingCart className="text-[10px]" /> Order Page
+                          </Link>
+                        )}
                       </div>
                     ) : (
                       <div className="py-3 bg-zinc-100 text-zinc-400 rounded-full font-bold text-sm text-center cursor-not-allowed">
@@ -623,6 +633,8 @@ export default function Home() {
                 { href: '/for-convenience-stores', icon: FaCoffee, label: 'Stores' },
                 { href: '/for-retail-shops', icon: FaStore, label: 'Shops & Boutiques' },
                 { href: '/for-coffee-shops', icon: FaMugHot, label: 'Coffee Shops' },
+                { href: '/for-uber-drivers', icon: FaCar, label: 'Uber Drivers' },
+                { href: '/features/roadside-assistance', icon: FaWrench, label: 'Roadside Help' },
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-zinc-700 hover:border-white hover:bg-white/10 transition-all group">
                   <item.icon className="text-sm text-zinc-500 group-hover:text-orange-400 transition-colors" />

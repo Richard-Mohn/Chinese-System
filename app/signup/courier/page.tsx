@@ -9,6 +9,7 @@ import type { MohnMenuUser, CourierVehicle } from '@/lib/types';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FaArrowRight, FaBicycle, FaWalking, FaCar, FaMotorcycle } from 'react-icons/fa';
+import ApplicationBackgroundCheckModal from '@/components/ApplicationBackgroundCheckModal';
 
 const VEHICLE_OPTIONS: { value: CourierVehicle; label: string; icon: any; desc: string }[] = [
   { value: 'bike', label: 'Bicycle', icon: FaBicycle, desc: 'Great for short distances' },
@@ -31,11 +32,20 @@ export default function CourierSignupPage() {
   const [vehicle, setVehicle] = useState<CourierVehicle>('bike');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [bgModalOpen, setBgModalOpen] = useState(false);
+  const [bgCompleted, setBgCompleted] = useState(false);
+  const [bgSummary, setBgSummary] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!bgCompleted) {
+      setError('Please complete the required background check before applying.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -51,6 +61,8 @@ export default function CourierSignupPage() {
         role: 'driver_marketplace',
         businessIds: [],
         allowedBusinessIds: [],
+        backgroundCheckStatus: 'approved',
+        backgroundCheckDate: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -74,6 +86,7 @@ export default function CourierSignupPage() {
         acceptanceRate: 100,
         cancellationRate: 0,
         backgroundCheckStatus: 'pending',
+        backgroundCheckDate: new Date().toISOString(),
         licenseVerified: false,
         insuranceVerified: false,
         stripeAccountId: null,
@@ -205,6 +218,18 @@ export default function CourierSignupPage() {
             </div>
 
             <button
+              type="button"
+              onClick={() => setBgModalOpen(true)}
+              className={`w-full py-3 rounded-full font-bold text-sm border transition-colors ${
+                bgCompleted
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100'
+              }`}
+            >
+              {bgCompleted ? `Background Check Complete${bgSummary ? ` · ${bgSummary}` : ''}` : 'Run Background Check'}
+            </button>
+
+            <button
               type="submit"
               disabled={loading}
               className="w-full group bg-emerald-600 text-white py-5 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:bg-emerald-700 transition-all active:scale-[0.98] shadow-xl shadow-emerald-600/20 disabled:opacity-50"
@@ -247,6 +272,16 @@ export default function CourierSignupPage() {
           </div>
         </div>
       </motion.div>
+
+      <ApplicationBackgroundCheckModal
+        open={bgModalOpen}
+        onClose={() => setBgModalOpen(false)}
+        defaultFullName={displayName}
+        onComplete={(result) => {
+          setBgCompleted(true);
+          setBgSummary(`${result.recordCount} records scanned`);
+        }}
+      />
     </div>
   );
 }

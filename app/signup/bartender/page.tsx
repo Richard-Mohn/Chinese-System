@@ -13,6 +13,7 @@ import {
   FaExchangeAlt, FaHeart, FaDollarSign
 } from 'react-icons/fa';
 import FloatingStoreIcons from '@/components/FloatingStoreIcons';
+import ApplicationBackgroundCheckModal from '@/components/ApplicationBackgroundCheckModal';
 
 const SPECIALTIES = [
   'Craft Cocktails', 'Beer & Draft', 'Wine Sommelier', 'Mixology',
@@ -45,6 +46,9 @@ export default function BartenderSignup() {
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [selectedCerts, setSelectedCerts] = useState<string[]>([]);
   const [ageVerified, setAgeVerified] = useState(false);
+  const [bgModalOpen, setBgModalOpen] = useState(false);
+  const [bgCompleted, setBgCompleted] = useState(false);
+  const [bgSummary, setBgSummary] = useState('');
 
   const toggleSpecialty = (s: string) => {
     setSelectedSpecialties(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
@@ -60,6 +64,10 @@ export default function BartenderSignup() {
     }
     if (!ageVerified) {
       setError('You must confirm you are 18+ to serve alcohol.');
+      return;
+    }
+    if (!bgCompleted) {
+      setError('Please complete the required background check before finishing your application.');
       return;
     }
     setLoading(true);
@@ -87,6 +95,8 @@ export default function BartenderSignup() {
         totalShifts: 0,
         totalEarnings: 0,
         profileComplete: true,
+        backgroundCheckStatus: 'approved',
+        backgroundCheckDate: serverTimestamp(),
         createdAt: serverTimestamp(),
       });
       setStep(3);
@@ -262,6 +272,7 @@ export default function BartenderSignup() {
             <div>
               <label className="block text-sm font-bold text-black mb-1.5">Years of Experience</label>
               <select value={experience} onChange={e => setExperience(e.target.value)}
+                title="Years of experience"
                 className="w-full px-5 py-4 bg-zinc-50 rounded-2xl border border-zinc-200 text-black font-medium focus:ring-2 focus:ring-black focus:border-black outline-none">
                 <option value="">Select...</option>
                 <option value="0-1">Less than 1 year</option>
@@ -330,6 +341,17 @@ export default function BartenderSignup() {
                 className="px-6 py-4 text-zinc-600 font-bold rounded-full hover:bg-zinc-100 transition-all">
                 Back
               </button>
+              <button
+                type="button"
+                onClick={() => setBgModalOpen(true)}
+                className={`px-5 py-4 rounded-full font-bold text-sm border transition-colors ${
+                  bgCompleted
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100'
+                }`}
+              >
+                {bgCompleted ? `Check Complete${bgSummary ? ` · ${bgSummary}` : ''}` : 'Run Background Check'}
+              </button>
               <button onClick={handleSubmit} disabled={loading}
                 className="flex-1 py-4 bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-purple-500/20 transition-all disabled:opacity-40">
                 {loading ? (
@@ -380,6 +402,16 @@ export default function BartenderSignup() {
           </motion.div>
         )}
       </div>
+
+      <ApplicationBackgroundCheckModal
+        open={bgModalOpen}
+        onClose={() => setBgModalOpen(false)}
+        defaultFullName={name}
+        onComplete={(result) => {
+          setBgCompleted(true);
+          setBgSummary(`${result.recordCount} records scanned`);
+        }}
+      />
     </div>
   );
 }

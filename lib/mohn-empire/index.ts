@@ -29,8 +29,11 @@ export { MohnEmpireProvider, useMohnAuth } from './auth-context';
 
 // Points
 export { awardPoints, spendPoints, getPointsHistory, applyReferralBonus, awardDailyLogin } from './points';
+export { runBackgroundCheck } from './background-checks';
+export type { BackgroundCheckRequest, BackgroundCheckResult, BackgroundCheckStatus } from './background-checks';
 
 // Components
 export { MohnLoginModal } from './components/MohnLoginModal';
 export { MohnUserBadge } from './components/MohnUserBadge';
 export { EmpireFooterBar } from './components/EmpireFooterBar';
+export { default as BackgroundCheckPanel } from './components/BackgroundCheckPanel';

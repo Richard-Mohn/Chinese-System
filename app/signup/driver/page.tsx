@@ -9,6 +9,7 @@ import type { MohnMenuUser } from '@/lib/types';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FaArrowRight } from 'react-icons/fa';
+import ApplicationBackgroundCheckModal from '@/components/ApplicationBackgroundCheckModal';
 
 /**
  * Driver Signup Page
@@ -22,11 +23,20 @@ export default function DriverSignupPage() {
   const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [bgModalOpen, setBgModalOpen] = useState(false);
+  const [bgCompleted, setBgCompleted] = useState(false);
+  const [bgSummary, setBgSummary] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!bgCompleted) {
+      setError('Please complete the required background check before joining.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -74,6 +84,8 @@ export default function DriverSignupPage() {
         businessIds: [foundBusinessId],
         activeBusinessId: foundBusinessId,
         allowedBusinessIds: [foundBusinessId],
+        backgroundCheckStatus: 'approved',
+        backgroundCheckDate: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -176,6 +188,18 @@ export default function DriverSignupPage() {
             </div>
 
             <button
+              type="button"
+              onClick={() => setBgModalOpen(true)}
+              className={`w-full py-3 rounded-full font-bold text-sm border transition-colors ${
+                bgCompleted
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100'
+              }`}
+            >
+              {bgCompleted ? `Background Check Complete${bgSummary ? ` · ${bgSummary}` : ''}` : 'Run Background Check'}
+            </button>
+
+            <button
               type="submit"
               disabled={loading}
               className="w-full group bg-black text-white py-5 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:bg-zinc-800 transition-all active:scale-[0.98] shadow-xl disabled:opacity-50"
@@ -192,6 +216,16 @@ export default function DriverSignupPage() {
           </div>
         </div>
       </motion.div>
+
+      <ApplicationBackgroundCheckModal
+        open={bgModalOpen}
+        onClose={() => setBgModalOpen(false)}
+        defaultFullName={displayName}
+        onComplete={(result) => {
+          setBgCompleted(true);
+          setBgSummary(`${result.recordCount} records scanned`);
+        }}
+      />
     </div>
   );
 }

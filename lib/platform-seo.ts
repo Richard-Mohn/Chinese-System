@@ -633,6 +633,28 @@ export const FOR_RETAIL_METADATA: Metadata = {
   alternates: { canonical: `${BASE_URL}/for-retail-shops` },
 };
 
+export const FOR_UBER_DRIVERS_METADATA: Metadata = {
+  title: 'Driver Marketplace for Uber & Rideshare Drivers — MohnMenu',
+  description: 'Earn more between rides with MohnMenu Driver Marketplace. Accept local delivery requests and roadside assistance jobs like jump starts, lockouts, and tire help from one app.',
+  keywords: [
+    'uber driver side income',
+    'rideshare driver marketplace',
+    'driver roadside assistance app',
+    'jump start gig jobs',
+    'local delivery gigs for drivers',
+    'multi-service driver app',
+    'roadside dispatch platform',
+    'mohnmenu driver marketplace',
+  ].join(', '),
+  openGraph: buildOG(
+    'Driver Marketplace for Uber Drivers — MohnMenu',
+    'Accept local delivery and roadside jobs from one platform. Turn downtime into extra earnings.',
+    '/for-uber-drivers',
+  ),
+  twitter: buildTwitter('MohnMenu for Uber Drivers', 'Delivery + roadside gigs in one driver marketplace.'),
+  alternates: { canonical: `${BASE_URL}/for-uber-drivers` },
+};
+
 // ─────────────────────────────────────────────────────────────────
 // FEATURE SUBPAGE METADATA
 // ─────────────────────────────────────────────────────────────────
@@ -680,6 +702,18 @@ export const FEATURE_PAGES_METADATA: Record<string, Metadata> = {
     keywords: 'white label restaurant website, branded ordering site, restaurant website builder, custom online storefront',
     alternates: { canonical: `${BASE_URL}/features/white-label-website` },
   },
+  'roadside-assistance': {
+    title: 'Roadside Assistance Dispatch — MohnMenu Feature',
+    description: 'Dispatch nearby marketplace drivers for jump starts, lockouts, and tire support with live tracking and in-app completion workflow.',
+    keywords: 'roadside assistance dispatch, jump start app, lockout support, tire help dispatch, driver marketplace roadside service',
+    alternates: { canonical: `${BASE_URL}/features/roadside-assistance` },
+  },
+  'offerwall-rewards': {
+    title: 'Offerwall Rewards for Restaurants, Drivers & Churches — MohnMenu Feature',
+    description: 'Add an Earn page to your business website where customers complete app/game/video offers, earn wallet credits, and redeem them for food, drinks, and products.',
+    keywords: 'offerwall rewards for restaurants, earn credits for food, church fundraising offerwall, driver side earnings, app install rewards platform',
+    alternates: { canonical: `${BASE_URL}/features/offerwall-rewards` },
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────
@@ -722,6 +756,11 @@ export function generateIndustryJsonLd(industry: string) {
       name: 'MohnMenu for Retail Shops',
       description: 'Online storefront for retail shops and boutiques. Product catalogs, online ordering, local delivery, and curbside pickup.',
       applicationSubCategory: 'Retail Management Software',
+    },
+    'uber-drivers': {
+      name: 'MohnMenu for Uber Drivers',
+      description: 'Driver marketplace for rideshare drivers to accept delivery and roadside assistance jobs between rides.',
+      applicationSubCategory: 'Driver Marketplace Software',
     },
   };
 

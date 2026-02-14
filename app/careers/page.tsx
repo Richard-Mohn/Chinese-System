@@ -16,7 +16,7 @@ const ROLES = [
     icon: FaCoffee,
     description: 'Make specialty coffee at top shops. Latte art skills, pour-over expertise, and customer service.',
     color: 'from-amber-600 to-orange-700',
-    link: '/signup/bartender',
+    link: '/apply/bartender-server',
     perks: ['Flexible shifts', 'Tips + base pay', 'Work at multiple shops', 'Build your portfolio'],
   },
   {
@@ -24,7 +24,7 @@ const ROLES = [
     icon: FaGlassCheers,
     description: 'Craft cocktails at the hottest bars. Mixology, customer engagement, and speed pouring.',
     color: 'from-purple-500 to-violet-600',
-    link: '/signup/bartender',
+    link: '/apply/bartender-server',
     perks: ['Premium tips', 'Night & weekend shifts', 'Multi-venue access', 'Certification tracking'],
   },
   {
@@ -32,7 +32,7 @@ const ROLES = [
     icon: FaUtensils,
     description: 'Provide exceptional dining experiences. Table management, upselling, and guest satisfaction.',
     color: 'from-red-500 to-orange-500',
-    link: '/signup/bartender',
+    link: '/apply/bartender-server',
     perks: ['High-traffic restaurants', 'Tip pooling options', 'Cross-trained roles', 'Career advancement'],
   },
   {
@@ -40,7 +40,7 @@ const ROLES = [
     icon: FaTruck,
     description: 'Deliver food and drinks in your area. Use your own vehicle, bike, or scooter.',
     color: 'from-green-500 to-emerald-600',
-    link: '/signup/driver',
+    link: '/apply/delivery-driver',
     perks: ['Set your own hours', 'Keep 100% of tips', 'Low barrier to entry', 'Instant payouts'],
   },
   {
@@ -48,7 +48,7 @@ const ROLES = [
     icon: FaUtensils,
     description: 'Line cook, prep cook, or executive chef. Fast-paced kitchen environments with real experience.',
     color: 'from-orange-500 to-red-600',
-    link: '/signup/bartender',
+    link: '/apply/kitchen-staff',
     perks: ['Skill development', 'Multi-cuisine exposure', 'Shift meals', 'Career growth path'],
   },
   {
@@ -56,7 +56,7 @@ const ROLES = [
     icon: FaBriefcase,
     description: 'Oversee operations, staff, and revenue. Restaurant and hospitality management roles.',
     color: 'from-zinc-700 to-zinc-900',
-    link: '/signup/owner',
+    link: '/apply/operations-manager',
     perks: ['Leadership roles', 'Performance bonuses', 'Multi-location ops', 'Full dashboard access'],
   },
 ];
@@ -79,10 +79,10 @@ export default function CareersPage() {
             Bartenders, baristas, servers, drivers, and kitchen staff — create a verified profile, find shifts at top restaurants and coffee shops, and get paid. One profile, many venues.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="flex flex-wrap justify-center gap-4">
-            <Link href="/signup/bartender" className="group px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full font-bold text-lg flex items-center gap-3 hover:shadow-xl hover:shadow-emerald-500/20 transition-all">
-              Create Your Profile <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+            <Link href="/apply" className="group px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full font-bold text-lg flex items-center gap-3 hover:shadow-xl hover:shadow-emerald-500/20 transition-all">
+              Apply for Roles <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/signup/owner" className="px-10 py-5 bg-white text-black border-2 border-zinc-200 rounded-full font-bold text-lg hover:border-black transition-all">
+            <Link href="/apply/operations-manager" className="px-10 py-5 bg-white text-black border-2 border-zinc-200 rounded-full font-bold text-lg hover:border-black transition-all">
               I&apos;m Hiring
             </Link>
           </motion.div>
@@ -229,10 +229,10 @@ export default function CareersPage() {
           <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Your career in hospitality starts here.</h2>
           <p className="text-emerald-100 text-lg mb-10 max-w-xl mx-auto">Create your free profile. Find shifts. Get paid. One platform for every role in the industry.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup/bartender" className="group px-10 py-5 bg-white text-emerald-700 rounded-full font-bold text-lg flex items-center gap-3 hover:bg-emerald-50 transition-all">
-              Create Your Profile <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+            <Link href="/apply" className="group px-10 py-5 bg-white text-emerald-700 rounded-full font-bold text-lg flex items-center gap-3 hover:bg-emerald-50 transition-all">
+              Apply for Roles <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/signup/owner" className="px-10 py-5 border-2 border-white/50 text-white rounded-full font-bold text-lg hover:border-white transition-all">
+            <Link href="/apply/operations-manager" className="px-10 py-5 border-2 border-white/50 text-white rounded-full font-bold text-lg hover:border-white transition-all">
               I&apos;m a Business Owner
             </Link>
           </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   FaShoppingCart, FaMapMarkerAlt, FaBitcoin, FaTruck, FaDesktop,
-  FaBolt, FaPaintBrush, FaArrowRight, FaCheck, FaBicycle
+  FaBolt, FaPaintBrush, FaArrowRight, FaCheck, FaBicycle, FaWrench, FaGift
 } from 'react-icons/fa';
 
 const FEATURES = [
@@ -21,6 +21,20 @@ const FEATURES = [
     title: 'Community Courier',
     description: 'Hyper-local micro-delivery by bikes, scooters & walkers. Just $0.25 per order — no 30% commissions. Couriers sign up in under 60 seconds.',
     color: 'from-emerald-500 to-teal-500',
+  },
+  {
+    slug: 'offerwall-rewards',
+    icon: FaGift,
+    title: 'Offerwall Rewards',
+    description: 'Let customers earn via app installs, game levels, and reward videos, then spend credits on food, drinks, and products at your business.',
+    color: 'from-violet-500 to-purple-600',
+  },
+  {
+    slug: 'roadside-assistance',
+    icon: FaWrench,
+    title: 'Roadside Assistance',
+    description: 'Dispatch nearby verified drivers for jump starts, lockouts, and tire support through the same marketplace network.',
+    color: 'from-orange-500 to-amber-500',
   },
   {
     slug: 'gps-tracking',

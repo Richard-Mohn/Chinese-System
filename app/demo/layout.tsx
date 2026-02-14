@@ -1,4 +1,5 @@
 import { DEMO_METADATA, generateBreadcrumbJsonLd } from '@/lib/platform-seo';
+import DemoRouteBanner from './_components/DemoRouteBanner';
 export const metadata = DEMO_METADATA;
 
 const breadcrumb = generateBreadcrumbJsonLd([
@@ -10,6 +11,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <DemoRouteBanner />
       {children}
     </>
   );

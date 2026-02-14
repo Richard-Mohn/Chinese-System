@@ -21,7 +21,6 @@ import {
   FaDesktop,
 } from 'react-icons/fa';
 import FloatingStoreIcons from '@/components/FloatingStoreIcons';
-import DemoBanner, { type DemoAccount, type DemoQuickLink } from '@/components/DemoBanner';
 
 const SERVICE_TIMES = [
   { day: 'Sunday', time: '9:00 AM', label: 'Classic Service' },
@@ -51,89 +50,33 @@ const FEATURES = [
   { icon: FaBible, title: 'Sermon Library', desc: 'Series, notes, and discussion guides organized.' },
 ];
 
-const CHURCH_DEMO_ACCOUNTS: DemoAccount[] = [
+const DEMO_ACCOUNTS = [
   {
-    role: 'pastor',
-    label: 'Pastor Admin',
+    role: 'Pastor Admin',
     email: 'pastor@shepherdsgate.demo',
-    icon: FaUserTie,
-    color: 'from-emerald-500 to-teal-600',
-    description: 'Dashboard, giving insights, events, and member care.',
-    dashboardPath: '/owner',
+    desc: 'Dashboard, giving insights, events, and member care.',
   },
   {
-    role: 'media',
-    label: 'Media / AV',
+    role: 'Media / AV',
     email: 'media@shepherdsgate.demo',
-    icon: FaVideo,
-    color: 'from-indigo-500 to-sky-500',
-    description: 'Streaming console, run of service, and media cues.',
-    dashboardPath: '/owner/kds',
+    desc: 'Streaming console, run of service, and media cues.',
   },
   {
-    role: 'volunteer',
-    label: 'Volunteer Lead',
+    role: 'Volunteer Lead',
     email: 'volunteers@shepherdsgate.demo',
-    icon: FaHandsHelping,
-    color: 'from-amber-500 to-orange-500',
-    description: 'Schedules, rotations, and team communication.',
-    dashboardPath: '/owner/staff',
+    desc: 'Schedules, rotations, and team communication.',
   },
   {
-    role: 'care',
-    label: 'Care Team',
+    role: 'Care Team',
     email: 'care@shepherdsgate.demo',
-    icon: FaHeart,
-    color: 'from-pink-500 to-rose-500',
-    description: 'Prayer requests, follow-ups, and care workflows.',
-    dashboardPath: '/owner/website',
+    desc: 'Prayer requests, follow-ups, and care workflows.',
   },
   {
-    role: 'finance',
-    label: 'Finance / Giving',
+    role: 'Finance / Giving',
     email: 'finance@shepherdsgate.demo',
-    icon: FaDonate,
-    color: 'from-emerald-600 to-green-500',
-    description: 'Giving campaigns, receipts, and reporting.',
-    dashboardPath: '/owner/analytics',
+    desc: 'Giving campaigns, receipts, and reporting.',
   },
 ];
-
-const CHURCH_QUICK_LINKS: Record<string, DemoQuickLink[]> = {
-  pastor: [
-    { label: 'Dashboard', href: '/owner', icon: FaUserTie },
-    { label: 'Giving', href: '#giving', icon: FaDonate },
-    { label: 'Events', href: '#events', icon: FaCalendarAlt },
-  ],
-  media: [
-    { label: 'Projector', href: '/demo/shepherds-gate/menu-board', icon: FaTv },
-    { label: 'KDS', href: '/owner/kds', icon: FaDesktop },
-    { label: 'Stream Hub', href: '#streaming', icon: FaBroadcastTower },
-  ],
-  volunteer: [
-    { label: 'Teams', href: '/owner/staff', icon: FaHandsHelping },
-    { label: 'Events', href: '#events', icon: FaCalendarAlt },
-  ],
-  care: [
-    { label: 'Member Care', href: '#ministries', icon: FaUsers },
-    { label: 'Prayer Requests', href: '#events', icon: FaHeart },
-  ],
-  finance: [
-    { label: 'Giving', href: '#giving', icon: FaDonate },
-    { label: 'Analytics', href: '/owner/analytics', icon: FaDesktop },
-  ],
-  default: [
-    { label: 'Donate', href: '#giving', icon: FaDonate },
-    { label: 'Events', href: '#events', icon: FaCalendarAlt },
-    { label: 'Projector', href: '/demo/shepherds-gate/menu-board', icon: FaTv },
-  ],
-};
-
-const DEMO_ACCOUNTS = CHURCH_DEMO_ACCOUNTS.map((acct) => ({
-  role: acct.label,
-  email: acct.email,
-  desc: acct.description,
-}));
 
 export default function ShepherdsGateDemoPage() {
   return (
@@ -243,15 +186,6 @@ export default function ShepherdsGateDemoPage() {
           </motion.div>
         </div>
       </section>
-
-      <DemoBanner
-        businessSlug="shepherds-gate"
-        demoAccounts={CHURCH_DEMO_ACCOUNTS}
-        welcomeTitle="Welcome to the Shepherds Gate demo! Click any role below to instantly log in and explore the platform."
-        welcomeSubtitle="Each role highlights a church team: admin, media, volunteers, care, and finance."
-        roleQuickLinks={CHURCH_QUICK_LINKS}
-        backLinkHref="/demo/shepherds-gate"
-      />
 
       {/* Events + Giving */}
       <section id="events" className="py-24 px-4">

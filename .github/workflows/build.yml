@@ -1,4 +1,4 @@
-name: Build & Test
+name: CI Build Matrix
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  build:
+  web-build:
     runs-on: ubuntu-latest
     
     strategy:
@@ -22,24 +22,20 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: restaurant-app/package-lock.json
+        cache-dependency-path: package-lock.json
     
     - name: Install dependencies
-      working-directory: restaurant-app
       run: npm ci
     
     - name: Run type check
-      working-directory: restaurant-app
       run: npm run type-check
       continue-on-error: true
     
     - name: Run lint
-      working-directory: restaurant-app
       run: npm run lint
       continue-on-error: true
     
     - name: Build application
-      working-directory: restaurant-app
       run: npm run build
       env:
         NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
@@ -50,3 +46,24 @@ jobs:
         NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
         NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+
+  functions-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js for Functions
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24.x'
+        cache: 'npm'
+        cache-dependency-path: functions/package-lock.json
+
+    - name: Install Functions dependencies
+      working-directory: functions
+      run: npm ci
+
+    - name: Build Functions
+      working-directory: functions
+      run: npm run build
