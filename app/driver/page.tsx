@@ -108,8 +108,16 @@ export default function DriverDashboard() {
 
   // Auth guard
   useEffect(() => {
-    if (!loading && (!user || !isDriver())) {
+    if (!loading && !user) {
+      console.log('❌ Driver page: No user, redirecting to login');
       router.push('/login');
+      return;
+    }
+    
+    if (!loading && user && !isDriver()) {
+      console.log('⚠️ Driver page: User is not a driver, showing error');
+      alert('You need a driver role to access this page. Contact your business manager.');
+      router.push('/dashboard');
     }
   }, [user, loading, isDriver, router]);
 
@@ -441,30 +449,54 @@ export default function DriverDashboard() {
 
   // Go online — start GPS tracking
   const goOnline = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      console.error('❌ Go Online: No user');
+      alert('Please log in first');
+      return;
+    }
+    
+    console.log('🚀 Go Online clicked', { isCourier, businessId, userId: user.uid });
+    
     try {
       let cleanup: () => void;
       if (isCourier) {
         // Community courier — use shared courier RTDB path
+        console.log('📍 Starting courier tracking...');
         cleanup = await startCourierTracking(
           user.uid,
-          (location) => setCurrentLocation(location)
+          (location) => {
+            console.log('📍 Courier location updated:', location);
+            setCurrentLocation(location);
+          }
         );
         await updateCourierStatus(user.uid, 'idle');
+        console.log('✅ Courier tracking started');
       } else {
         // In-house driver — use business-specific path
+        if (!businessId) {
+          console.error('❌ No businessId for in-house driver');
+          alert('No business assigned. Contact your manager.');
+          return;
+        }
+        console.log('📍 Starting driver tracking for business:', businessId);
         cleanup = await startDriverTracking(
           businessId,
           user.uid,
-          (location) => setCurrentLocation(location)
+          (location) => {
+            console.log('📍 Driver location updated:', location);
+            setCurrentLocation(location);
+          }
         );
         await updateDriverStatus(businessId, user.uid, 'idle');
+        console.log('✅ Driver tracking started');
       }
       trackingCleanup.current = cleanup;
       setIsTracking(true);
       setDriverStatus('online');
-    } catch {
-      alert('Failed to start GPS. Enable location services.');
+      console.log('✅ Successfully went online');
+    } catch (error) {
+      console.error('❌ Failed to go online:', error);
+      alert(`Failed to start GPS: ${error instanceof Error ? error.message : 'Enable location services'}`);
     }
   }, [user, businessId, isCourier]);
 
