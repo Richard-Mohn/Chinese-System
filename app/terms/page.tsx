@@ -48,12 +48,12 @@ export default function Terms() {
             <section>
               <h2 className="text-2xl font-black text-black mb-4 tracking-tight uppercase italic">04. Fees &amp; Payments</h2>
               <p className="mb-4">
-                MohnMenu&apos;s core ordering platform is provided free of charge with zero commission on orders. Our revenue model is based on optional premium module subscriptions:
+                MohnMenu&apos;s core ordering platform uses transparent monthly subscriptions with zero commission on orders. New paid plans include a 3-day free trial:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-2">
-                <li><strong>Starter Plan (Free):</strong> Core ordering, menu management, QR ordering, basic analytics, and standard payment processing.</li>
-                <li><strong>Growth Plan ($47/month):</strong> Includes GPS fleet tracking, Chef&apos;s Eye live streaming, advanced analytics, Google ordering integration, and priority support.</li>
-                <li><strong>Enterprise Plan (Custom):</strong> Multi-location management, API access, custom integrations, dedicated account manager, and white-label options.</li>
+                <li><strong>Starter Plan ($39.99/month):</strong> Core ordering, menu management, QR ordering, and standard payment processing.</li>
+                <li><strong>Growth Plan ($79.99/month):</strong> Includes analytics, KDS, custom domain support, and managed support eligibility.</li>
+                <li><strong>Professional Plan ($99.99/month):</strong> Includes dispatch, fleet tools, live streaming, advanced integrations, and priority support.</li>
               </ul>
               <p className="mt-4">
                 Payment processing fees (e.g., Stripe&apos;s 2.9% + 30&cent;) are charged by the respective payment processor and are separate from MohnMenu&apos;s subscription pricing. Cryptocurrency transaction fees are determined by the blockchain network and NOWPayments.

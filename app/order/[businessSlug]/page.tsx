@@ -11,10 +11,11 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef, type MouseEvent as ReactMouseEvent } from 'react';
-import { collection, query, where, getDocs, addDoc, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, orderBy, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { authFetch } from '@/lib/authFetch';
 import type { MohnMenuBusiness } from '@/lib/types';
+import { useAuth } from '@/context/AuthContext';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { useCart, type CartItem } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,13 +23,14 @@ import {
   FaShoppingCart, FaPlus, FaMinus, FaTrash, FaTimes, FaCheck,
   FaMotorcycle, FaStore, FaSearch, FaFire, FaArrowLeft, FaCreditCard, FaLock,
   FaBitcoin, FaCopy, FaUtensils, FaCalendarAlt, FaUsers, FaClock, FaStar,
-  FaConciergeBell, FaGlassCheers,
+  FaConciergeBell, FaGlassCheers, FaGift, FaUserFriends,
 } from 'react-icons/fa';
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { QRCodeSVG } from 'qrcode.react';
 import LiveStaffSection from '@/components/LiveStaffSection';
 import DemoBanner from '@/components/DemoBanner';
+import PostOrderSignupModal from '@/components/PostOrderSignupModal';
 import {
   addToCartEvent, removeFromCartEvent, beginCheckout, purchase,
   viewItem, makeGtagItem, event as gtagEvent,
@@ -229,6 +231,24 @@ function getDefaultPriceKey(prices: Record<string, number>): string {
   return keys[0];
 }
 
+function stripUndefinedDeep<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map(stripUndefinedDeep) as T;
+  }
+
+  if (value && typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const next: Record<string, unknown> = {};
+    for (const [key, v] of Object.entries(obj)) {
+      if (v === undefined) continue;
+      next[key] = stripUndefinedDeep(v);
+    }
+    return next as T;
+  }
+
+  return value;
+}
+
 // ─── Main Component ──────────────────────────────────────────
 
 export default function OrderPage({
@@ -290,6 +310,8 @@ export default function OrderPage({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryLat, setDeliveryLat] = useState<number | null>(null);
+  const [deliveryLng, setDeliveryLng] = useState<number | null>(null);
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'crypto' | 'cash'>('card');
   const [tip, setTip] = useState(0);
@@ -312,11 +334,88 @@ export default function OrderPage({
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Delivery provider state
-  const [deliveryProvider, setDeliveryProvider] = useState<'community' | 'doordash' | 'uber'>('community');
-  const [deliveryQuotes, setDeliveryQuotes] = useState<Array<{ provider: string; fee: number; estimatedMinutes: number; quoteId: string }>>([]);
-  const [quotesLoading, setQuotesLoading] = useState(false);
+  const [deliveryProvider] = useState<'community'>('community');
 
+  // Order-for-friend state
+  const [orderForFriend, setOrderForFriend] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState<{id: string; name: string; email: string; address: string; lat?: number; lng?: number; acceptsOrders: boolean} | null>(null);
+  const [friendsList, setFriendsList] = useState<Array<{id: string; name: string; email: string; address: string; lat?: number; lng?: number; acceptsOrders: boolean}>>([]);
+  const [friendSearch, setFriendSearch] = useState('');
+
+  // Post-order signup modal state
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [completedOrderData, setCompletedOrderData] = useState<{
+    orderId: string;
+    email: string;
+    name: string;
+    phone: string;
+    stripeCustomerId?: string;
+  } | null>(null);
+
+  const { user, MohnMenuUser } = useAuth();
   const { cart, addToCart, removeFromCart, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCart();
+
+  useEffect(() => {
+    if (MohnMenuUser?.displayName && !customerName) {
+      setCustomerName(MohnMenuUser.displayName);
+    }
+    if (!email && (MohnMenuUser?.email || user?.email)) {
+      setEmail((MohnMenuUser?.email || user?.email || '').toLowerCase());
+    }
+  }, [MohnMenuUser?.displayName, MohnMenuUser?.email, user?.email, customerName, email]);
+
+  // ── Load friends list for order-for-friend feature ──
+  useEffect(() => {
+    const loadFriends = async () => {
+      if (!user) return;
+      try {
+        // Get accepted friendships
+        const friendshipsQuery = query(
+          collection(db, 'friendships'),
+          where('users', 'array-contains', user.uid)
+        );
+        const friendshipsSnap = await getDocs(friendshipsQuery);
+        const friendIds: string[] = [];
+        friendshipsSnap.forEach(doc => {
+          const data = doc.data();
+          const otherUser = data.users.find((id: string) => id !== user.uid);
+          if (otherUser) friendIds.push(otherUser);
+        });
+
+        if (friendIds.length === 0) {
+          setFriendsList([]);
+          return;
+        }
+
+        // Get friend profiles with acceptance status
+        const friendProfiles = await Promise.all(
+          friendIds.map(async (friendId) => {
+            const profileDoc = await getDoc(doc(db, 'customerProfiles', friendId));
+            const userDoc = await getDoc(doc(db, 'users', friendId));
+            if (profileDoc.exists()) {
+              const profileData = profileDoc.data();
+              const userData = userDoc.data();
+              return {
+                id: friendId,
+                name: profileData.displayName || userData?.displayName || 'Friend',
+                email: profileData.email || userData?.email || '',
+                address: (userData as any)?.address || '',
+                lat: (userData as any)?.lat,
+                lng: (userData as any)?.lng,
+                acceptsOrders: profileData.privacy?.acceptFriendOrders !== false,
+              };
+            }
+            return null;
+          })
+        );
+
+        setFriendsList(friendProfiles.filter(f => f !== null && f.acceptsOrders) as typeof friendsList);
+      } catch (err) {
+        console.error('Failed to load friends:', err);
+      }
+    };
+    loadFriends();
+  }, [user]);
 
   // ── Load business & menu ──
   useEffect(() => {
@@ -405,10 +504,15 @@ export default function OrderPage({
 
   // ── Build order data object ──
   const buildOrderData = () => {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedDeliveryAddress = deliveryAddress?.trim();
     const data: Record<string, any> = {
       businessId: business!.businessId,
+      customerId: user?.uid || null,
+      customerAuthUid: user?.uid || null,
       customerName,
-      customerEmail: email,
+      customerEmail: normalizedEmail,
+      customerEmailLower: normalizedEmail,
       customerPhone: phone,
       items: cart.map(item => ({
         menuItemId: item.id.split('-')[0],
@@ -436,7 +540,9 @@ export default function OrderPage({
 
     // Only include delivery fields when order type is delivery
     if (orderType === 'delivery') {
-      if (deliveryAddress) data.deliveryAddress = deliveryAddress;
+      if (normalizedDeliveryAddress) data.deliveryAddress = normalizedDeliveryAddress;
+      if (typeof deliveryLat === 'number') data.deliveryLat = deliveryLat;
+      if (typeof deliveryLng === 'number') data.deliveryLng = deliveryLng;
       if (deliveryInstructions) data.deliveryInstructions = deliveryInstructions;
       if (deliveryProvider) data.deliveryProvider = deliveryProvider;
     }
@@ -453,6 +559,18 @@ export default function OrderPage({
       };
       if (selectedStaffId) data.assignedStaffId = selectedStaffId;
       if (selectedStaffName) data.assignedStaffName = selectedStaffName;
+    }
+
+    // Include gift order fields when ordering for a friend
+    if (orderForFriend && selectedFriend) {
+      data.isGiftOrder = true;
+      data.giftRecipient = {
+        userId: selectedFriend.id,
+        name: selectedFriend.name,
+        email: selectedFriend.email,
+      };
+      data.giftFromName = customerName;
+      data.giftFromUserId = user?.uid || null;
     }
 
     return data;
@@ -496,6 +614,83 @@ export default function OrderPage({
     }
   };
 
+  // ── Create social feed post when order is placed ──
+  const createSocialPost = async (oId: string) => {
+    if (!user || !business) return;
+    try {
+      // Get user's privacy settings
+      const profileDoc = await getDoc(doc(db, 'customerProfiles', user.uid));
+      const profileData = profileDoc.data();
+      const privacy = profileData?.privacy || {};
+
+      // Only create post if user hasn't disabled social sharing
+      if (privacy.disableSocialPosts) return;
+
+      // Check if this is a gift order
+      const isGift = orderForFriend && selectedFriend;
+      const postContent = isGift 
+        ? `gifted ${selectedFriend!.name} an order from ${business.name}!`
+        : undefined;
+
+      await addDoc(collection(db, 'socialPosts'), {
+        userId: user.uid,
+        userName: user.displayName || customerName || 'Anonymous',
+        userPhoto: user.photoURL || null,
+        type: isGift ? 'gift_order' : 'order',
+        content: postContent,
+        orderData: {
+          businessName: business.name,
+          businessSlug: businessSlug,
+          items: cart.map(item => item.name),
+          total: total,
+          orderType: orderType,
+          ...(isGift ? { giftRecipient: selectedFriend!.name } : {}),
+        },
+        likes: [],
+        commentCount: 0,
+        createdAt: new Date(),
+        privacy: privacy.socialPostPrivacy || 'public',
+      });
+    } catch (err) {
+      console.error('Failed to create social post:', err);
+      // Don't block order if social post fails
+    }
+  };
+
+  // ── Handle gift order notification and stats ──
+  const handleGiftOrder = async (oId: string) => {
+    if (!orderForFriend || !selectedFriend || !user) return;
+    try {
+      // Send notification to friend (create a notification document)
+      await addDoc(collection(db, 'notifications'), {
+        userId: selectedFriend.id,
+        type: 'gift_order',
+        title: 'Gift Order Received!',
+        message: `${customerName} sent you a gift order from ${business!.name}`,
+        orderId: oId,
+        businessId: business!.businessId,
+        fromUserId: user.uid,
+        fromUserName: customerName,
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Update sender's friendsOrderedFor count
+      const senderProfileRef = doc(db, 'customerProfiles', user.uid);
+      const senderSnap = await getDoc(senderProfileRef);
+      if (senderSnap.exists()) {
+        await updateDoc(senderProfileRef, {
+          'stats.friendsOrderedFor': (senderSnap.data().stats?.friendsOrderedFor || 0) + 1,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      console.error('Failed to handle gift order:', err);
+      // Don't block order if notification fails
+    }
+  };
+
+
   // ── Place order ──
   const handlePlaceOrder = async () => {
     if (!business || cart.length === 0) return;
@@ -503,7 +698,7 @@ export default function OrderPage({
       alert('Please fill in your contact info.');
       return;
     }
-    if (orderType === 'delivery' && !deliveryAddress) {
+    if (orderType === 'delivery' && !deliveryAddress?.trim()) {
       alert('Please enter a delivery address.');
       return;
     }
@@ -518,7 +713,7 @@ export default function OrderPage({
     try {
       // For card payment — create order first, then show Stripe form
       if (paymentMethod === 'card') {
-        const orderData = { ...buildOrderData(), paymentStatus: 'awaiting_payment' };
+        const orderData = stripUndefinedDeep({ ...buildOrderData(), paymentStatus: 'awaiting_payment' });
         const docRef = await addDoc(
           collection(db, 'businesses', business.businessId, 'orders'),
           orderData
@@ -562,7 +757,7 @@ export default function OrderPage({
 
       // For crypto payment — create order, then get deposit address
       if (paymentMethod === 'crypto') {
-        const orderData = { ...buildOrderData(), paymentStatus: 'awaiting_crypto' };
+        const orderData = stripUndefinedDeep({ ...buildOrderData(), paymentStatus: 'awaiting_crypto' });
         const docRef = await addDoc(
           collection(db, 'businesses', business.businessId, 'orders'),
           orderData
@@ -601,7 +796,7 @@ export default function OrderPage({
       }
 
       // For cash payment — just place the order
-      const orderData = buildOrderData();
+      const orderData = stripUndefinedDeep(buildOrderData());
       const docRef = await addDoc(
         collection(db, 'businesses', business.businessId, 'orders'),
         orderData
@@ -609,6 +804,8 @@ export default function OrderPage({
 
       await createTrackingLink(docRef.id, business.businessId);
       await createDineInBooking(docRef.id, business.businessId);
+      await createSocialPost(docRef.id);
+      await handleGiftOrder(docRef.id);
 
       setOrderId(docRef.id);
       setOrderPlaced(true);
@@ -621,6 +818,17 @@ export default function OrderPage({
         { payment_type: 'cash' },
       );
       clearCart();
+      
+      // Show signup modal for guest users
+      if (!user && email) {
+        setCompletedOrderData({
+          orderId: docRef.id,
+          email,
+          name: customerName,
+          phone,
+        });
+        setTimeout(() => setShowSignupModal(true), 2500);
+      }
     } catch (err) {
       console.error('Order error:', err);
       alert('Failed to place order. Please try again.');
@@ -640,6 +848,9 @@ export default function OrderPage({
         updatedAt: new Date().toISOString(),
       });
 
+      await createSocialPost(pendingOrderId);
+      await handleGiftOrder(pendingOrderId);
+
       setOrderId(pendingOrderId);
       setOrderPlaced(true);
       setShowStripeForm(false);
@@ -652,6 +863,17 @@ export default function OrderPage({
         { payment_type: 'card' },
       );
       clearCart();
+      
+      // Show signup modal for guest users after card payment
+      if (!user && email) {
+        setCompletedOrderData({
+          orderId: pendingOrderId,
+          email,
+          name: customerName,
+          phone,
+        });
+        setTimeout(() => setShowSignupModal(true), 2500);
+      }
     } catch (err) {
       console.error('Failed to update order after payment:', err);
       // Payment went through, but order update failed — still show success
@@ -686,6 +908,10 @@ export default function OrderPage({
     } catch {
       /* payment confirmed on-chain — still show success */
     }
+    
+    await createSocialPost(pendingOrderId);
+    await handleGiftOrder(pendingOrderId);
+    
     setOrderId(pendingOrderId);
     setOrderPlaced(true);
     setShowCryptoModal(false);
@@ -700,6 +926,17 @@ export default function OrderPage({
       { payment_type: 'crypto' },
     );
     clearCart();
+    
+    // Show signup modal for guest users after crypto payment
+    if (!user && email) {
+      setCompletedOrderData({
+        orderId: pendingOrderId,
+        email,
+        name: customerName,
+        phone,
+      });
+      setTimeout(() => setShowSignupModal(true), 2500);
+    }
   };
 
   // Copy crypto address to clipboard
@@ -804,6 +1041,12 @@ export default function OrderPage({
             className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-full font-bold hover:bg-zinc-800 transition-all w-full justify-center"
           >
             Back to {business.name}
+          </a>
+          <a
+            href="/rewards"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-zinc-100 text-zinc-800 rounded-full font-bold hover:bg-zinc-200 transition-all w-full justify-center mt-3"
+          >
+            Earn Credits with Offers
           </a>
         </motion.div>
       </div>
@@ -1483,14 +1726,21 @@ export default function OrderPage({
                     </motion.div>
                   )}
 
-                  {/* Third-party delivery options */}
-                  {orderType === 'delivery' && business?.settings?.thirdPartyDelivery?.enabled && (
+                  {/* External marketplace links (optional) */}
+                  {orderType === 'delivery' && (
+                    business.settings?.thirdPartyDelivery?.uberEatsUrl ||
+                    business.settings?.thirdPartyDelivery?.doordashUrl ||
+                    business.settings?.thirdPartyDelivery?.grubhubUrl
+                  ) && (
                     <div className="mt-4 bg-zinc-50 rounded-xl p-4 space-y-3">
-                      <p className="text-xs font-bold text-zinc-500">Also available via:</p>
+                      <p className="text-xs font-bold text-zinc-500">Existing marketplace listings:</p>
+                      <p className="text-[11px] text-zinc-500">
+                        Ordering on MohnMenu does not affect your existing Uber Eats, DoorDash, or Grubhub storefront listings.
+                      </p>
                       <div className="flex flex-wrap gap-2">
-                        {business.settings.thirdPartyDelivery.uberEatsUrl && (
+                        {business.settings?.thirdPartyDelivery?.uberEatsUrl && (
                           <a
-                            href={business.settings.thirdPartyDelivery.uberEatsUrl}
+                            href={business.settings.thirdPartyDelivery!.uberEatsUrl!}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl text-xs font-bold hover:bg-zinc-800 transition-all"
@@ -1498,9 +1748,9 @@ export default function OrderPage({
                             🟢 Uber Eats
                           </a>
                         )}
-                        {business.settings.thirdPartyDelivery.doordashUrl && (
+                        {business.settings?.thirdPartyDelivery?.doordashUrl && (
                           <a
-                            href={business.settings.thirdPartyDelivery.doordashUrl}
+                            href={business.settings.thirdPartyDelivery!.doordashUrl!}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-all"
@@ -1508,9 +1758,9 @@ export default function OrderPage({
                             🔴 DoorDash
                           </a>
                         )}
-                        {business.settings.thirdPartyDelivery.grubhubUrl && (
+                        {business.settings?.thirdPartyDelivery?.grubhubUrl && (
                           <a
-                            href={business.settings.thirdPartyDelivery.grubhubUrl}
+                            href={business.settings.thirdPartyDelivery!.grubhubUrl!}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-xl text-xs font-bold hover:bg-orange-600 transition-all"
@@ -1533,6 +1783,101 @@ export default function OrderPage({
                   </div>
                 </div>
 
+                {/* Order for a Friend */}
+                {user && orderType === 'delivery' && friendsList.length > 0 && (
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+                    <label className="flex items-center gap-3 cursor-pointer mb-3">
+                      <input
+                        type="checkbox"
+                        checked={orderForFriend}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setOrderForFriend(checked);
+                          if (!checked) {
+                            setSelectedFriend(null);
+                            setFriendSearch('');
+                          }
+                        }}
+                        className="w-5 h-5 rounded border-orange-300 text-orange-600 focus:ring-orange-500"
+                      />
+                      <div className="flex items-center gap-2">
+                        <FaGift className="text-orange-600" />
+                        <span className="text-sm font-black text-black">Order for a friend?</span>
+                      </div>
+                    </label>
+                    
+                    {orderForFriend && (
+                      <div className="space-y-3">
+                        <p className="text-xs text-orange-700 font-medium">
+                          Send a gift order to a friend! They’ll receive a notification when it arrives.
+                        </p>
+                        
+                        {/* Friend search/select */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={friendSearch}
+                            onChange={(e) => setFriendSearch(e.target.value)}
+                            placeholder="Search for a friend..."
+                            className="w-full px-4 py-3 border border-orange-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                          />
+                          
+                          {friendSearch && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-orange-200 rounded-xl shadow-lg max-h-48 overflow-y-auto z-20">
+                              {friendsList
+                                .filter(f => 
+                                  f.name.toLowerCase().includes(friendSearch.toLowerCase()) ||
+                                  f.email.toLowerCase().includes(friendSearch.toLowerCase())
+                                )
+                                .slice(0, 10)
+                                .map(friend => (
+                                  <button
+                                    key={friend.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedFriend(friend);
+                                      setFriendSearch(friend.name);
+                                      // Auto-fill friend's address if available
+                                      if (friend.address) {
+                                        setDeliveryAddress(friend.address);
+                                        if (friend.lat && friend.lng) {
+                                          setDeliveryLat(friend.lat);
+                                          setDeliveryLng(friend.lng);
+                                        }
+                                      }
+                                    }}
+                                    className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors text-sm border-b border-orange-100 last:border-b-0"
+                                  >
+                                    <div className="font-bold text-black">{friend.name}</div>
+                                    <div className="text-xs text-zinc-500">{friend.email}</div>
+                                  </button>
+                                ))
+                              }
+                            </div>
+                          )}
+                        </div>
+                        
+                        {selectedFriend && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-orange-200">
+                            <FaUserFriends className="text-orange-600" />
+                            <span className="text-sm font-bold text-black flex-1">{selectedFriend.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedFriend(null);
+                                setFriendSearch('');
+                              }}
+                              className="text-xs text-orange-600 hover:text-orange-700"
+                            >
+                              Change
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Delivery address */}
                 {orderType === 'delivery' && (
                   <div>
@@ -1541,7 +1886,20 @@ export default function OrderPage({
                       <AddressAutocomplete
                         value={deliveryAddress}
                         onChange={setDeliveryAddress}
-                        onSelect={(parsed) => setDeliveryAddress(parsed.formatted)}
+                        onSelect={(parsed) => {
+                          setDeliveryAddress(parsed.formatted);
+                          // Ensure we have valid coordinates
+                          const nextLat = Number(parsed.lat);
+                          const nextLng = Number(parsed.lng);
+                          if (Number.isFinite(nextLat) && Number.isFinite(nextLng)) {
+                            setDeliveryLat(nextLat);
+                            setDeliveryLng(nextLng);
+                          } else {
+                            console.warn('[Order] Invalid coordinates from address autocomplete:', parsed);
+                            setDeliveryLat(null);
+                            setDeliveryLng(null);
+                          }
+                        }}
                         placeholder="Start typing your address…"
                         inputClassName="border-zinc-200 font-medium"
                       />
@@ -1550,61 +1908,25 @@ export default function OrderPage({
                   </div>
                 )}
 
-                {/* Delivery provider selection — shown when business has white-label delivery enabled */}
-                {orderType === 'delivery' && business?.settings?.thirdPartyDelivery?.enabled && business.settings.thirdPartyDelivery.whiteLabel && (
+                {/* Delivery method */}
+                {orderType === 'delivery' && (
                   <div>
                     <h3 className="text-sm font-black text-black mb-3">Delivery Method</h3>
                     <div className="space-y-2">
                       <button
                         type="button"
-                        onClick={() => setDeliveryProvider('community')}
-                        className={`w-full px-4 py-3 rounded-xl text-left flex items-center justify-between transition-all ${
-                          deliveryProvider === 'community' ? 'bg-black text-white ring-2 ring-black' : 'bg-zinc-50 hover:bg-zinc-100 border border-zinc-200'
-                        }`}
+                        className="w-full px-4 py-3 rounded-xl text-left flex items-center justify-between bg-black text-white ring-2 ring-black"
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-lg">🚴</span>
                           <div>
                             <div className="text-sm font-bold">Community Courier</div>
-                            <div className={`text-[11px] ${deliveryProvider === 'community' ? 'text-zinc-300' : 'text-zinc-400'}`}>Local walker, biker, or scooter</div>
+                            <div className="text-[11px] text-zinc-300">Local walker, biker, or scooter</div>
                           </div>
                         </div>
                         <div className="text-sm font-black">${(business.settings?.pricing?.deliveryFee || 3.99).toFixed(2)}</div>
                       </button>
-
-                      {(business.settings.thirdPartyDelivery.providers || []).includes('doordash') && (
-                        <div
-                          className="w-full px-4 py-3 rounded-xl text-left flex items-center justify-between bg-zinc-50 border border-zinc-200 opacity-60 cursor-not-allowed"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg">🔴</span>
-                            <div>
-                              <div className="text-sm font-bold text-zinc-400">Express Delivery</div>
-                              <div className="text-[11px] text-zinc-400">Professional driver • ~25-40 min</div>
-                            </div>
-                          </div>
-                          <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full border border-amber-200">Coming Soon</span>
-                        </div>
-                      )}
-
-                      {(business.settings.thirdPartyDelivery.providers || []).includes('uber') && (
-                        <div
-                          className="w-full px-4 py-3 rounded-xl text-left flex items-center justify-between bg-zinc-50 border border-zinc-200 opacity-60 cursor-not-allowed"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg">⬛</span>
-                            <div>
-                              <div className="text-sm font-bold text-zinc-400">Premium Delivery</div>
-                              <div className="text-[11px] text-zinc-400">Professional driver • ~20-35 min</div>
-                            </div>
-                          </div>
-                          <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full border border-amber-200">Coming Soon</span>
-                        </div>
-                      )}
                     </div>
-                    {quotesLoading && (
-                      <p className="text-xs text-zinc-400 mt-2 animate-pulse">Getting delivery quotes…</p>
-                    )}
                   </div>
                 )}
 
@@ -1994,6 +2316,23 @@ export default function OrderPage({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Post-Order Signup Modal */}
+      {completedOrderData && (
+        <PostOrderSignupModal
+          isOpen={showSignupModal}
+          onClose={() => {
+            setShowSignupModal(false);
+            setCompletedOrderData(null);
+          }}
+          customerEmail={completedOrderData.email}
+          customerName={completedOrderData.name}
+          customerPhone={completedOrderData.phone}
+          orderId={completedOrderData.orderId}
+          businessId={business.businessId}
+          stripeCustomerId={completedOrderData.stripeCustomerId}
+        />
+      )}
     </div>
   );
 }

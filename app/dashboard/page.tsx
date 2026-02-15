@@ -24,8 +24,11 @@ export default function DashboardRouter() {
     } else if (role === 'driver_inhouse' || role === 'driver_marketplace' || role === 'driver') {
       router.push('/driver');
     } else if (role === 'staff') {
-      // Staff (bartender/server) — go to KDS / Orders inside owner dashboard
-      router.push('/owner/kds');
+      const staffRole = String((MohnMenuUser as any)?.staffRole || '').toLowerCase();
+      // Staff landing pages:
+      // - bartender → KDS
+      // - server/both → Orders (so they can advance delivery orders to "ready")
+      router.push(staffRole === 'bartender' ? '/owner/kds' : '/owner/orders');
     } else if (role === 'customer') {
       router.push('/customer');
     } else if (role === 'admin') {

@@ -73,6 +73,8 @@ export default function OnboardingPage() {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [zipCode, setZipCode] = useState('');
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
   const [description, setDescription] = useState('');
 
   const slug = generateSlug(businessName, city);
@@ -128,6 +130,20 @@ export default function OnboardingPage() {
     setError('');
 
     try {
+      const now = new Date();
+      const trialEnds = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+      let resolvedLatitude = latitude;
+      let resolvedLongitude = longitude;
+
+      if (resolvedLatitude === null || resolvedLongitude === null) {
+        const coords = await geocodeAddress(`${address.trim()}, ${city.trim()}, ${state.toUpperCase()} ${zipCode.trim()}`);
+        if (coords) {
+          resolvedLatitude = coords.lat;
+          resolvedLongitude = coords.lng;
+        }
+      }
+
       // Create business document
       const businessRef = doc(collection(db, 'businesses'));
       const businessId = businessRef.id;
@@ -139,9 +155,10 @@ export default function OnboardingPage() {
         ownerId: user.uid,
         type: businessType as MohnMenuBusiness['type'],
         description: description.trim() || undefined,
-        tier: 'free' as const,
-        subscriptionStatus: 'active' as const,
-        subscriptionStartDate: new Date().toISOString(),
+        tier: 'starter' as const,
+        subscriptionStatus: 'trial' as const,
+        subscriptionStartDate: now.toISOString(),
+        subscriptionEndDate: trialEnds.toISOString(),
         brandColors: {
           primary: '#000000',
           secondary: '#4F46E5',
@@ -154,8 +171,8 @@ export default function OnboardingPage() {
         city: city.trim(),
         state: state.toUpperCase(),
         zipCode: zipCode.trim(),
-        latitude: 0,
-        longitude: 0,
+        latitude: resolvedLatitude ?? 0,
+        longitude: resolvedLongitude ?? 0,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         website: {
           enabled: true,
@@ -202,8 +219,8 @@ export default function OnboardingPage() {
         maxInhouseDrivers: 0,
         inHouseDriverIds: [],
         staffCount: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
       };
 
       // Save business
@@ -431,6 +448,8 @@ export default function OnboardingPage() {
                       setCity(parsed.city);
                       setState(parsed.state);
                       setZipCode(parsed.zipCode);
+                      setLatitude(parsed.lat);
+                      setLongitude(parsed.lng);
                     }}
                     label="Street Address *"
                     placeholder="Start typing your business address…"
@@ -561,4 +580,24 @@ export default function OnboardingPage() {
       </motion.div>
     </div>
   );
+}
+
+async function geocodeAddress(fullAddress: string): Promise<{ lat: number; lng: number } | null> {
+  const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!key) return null;
+
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(fullAddress)}&key=${key}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const loc = data?.results?.[0]?.geometry?.location;
+    if (typeof loc?.lat === 'number' && typeof loc?.lng === 'number') {
+      return { lat: loc.lat, lng: loc.lng };
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }

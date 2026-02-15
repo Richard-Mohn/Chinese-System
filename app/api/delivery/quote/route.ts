@@ -1,15 +1,13 @@
 /**
  * Delivery Quote API — GET /api/delivery/quote
  * 
- * Gets delivery fee quotes from available third-party providers
- * (DoorDash Drive + Uber Direct) for the specified pickup/dropoff.
+ * Gets the community courier delivery quote for the specified pickup/dropoff.
  * 
  * Query params: businessId, orderId, dropoffAddress, dropoffPhone, dropoffName
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyApiAuth } from '@/lib/apiAuth';
-import { getDeliveryQuotes, getAvailableProviders, type DeliveryRequest } from '@/lib/deliveryProviders';
 import { adminDb } from '@/lib/firebaseAdmin';
 
 export async function GET(request: NextRequest) {
@@ -38,52 +36,18 @@ export async function GET(request: NextRequest) {
       .filter(Boolean)
       .join(', ');
 
-    // Check if business has third-party delivery enabled
-    if (!business.settings?.thirdPartyDelivery?.enabled) {
-      return NextResponse.json({
-        quotes: [],
-        available: ['community'],
-        message: 'Third-party delivery not enabled for this business',
-      });
-    }
-
-    const enabledProviders = business.settings.thirdPartyDelivery.providers || ['doordash', 'uber'];
-    const available = getAvailableProviders().filter(
-      (p) => p === 'community' || enabledProviders.includes(p)
-    );
-
-    const req: DeliveryRequest = {
-      orderId: `quote-${Date.now()}`,
-      businessId,
-      pickupAddress,
-      pickupPhone: business.businessPhone || business.ownerPhone || '',
-      pickupBusinessName: business.name || 'Restaurant',
-      dropoffAddress,
-      dropoffPhone,
-      dropoffName,
-      orderValue: 0, // Not needed for quotes
-      tip: 0,
-      items: [],
-    };
-
-    const quotes = await getDeliveryQuotes(
-      req,
-      available.filter((p): p is 'doordash' | 'uber' => p !== 'community'),
-    );
-
-    // Add community courier option with the business's configured delivery fee
     const deliveryFee = business.settings?.pricing?.deliveryFee || 3.99;
-    quotes.push({
+    const quotes = [{
       provider: 'community',
       fee: Math.round(deliveryFee * 100), // Convert to cents
       estimatedMinutes: 30,
       quoteId: 'community',
       expiresAt: new Date(Date.now() + 30 * 60_000).toISOString(),
-    });
+    }];
 
     return NextResponse.json({
-      quotes: quotes.sort((a, b) => a.fee - b.fee),
-      available,
+      quotes,
+      available: ['community'],
     });
   } catch (err) {
     console.error('[API] Delivery quote error:', err);

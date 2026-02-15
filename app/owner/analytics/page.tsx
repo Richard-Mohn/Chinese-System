@@ -3,7 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import GatedPage from '@/components/GatedPage';
 import { useEffect, useState, useCallback } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { authFetch } from '@/lib/authFetch';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +15,7 @@ import {
   FaUsers, FaSignal, FaClipboardList,
 } from 'react-icons/fa';
 
-type Tab = 'overview' | 'seo' | 'traffic' | 'live';
+type Tab = 'overview' | 'seo' | 'traffic' | 'live' | 'staff';
 
 interface DayStat { date: string; orders: number; revenue: number }
 interface TopItem { name: string; count: number; revenue: number }
@@ -206,6 +206,7 @@ function OwnerAnalyticsPage() {
     { id: 'seo', label: 'SEO', icon: FaSearch, requiresTier: 'growth', beta: true },
     { id: 'traffic', label: 'Traffic', icon: FaGlobe, requiresTier: 'growth', beta: true },
     { id: 'live', label: 'Live', icon: FaSignal, requiresTier: 'professional', beta: true },
+    { id: 'staff', label: 'Staff', icon: FaUsers },
   ];
 
   return (
@@ -286,14 +287,14 @@ function OwnerAnalyticsPage() {
             hasGrowth ? (
               <SeoTab data={seoData} loading={seoLoading} error={seoError} onRefresh={fetchSeoData} slug={slug} />
             ) : (
-              <UpgradeGate feature="SEO Analytics" tier="Growth" price="$49.99/mo" />
+              <UpgradeGate feature="SEO Analytics" tier="Growth" price="$79.99/mo" />
             )
           )}
           {activeTab === 'traffic' && (
             hasGrowth ? (
               <TrafficTab data={trafficData} loading={trafficLoading} error={trafficError} onRefresh={fetchTrafficData} />
             ) : (
-              <UpgradeGate feature="Traffic Analytics" tier="Growth" price="$49.99/mo" />
+              <UpgradeGate feature="Traffic Analytics" tier="Growth" price="$79.99/mo" />
             )
           )}
           {activeTab === 'live' && (
@@ -302,6 +303,9 @@ function OwnerAnalyticsPage() {
             ) : (
               <UpgradeGate feature="Live Visitor Dashboard" tier="Professional" price="$99.99/mo" />
             )
+          )}
+          {activeTab === 'staff' && (
+            <StaffTab businessId={currentBusiness.businessId} />
           )}
         </motion.div>
       </AnimatePresence>
@@ -1067,6 +1071,213 @@ function LiveTab({ data, loading, onRefresh }: {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Staff Analytics Tab ─────────────────────────────────────
+
+interface StaffSummary {
+  staffId: string;
+  staffName: string;
+  staffRole: string;
+  totalActions: number;
+  foodItemsCount: number;
+  drinkItemsCount: number;
+  ordersBumped: number;
+  statusChanges: number;
+  deliveries: number;
+}
+
+function StaffTab({ businessId }: { businessId: string }) {
+  const [loading, setLoading] = useState(true);
+  const [staffSummaries, setStaffSummaries] = useState<StaffSummary[]>([]);
+  const [rangeDays, setRangeDays] = useState(1); // default: today
+
+  useEffect(() => {
+    if (!businessId) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const now = new Date();
+        const start = new Date(now);
+        start.setDate(start.getDate() - rangeDays);
+        start.setHours(0, 0, 0, 0);
+
+        const activityRef = collection(db, 'businesses', businessId, 'staffActivity');
+        const q = query(
+          activityRef,
+          where('createdAt', '>=', Timestamp.fromDate(start)),
+          orderBy('createdAt', 'desc'),
+        );
+
+        const snap = await getDocs(q);
+        const byStaff = new Map<string, StaffSummary>();
+
+        snap.forEach((doc) => {
+          const d = doc.data();
+          const id = d.staffId || 'unknown';
+          if (!byStaff.has(id)) {
+            byStaff.set(id, {
+              staffId: id,
+              staffName: d.staffName || 'Unknown',
+              staffRole: d.staffRole || 'staff',
+              totalActions: 0,
+              foodItemsCount: 0,
+              drinkItemsCount: 0,
+              ordersBumped: 0,
+              statusChanges: 0,
+              deliveries: 0,
+            });
+          }
+
+          const s = byStaff.get(id)!;
+          s.totalActions++;
+          s.foodItemsCount += d.foodItemCount || 0;
+          s.drinkItemsCount += d.drinkItemCount || 0;
+
+          if (d.action === 'order_bumped') s.ordersBumped++;
+          if (d.action === 'order_status_changed') s.statusChanges++;
+          if (d.action === 'delivery_completed') s.deliveries++;
+        });
+
+        const summaries = Array.from(byStaff.values()).sort((a, b) => b.totalActions - a.totalActions);
+        setStaffSummaries(summaries);
+      } catch (err) {
+        console.error('Failed to fetch staff activity:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [businessId, rangeDays]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const totalFood = staffSummaries.reduce((s, x) => s + x.foodItemsCount, 0);
+  const totalDrinks = staffSummaries.reduce((s, x) => s + x.drinkItemsCount, 0);
+  const totalActions = staffSummaries.reduce((s, x) => s + x.totalActions, 0);
+
+  return (
+    <div className="space-y-6">
+      {/* Range selector */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-black text-black">Staff Performance</h2>
+        <select
+          value={rangeDays}
+          onChange={e => setRangeDays(parseInt(e.target.value))}
+          className="px-4 py-2 border border-zinc-200 rounded-xl text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-black"
+        >
+          <option value={1}>Today</option>
+          <option value={7}>Last 7 days</option>
+          <option value={14}>Last 14 days</option>
+          <option value={30}>Last 30 days</option>
+        </select>
+      </div>
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl border border-zinc-100 p-5 text-center">
+          <p className="text-3xl font-black text-black">{totalActions}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-1">Total Actions</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-zinc-100 p-5 text-center">
+          <p className="text-3xl font-black text-orange-500">{totalFood}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-1">Food Items</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-zinc-100 p-5 text-center">
+          <p className="text-3xl font-black text-blue-500">{totalDrinks}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-1">Drinks Made</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-zinc-100 p-5 text-center">
+          <p className="text-3xl font-black text-emerald-500">{staffSummaries.length}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-1">Active Staff</p>
+        </div>
+      </div>
+
+      {/* Staff leaderboard */}
+      {staffSummaries.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-zinc-100 p-10 text-center">
+          <p className="text-4xl mb-3">📊</p>
+          <h3 className="text-lg font-black text-black mb-1">No Staff Activity Yet</h3>
+          <p className="text-zinc-400 text-sm">
+            Staff activity will appear here as your team processes orders, bumps items on KDS, and makes deliveries.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
+          <div className="px-5 py-4 border-b border-zinc-100">
+            <h3 className="text-sm font-black uppercase tracking-widest text-zinc-400">Staff Leaderboard</h3>
+          </div>
+          <div className="divide-y divide-zinc-50">
+            {staffSummaries.map((s, idx) => (
+              <div key={s.staffId} className="px-5 py-4 flex items-center gap-4 hover:bg-zinc-50 transition-colors">
+                {/* Rank */}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-black ${
+                  idx === 0 ? 'bg-yellow-100 text-yellow-700' :
+                  idx === 1 ? 'bg-zinc-100 text-zinc-600' :
+                  idx === 2 ? 'bg-orange-100 text-orange-700' :
+                  'bg-zinc-50 text-zinc-400'
+                }`}>
+                  {idx + 1}
+                </div>
+
+                {/* Name & role */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-black text-sm truncate">{s.staffName}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 capitalize">{s.staffRole.replace(/_/g, ' ')}</p>
+                </div>
+
+                {/* Stats */}
+                <div className="flex gap-4 text-right">
+                  {s.foodItemsCount > 0 && (
+                    <div>
+                      <p className="text-sm font-black text-orange-500">{s.foodItemsCount}</p>
+                      <p className="text-[8px] font-bold uppercase text-zinc-400">Food</p>
+                    </div>
+                  )}
+                  {s.drinkItemsCount > 0 && (
+                    <div>
+                      <p className="text-sm font-black text-blue-500">{s.drinkItemsCount}</p>
+                      <p className="text-[8px] font-bold uppercase text-zinc-400">Drinks</p>
+                    </div>
+                  )}
+                  {s.ordersBumped > 0 && (
+                    <div>
+                      <p className="text-sm font-black text-purple-500">{s.ordersBumped}</p>
+                      <p className="text-[8px] font-bold uppercase text-zinc-400">Bumped</p>
+                    </div>
+                  )}
+                  {s.statusChanges > 0 && (
+                    <div>
+                      <p className="text-sm font-black text-emerald-500">{s.statusChanges}</p>
+                      <p className="text-[8px] font-bold uppercase text-zinc-400">Status</p>
+                    </div>
+                  )}
+                  {s.deliveries > 0 && (
+                    <div>
+                      <p className="text-sm font-black text-indigo-500">{s.deliveries}</p>
+                      <p className="text-[8px] font-bold uppercase text-zinc-400">Deliveries</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-black text-black">{s.totalActions}</p>
+                    <p className="text-[8px] font-bold uppercase text-zinc-400">Total</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

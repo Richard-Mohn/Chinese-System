@@ -195,7 +195,7 @@ export default function FeaturesIndex() {
               'Real-time order notifications',
               'Auto-generated SEO website',
               'Custom domain registration ($14.99/yr)',
-              '14-day free trial on all plans',
+              '3-day free trial on all plans',
             ].map((feature, i) => (
               <motion.div
                 key={i}
@@ -222,7 +222,7 @@ export default function FeaturesIndex() {
                 Ready to get started?
               </h2>
               <p className="text-zinc-400 text-lg mb-10 max-w-xl mx-auto">
-                14-day free trial. No credit card. No commitment. Launch your store today.
+                3-day free trial. No credit card. No commitment. Launch your store today.
               </p>
               <Link
                 href="/register"

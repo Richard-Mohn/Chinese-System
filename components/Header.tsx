@@ -11,7 +11,7 @@ import {
   FaShoppingCart, FaUtensils, FaCoffee, FaDesktop, FaTruck,
   FaClipboardList, FaGlobe, FaBirthdayCake, FaShoppingBasket,
   FaGlassCheers, FaStore, FaBicycle, FaCalendarAlt, FaUserTie, FaMusic,
-  FaChurch, FaMugHot, FaCar, FaWrench,
+  FaChurch, FaMugHot, FaCar, FaWrench, FaBox,
   FaGamepad, FaDragon, FaCoins, FaUsers, FaGift
 } from 'react-icons/fa';
 import { useAuthModal } from '@/context/AuthModalContext';
@@ -44,7 +44,8 @@ const featureItems = [
   { href: '/features/staff-marketplace', icon: FaUserTie, label: 'Staff Marketplace', desc: 'Bartender & server multi-venue work' },
   { href: '/features/bar-entertainment', icon: FaMusic, label: 'Bar Entertainment', desc: 'Jukebox, karaoke & kiosk ordering' },
   { href: '/features/peer-delivery', icon: FaBicycle, label: 'Peer Delivery', desc: 'Customers deliver for each other' },
-  { href: '/quick-delivery', label: 'Packages', desc: 'Fast local package delivery with live tracking and proof of drop-off' },
+  { href: '/features/social-ordering', icon: FaUsers, label: 'Social Ordering', desc: 'Friend orders, leaderboards & live feed' },
+  { href: '/quick-delivery', icon: FaBox, label: 'Packages', desc: 'Fast local package delivery with live tracking and proof of drop-off' },
   { href: '/features/offerwall-rewards', icon: FaGift, label: 'Offerwall Rewards', desc: 'Customers earn via games/apps/videos and spend at your business' },
   { href: '/features/roadside-assistance', icon: FaWrench, label: 'Roadside Assistance', desc: 'Jump starts, lockouts, tire help by nearby drivers' },
 ];

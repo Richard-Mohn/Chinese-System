@@ -60,6 +60,14 @@ export default function Comparison() {
           >
             We don&apos;t just compete with the giants. We make them obsolete.
           </motion.p>
+          <motion.p
+            className="text-sm md:text-base text-zinc-400 leading-relaxed font-medium max-w-3xl mx-auto mt-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            Your existing Uber Eats and DoorDash listings can stay live. Starting a MohnMenu trial does not change or disconnect those marketplace storefronts.
+          </motion.p>
         </div>
       </section>
 
@@ -68,7 +76,7 @@ export default function Comparison() {
         <div className="container mx-auto max-w-5xl">
           <div className="hidden md:grid grid-cols-3 gap-4 pb-8 border-b-2 border-zinc-900 mb-6 items-end">
             <div className="text-sm font-black uppercase tracking-widest text-zinc-400">Features</div>
-            <div className="text-3xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">MohnMenu</div>
+            <div className="text-3xl font-black bg-linear-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">MohnMenu</div>
             <div className="text-sm font-black uppercase tracking-widest text-zinc-400 italic">Others (DoorDash, etc.)</div>
           </div>
 
@@ -99,7 +107,7 @@ export default function Comparison() {
             <Link href="/register" className="relative z-10 inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-orange-500/20 transition-all active:scale-95 whitespace-nowrap">
               Start Free Today <FaArrowRight />
             </Link>
-            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-orange-600/10 to-transparent blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-linear-to-t from-orange-600/10 to-transparent blur-3xl pointer-events-none" />
           </motion.div>
         </div>
       </section>

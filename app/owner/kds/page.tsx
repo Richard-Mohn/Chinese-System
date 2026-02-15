@@ -16,6 +16,7 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { logKdsBump, logItemsPrepared } from '@/lib/staffActivity';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaPlus,
@@ -289,8 +290,31 @@ function KDSPage() {
     const key = `${orderId}::${stationId}::${itemIdx}`;
     setCompletedItems(prev => {
       const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
+      const wasComplete = next.has(key);
+      if (wasComplete) next.delete(key);
+      else {
+        next.add(key);
+        // Log item preparation when marking complete
+        if (currentBusiness?.businessId && MohnMenuUser) {
+          const order = orders.find(o => o.id === orderId);
+          const station = stations.find(s => s.id === stationId);
+          if (order && station) {
+            const stationItems = getItemsForStation(order, station);
+            const item = stationItems[itemIdx];
+            if (item) {
+              logItemsPrepared(
+                currentBusiness.businessId,
+                MohnMenuUser.uid,
+                MohnMenuUser.displayName || MohnMenuUser.email,
+                MohnMenuUser.role,
+                orderId,
+                station.name,
+                [{ name: item.name, quantity: item.quantity, category: item.category }],
+              );
+            }
+          }
+        }
+      }
       return next;
     });
   };
@@ -305,6 +329,21 @@ function KDSPage() {
     // Find current station's position
     const station = stations.find(s => s.id === stationId);
     if (!station) return;
+
+    // ── Log staff activity ──
+    const order = orders.find(o => o.id === orderId);
+    if (order && MohnMenuUser) {
+      const stationItems = getItemsForStation(order, station);
+      logKdsBump(
+        currentBusiness.businessId,
+        MohnMenuUser.uid,
+        MohnMenuUser.displayName || MohnMenuUser.email,
+        MohnMenuUser.role,
+        orderId,
+        station.name,
+        stationItems.map(i => ({ name: i.name, quantity: i.quantity, category: i.category })),
+      );
+    }
 
     // If this is the last station (expo or highest position), mark order as ready
     const nextStation = stations.find(s => s.position === station.position + 1);

@@ -327,7 +327,7 @@ export default function MusicDemoPage() {
               Your fans deserve<br />better than Linktree<span className="text-violet-500">.</span>
             </h2>
             <p className="text-xl text-zinc-400 mb-10 max-w-2xl mx-auto">
-              Give them a real storefront. Music, merch, tours, and a jukebox — all under your brand. Starting at $19.99/mo.
+              Give them a real storefront. Music, merch, tours, and a jukebox — all under your brand. Starting at $39.99/mo.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/for-music-artists" className="group px-12 py-5 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-full font-bold text-lg flex items-center gap-3 hover:shadow-xl hover:shadow-violet-500/20 transition-all">
@@ -337,7 +337,7 @@ export default function MusicDemoPage() {
                 View All Demos
               </Link>
             </div>
-            <p className="text-xs text-zinc-400 mt-6">14-day free trial. No credit card required. Cancel anytime.</p>
+            <p className="text-xs text-zinc-400 mt-6">3-day free trial. No credit card required. Cancel anytime.</p>
           </motion.div>
         </div>
       </section>

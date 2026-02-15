@@ -72,7 +72,7 @@ function UpgradeScreen({
           <div
             className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto transition-all duration-500 ${
               hovered
-                ? `bg-gradient-to-br ${colors.gradient} text-white scale-110 shadow-xl`
+                ? `bg-linear-to-br ${colors.gradient} text-white scale-110 shadow-xl`
                 : 'bg-zinc-100 text-zinc-400'
             }`}
           >
@@ -99,7 +99,7 @@ function UpgradeScreen({
 
         {/* What you get */}
         {sameTierFeatures.length > 0 && (
-          <div className={`bg-gradient-to-br ${colors.bg} border ${colors.border} rounded-2xl p-6 mb-8 text-left`}>
+          <div className={`bg-linear-to-br ${colors.bg} border ${colors.border} rounded-2xl p-6 mb-8 text-left`}>
             <p className={`text-xs font-black uppercase tracking-widest ${colors.text} mb-4`}>
               Also included in {meta.upgradeTo}
             </p>
@@ -117,14 +117,14 @@ function UpgradeScreen({
         {/* CTA */}
         <Link
           href="/owner/settings#subscription"
-          className={`inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r ${colors.gradient} text-white rounded-2xl font-black text-base hover:shadow-xl hover:scale-105 transition-all duration-300`}
+          className={`inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r ${colors.gradient} text-white rounded-2xl font-black text-base hover:shadow-xl hover:scale-105 transition-all duration-300`}
         >
           Upgrade to {meta.upgradeTo} — {meta.upgradePrice}
           <FaArrowRight />
         </Link>
 
         <p className="text-xs text-zinc-400 mt-4">
-          14-day free trial included. Cancel anytime.
+          3-day free trial included. Cancel anytime.
         </p>
       </div>
     </div>

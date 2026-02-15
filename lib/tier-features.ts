@@ -29,6 +29,7 @@ export type FeatureKey =
   | 'floor-plan'
   | 'auctions'
   | 'domain'
+  | 'integrations'
   // Functional features
   | 'quick-order'
   | 'qr-ordering'
@@ -45,7 +46,18 @@ export type FeatureKey =
   | 'custom-integrations'
   | 'staff-marketplace'
   | 'inventory-tracking'
-  | 'flash-sales';
+  | 'flash-sales'
+  | 'managed-support'
+  // HR & Compliance
+  | 'background-checks'
+  | 'application-portal'
+  | 'id-verification'
+  | 'paper-to-digital'
+  // Social Features
+  | 'customer-profiles'
+  | 'customer-leaderboard'
+  | 'social-ordering'
+  | 'friend-system';
 
 // ─── Feature Metadata ────────────────────────────────────────
 
@@ -103,26 +115,28 @@ export function tierMeetsRequirement(
 
 export const FEATURE_REGISTRY: Record<FeatureKey, FeatureMeta> = {
   // ── Always available (starter+) ──
-  dashboard:       { label: 'Dashboard',           description: 'Business overview and quick stats',          minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  orders:          { label: 'Orders',               description: 'View and manage incoming orders',            minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  menu:            { label: 'Menu Editor',           description: 'Create and manage your menu items',          minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  website:         { label: 'Website Builder',       description: 'Build your branded online storefront',       minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  settings:        { label: 'Settings',              description: 'Configure your business settings',           minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  'quick-order':   { label: 'Quick Order',           description: 'One-click ordering widget for customers',    minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  'qr-ordering':   { label: 'QR Code Ordering',      description: 'Table QR codes for dine-in ordering',        minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  'card-payments':  { label: 'Card Payments',         description: 'Accept card payments via Stripe',            minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  'crypto-payments':{ label: 'Crypto Payments',       description: 'Accept BTC, ETH, and 6+ cryptocurrencies',  minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
-  'cash-payments':  { label: 'Cash Payments',         description: 'Allow cash-on-delivery orders',              minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$19.99/mo' },
+  dashboard:       { label: 'Dashboard',           description: 'Business overview and quick stats',          minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  orders:          { label: 'Orders',               description: 'View and manage incoming orders',            minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  menu:            { label: 'Menu Editor',           description: 'Create and manage your menu items',          minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  website:         { label: 'Website Builder',       description: 'Build your branded online storefront',       minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  settings:        { label: 'Settings',              description: 'Configure your business settings',           minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  'quick-order':   { label: 'Quick Order',           description: 'One-click ordering widget for customers',    minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  'qr-ordering':   { label: 'QR Code Ordering',      description: 'Table QR codes for dine-in ordering',        minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  'card-payments':  { label: 'Card Payments',         description: 'Accept card payments via Stripe',            minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  'crypto-payments':{ label: 'Crypto Payments',       description: 'Accept BTC, ETH, and 6+ cryptocurrencies',  minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
+  'cash-payments':  { label: 'Cash Payments',         description: 'Allow cash-on-delivery orders',              minTier: 'starter', upgradeTo: 'Starter',       upgradePrice: '$39.99/mo' },
 
-  // ── Growth tier ($49.99/mo) ──
-  staff:             { label: 'Staff Management',     description: 'Manage your team, roles, and schedules',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
-  kds:               { label: 'Kitchen Display',      description: 'Real-time kitchen order display system',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
-  analytics:         { label: 'Analytics',            description: 'Sales analytics and traffic insights',       minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
-  reservations:      { label: 'Reservations',         description: 'Online table and event reservations',        minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
-  domain:            { label: 'Custom Domain',        description: 'Use your own domain (e.g. yourbiz.com)',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
-  'real-time-tracking': { label: 'Real-Time Tracking', description: 'Live order status updates for customers',   minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
-  'inventory-tracking': { label: 'Inventory Tracking', description: 'Track stock levels and low-stock alerts',   minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
-  'flash-sales':     { label: 'Flash Sales',          description: 'Time-limited sale prices on menu items',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$49.99/mo' },
+  // ── Growth tier ($79.99/mo) ──
+  staff:             { label: 'Staff Management',     description: 'Manage your team, roles, and schedules',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  kds:               { label: 'Kitchen Display',      description: 'Real-time kitchen order display system',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  analytics:         { label: 'Analytics',            description: 'Sales analytics and traffic insights',       minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  reservations:      { label: 'Reservations',         description: 'Online table and event reservations',        minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  domain:            { label: 'Custom Domain',        description: 'Use your own domain (e.g. yourbiz.com)',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  integrations:      { label: 'Integrations Hub',     description: 'Connect POS, printers, accounting & more',   minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  'real-time-tracking': { label: 'Real-Time Tracking', description: 'Live order status updates for customers',   minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  'inventory-tracking': { label: 'Inventory Tracking', description: 'Track stock levels and low-stock alerts',   minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  'flash-sales':     { label: 'Flash Sales',          description: 'Time-limited sale prices on menu items',     minTier: 'growth', upgradeTo: 'Growth',        upgradePrice: '$79.99/mo' },
+  'managed-support': { label: 'Managed Support',      description: 'SLA-based support rollover handled by MohnMenu ops', minTier: 'growth', upgradeTo: 'Growth', upgradePrice: '$79.99/mo' },
 
   // ── Professional tier ($99.99/mo) ──
   drivers:           { label: 'Driver Management',    description: 'Manage your in-house delivery drivers',      minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
@@ -139,6 +153,14 @@ export const FEATURE_REGISTRY: Record<FeatureKey, FeatureMeta> = {
   'api-access':      { label: 'API Access',           description: 'REST API for custom integrations',           minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
   'custom-integrations': { label: 'Custom Integrations', description: 'Connect third-party tools and services', minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
   'staff-marketplace': { label: 'Staff Marketplace',  description: 'Hire shared staff from the platform',        minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
+  'background-checks': { label: 'Background Checks',  description: 'Run employment background checks via MohnMatrix', minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
+  'application-portal': { label: 'Application Portal', description: 'ID verification and application review dashboard', minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
+  'id-verification': { label: 'ID Verification',      description: 'Upload and verify government IDs and licenses', minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
+  'paper-to-digital': { label: 'Paper-to-Digital',    description: 'OCR scan paper applications to digital forms', minTier: 'professional', upgradeTo: 'Professional', upgradePrice: '$99.99/mo' },
+  'customer-profiles': { label: 'Customer Profiles',  description: 'Public customer profiles with stats and badges', minTier: 'growth', upgradeTo: 'Growth', upgradePrice: '$79.99/mo' },
+  'customer-leaderboard': { label: 'Customer Leaderboard', description: 'Top spenders and most active customers', minTier: 'growth', upgradeTo: 'Growth', upgradePrice: '$79.99/mo' },
+  'social-ordering': { label: 'Social Ordering',      description: 'Order food for friends and gift meals',      minTier: 'growth', upgradeTo: 'Growth', upgradePrice: '$79.99/mo' },
+  'friend-system':   { label: 'Friend System',        description: 'Add friends and see their activity',         minTier: 'growth', upgradeTo: 'Growth', upgradePrice: '$79.99/mo' },
 };
 
 // ─── Owner page → feature key mapping ────────────────────────

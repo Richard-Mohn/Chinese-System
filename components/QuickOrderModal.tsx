@@ -23,6 +23,8 @@ import {
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { QRCodeSVG } from 'qrcode.react';
+import { useAuth } from '@/context/AuthContext';
+import PostOrderSignupModal from '@/components/PostOrderSignupModal';
 
 // ─── Supported Crypto Options (client-side display config) ──
 
@@ -262,6 +264,18 @@ export default function QuickOrderModal({
   const [pendingOrderId, setPendingOrderId] = useState('');
   const [paymentError, setPaymentError] = useState('');
   const [orderId, setOrderId] = useState('');
+
+  // Post-order signup modal state
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [completedOrderData, setCompletedOrderData] = useState<{
+    orderId: string;
+    email: string;
+    name: string;
+    phone: string;
+    stripeCustomerId?: string;
+  } | null>(null);
+
+  const { user } = useAuth();
 
   // Inline crypto payment
   const [selectedCrypto, setSelectedCrypto] = useState<CryptoOption>(SUPPORTED_CRYPTOS[0]);
@@ -541,6 +555,18 @@ export default function QuickOrderModal({
       setOrderId(docRef.id);
       setStep('done');
       setCart([]);
+      
+      // Show signup modal for guest users
+      if (!user && email) {
+        setCompletedOrderData({
+          orderId: docRef.id,
+          email,
+          name,
+          phone,
+        });
+        // Delay to let success message show first
+        setTimeout(() => setShowSignupModal(true), 2000);
+      }
     } catch (err) {
       console.error(err);
       alert('Failed to place order.');
@@ -561,6 +587,17 @@ export default function QuickOrderModal({
     setOrderId(pendingOrderId);
     setStep('done');
     setCart([]);
+    
+    // Show signup modal for guest users after card payment
+    if (!user && email) {
+      setCompletedOrderData({
+        orderId: pendingOrderId,
+        email,
+        name,
+        phone,
+      });
+      setTimeout(() => setShowSignupModal(true), 2000);
+    }
   };
 
   const handleCryptoComplete = async () => {
@@ -586,6 +623,17 @@ export default function QuickOrderModal({
     setCart([]);
     setCryptoPayment(null);
     setCryptoStatus('');
+    
+    // Show signup modal for guest users after crypto payment
+    if (!user && email) {
+      setCompletedOrderData({
+        orderId: pendingOrderId,
+        email,
+        name,
+        phone,
+      });
+      setTimeout(() => setShowSignupModal(true), 2000);
+    }
   };
 
   // ─── Crypto payment polling ──────────────────────────────
@@ -1688,6 +1736,23 @@ export default function QuickOrderModal({
           </>
         )}
       </AnimatePresence>
+
+      {/* Post-order signup modal */}
+      {completedOrderData && (
+        <PostOrderSignupModal
+          isOpen={showSignupModal}
+          onClose={() => {
+            setShowSignupModal(false);
+            setCompletedOrderData(null);
+          }}
+          customerEmail={completedOrderData.email}
+          customerName={completedOrderData.name}
+          customerPhone={completedOrderData.phone}
+          orderId={completedOrderData.orderId}
+          businessId={business.businessId}
+          stripeCustomerId={completedOrderData.stripeCustomerId}
+        />
+      )}
     </>
   );
 }

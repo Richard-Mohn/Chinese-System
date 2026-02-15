@@ -644,7 +644,7 @@ export default function Home() {
             </div>
             <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">Ready to keep 100%?</h2>
             <p className="text-zinc-400 text-lg max-w-xl mx-auto mb-10">
-              14-day free trial. No credit card. No commitment. Start building your store today.
+              3-day free trial. No credit card. No commitment. Start building your store today.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/register" className="group px-10 py-5 bg-white text-black rounded-full font-bold text-lg flex items-center gap-3 hover:bg-zinc-100 transition-all active:scale-95">

@@ -72,7 +72,7 @@ const PricingCard = ({ title, price, period, description, features, icon: Icon, 
           ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-lg hover:shadow-orange-500/20'
           : 'bg-zinc-900 text-white hover:bg-black'
       }`}>
-        Start 14-Day Free Trial <FaArrowRight className="text-xs" />
+        Start 3-Day Free Trial <FaArrowRight className="text-xs" />
       </button>
     </Link>
   </motion.div>
@@ -101,7 +101,7 @@ export default function Pricing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Every plan starts with a 14-day free trial. No credit card required. Zero commissions — always.
+            Every plan starts with a 3-day free trial. No credit card required. Zero commissions — always.
           </motion.p>
         </div>
       </section>
@@ -112,9 +112,9 @@ export default function Pricing() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <PricingCard
               title="Starter"
-              price="$19.99"
+              price="$39.99"
               period="/month"
-              description="Everything you need to sell online. 14-day free trial."
+              description="Everything you need to sell online. 3-day free trial."
               icon={FaStar}
               tier="starter"
               features={[
@@ -132,9 +132,9 @@ export default function Pricing() {
             />
             <PricingCard
               title="Growth"
-              price="$49.99"
+              price="$79.99"
               period="/month"
-              description="Premium tools for growing businesses. 14-day free trial."
+              description="Premium tools for growing businesses. 3-day free trial."
               icon={FaRocket}
               tier="growth"
               features={[
@@ -155,7 +155,7 @@ export default function Pricing() {
               title="Professional"
               price="$99.99"
               period="/month"
-              description="Full platform for serious operations. 14-day free trial."
+              description="Full platform for serious operations. 3-day free trial."
               icon={FaBuilding}
               tier="professional"
               features={[
@@ -182,7 +182,7 @@ export default function Pricing() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { label: '0% Commission', sub: 'On every order' },
-              { label: '14-Day Trial', sub: 'No credit card' },
+              { label: '3-Day Trial', sub: 'No credit card' },
               { label: 'No Contracts', sub: 'Cancel anytime' },
               { label: 'Free Updates', sub: 'New features included' },
             ].map((item, i) => (
@@ -199,7 +199,7 @@ export default function Pricing() {
       <section className="py-24 px-4">
         <div className="container mx-auto max-w-4xl bg-zinc-950 rounded-[3rem] p-10 md:p-16 text-white shadow-2xl relative overflow-hidden text-center">
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Try it 14 days free. Then $19.99.</h2>
+            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Try it 3 days free. Then $39.99.</h2>
             <p className="text-zinc-400 text-xl font-medium mb-10">
               By switching from commission-based platforms to MohnMenu, the average business saves <span className="text-white font-black">$1,350+ every month</span>. That&apos;s money you earned — keep it.
             </p>

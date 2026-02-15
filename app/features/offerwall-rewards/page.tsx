@@ -74,6 +74,9 @@ export default function OfferwallRewardsFeaturePage() {
             <Link href="/register" className="group px-10 py-5 bg-linear-to-r from-violet-500 to-purple-600 text-white rounded-full font-bold text-lg flex items-center gap-3 hover:shadow-xl hover:shadow-violet-500/20 transition-all">
               Activate Offerwall <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
             </Link>
+            <Link href="/rewards" className="px-10 py-5 bg-white text-black border-2 border-zinc-200 rounded-full font-bold text-lg hover:border-black transition-all">
+              Open Live Rewards
+            </Link>
             <Link href="/for-churches" className="px-10 py-5 bg-white text-black border-2 border-zinc-200 rounded-full font-bold text-lg hover:border-black transition-all">
               For Churches
             </Link>

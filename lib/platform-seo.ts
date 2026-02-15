@@ -173,7 +173,7 @@ export const FAQ_JSONLD = {
       name: 'Is MohnMenu actually free?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MohnMenu plans start at $19.99/month with a 14-day free trial. We never charge commissions on orders — you keep 100% of your revenue. All plans include unlimited menu items, card and crypto payments, QR ordering, and fraud protection.',
+        text: 'MohnMenu plans start at $39.99/month with a 3-day free trial. We never charge commissions on orders — you keep 100% of your revenue. All plans include unlimited menu items, card and crypto payments, QR ordering, and fraud protection.',
       },
     },
     {
@@ -245,7 +245,7 @@ export const FAQ_JSONLD = {
       name: 'Can I cancel at any time?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MohnMenu has zero contracts. All plans can be cancelled at any time from your dashboard. No cancellation fees, no lock-in periods. Every plan starts with a 14-day free trial.',
+        text: 'MohnMenu has zero contracts. All plans can be cancelled at any time from your dashboard. No cancellation fees, no lock-in periods. Every plan starts with a 3-day free trial.',
       },
     },
   ],
@@ -268,7 +268,7 @@ export const COMPARISON_JSONLD = {
     brand: { '@type': 'Brand', name: 'MohnMenu' },
     offers: {
       '@type': 'Offer',
-      price: '19.99',
+      price: '39.99',
       priceCurrency: 'USD',
     },
   },
@@ -331,8 +331,8 @@ export const HOME_METADATA: Metadata = {
 // ── Pricing ─────────────────────────────────────────────────────
 
 export const PRICING_METADATA: Metadata = {
-  title: 'Pricing — MohnMenu | Plans Starting at $19.99/mo',
-  description: 'Simple, transparent pricing for your ordering system. Starter $19.99/mo, Growth $49.99/mo, Professional $99.99/mo. Zero commissions on every plan. 14-day free trial, no credit card required.',
+  title: 'Pricing — MohnMenu | Plans Starting at $39.99/mo',
+  description: 'Simple, transparent pricing for your ordering system. Starter $39.99/mo, Growth $79.99/mo, Professional $99.99/mo. Zero commissions on every plan. 3-day free trial, no credit card required.',
   keywords: [
     'restaurant ordering system pricing',
     'commission free ordering cost',
@@ -343,11 +343,11 @@ export const PRICING_METADATA: Metadata = {
     'ordering platform plans',
   ].join(', '),
   openGraph: buildOG(
-    'Pricing — MohnMenu | From $19.99/mo, Zero Commissions',
-    'Transparent pricing — Starter $19.99/mo, Growth $49.99/mo, Professional $99.99/mo. No commissions, no contracts, 14-day free trial.',
+    'Pricing — MohnMenu | From $39.99/mo, Zero Commissions',
+    'Transparent pricing — Starter $39.99/mo, Growth $79.99/mo, Professional $99.99/mo. No commissions, no contracts, 3-day free trial.',
     '/pricing',
   ),
-  twitter: buildTwitter('MohnMenu Pricing | From $19.99/mo', 'Zero commissions, transparent pricing. 14-day free trial.'),
+  twitter: buildTwitter('MohnMenu Pricing | From $39.99/mo', 'Zero commissions, transparent pricing. 3-day free trial.'),
   alternates: { canonical: `${BASE_URL}/pricing` },
 };
 

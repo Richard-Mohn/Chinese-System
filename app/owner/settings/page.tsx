@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { authFetch } from '@/lib/authFetch';
+import { FEATURE_REGISTRY, tierMeetsRequirement } from '@/lib/tier-features';
 import Link from 'next/link';
 
 /** Reusable iOS-style toggle switch */
@@ -14,6 +15,7 @@ function Toggle({ checked, onChange, color = 'bg-emerald-500' }: { checked: bool
       type="button"
       role="switch"
       aria-checked={checked}
+      aria-label="Toggle setting"
       onClick={onChange}
       className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black ${
         checked ? color : 'bg-zinc-300'
@@ -30,6 +32,10 @@ function Toggle({ checked, onChange, color = 'bg-emerald-500' }: { checked: bool
 
 export default function OwnerSettingsPage() {
   const { currentBusiness } = useAuth();
+  const managedSupportEntitled = tierMeetsRequirement(
+    currentBusiness?.tier,
+    FEATURE_REGISTRY['managed-support'].minTier,
+  );
 
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -55,13 +61,10 @@ export default function OwnerSettingsPage() {
     maxRadiusMiles: currentBusiness?.settings?.courierDelivery?.maxRadiusMiles ?? 3,
   });
 
-  const [thirdPartyDelivery, setThirdPartyDelivery] = useState({
-    enabled: currentBusiness?.settings?.thirdPartyDelivery?.enabled ?? false,
+  const [marketplaceListings, setMarketplaceListings] = useState({
     uberEatsUrl: currentBusiness?.settings?.thirdPartyDelivery?.uberEatsUrl || '',
     doordashUrl: currentBusiness?.settings?.thirdPartyDelivery?.doordashUrl || '',
     grubhubUrl: currentBusiness?.settings?.thirdPartyDelivery?.grubhubUrl || '',
-    whiteLabel: currentBusiness?.settings?.thirdPartyDelivery?.whiteLabel ?? false,
-    providers: currentBusiness?.settings?.thirdPartyDelivery?.providers || ['doordash', 'uber'],
   });
 
   const [businessInfo, setBusinessInfo] = useState({
@@ -120,12 +123,10 @@ export default function OwnerSettingsPage() {
             maxRadiusMiles: courierDelivery.maxRadiusMiles,
           },
           thirdPartyDelivery: {
-            enabled: thirdPartyDelivery.enabled,
-            whiteLabel: thirdPartyDelivery.whiteLabel,
-            providers: thirdPartyDelivery.providers,
-            uberEatsUrl: thirdPartyDelivery.uberEatsUrl || null,
-            doordashUrl: thirdPartyDelivery.doordashUrl || null,
-            grubhubUrl: thirdPartyDelivery.grubhubUrl || null,
+            enabled: false,
+            uberEatsUrl: marketplaceListings.uberEatsUrl || null,
+            doordashUrl: marketplaceListings.doordashUrl || null,
+            grubhubUrl: marketplaceListings.grubhubUrl || null,
           },
         },
         updatedAt: new Date().toISOString(),
@@ -400,94 +401,50 @@ export default function OwnerSettingsPage() {
         </div>
       </section>
 
-      {/* ── Third-Party Delivery ────────────────────────────── */}
+      {/* ── External Marketplace Listings ───────────────────── */}
       <section className="bg-white rounded-2xl border border-zinc-100 p-6 space-y-5">
         <h2 className="text-xs font-black uppercase tracking-widest text-zinc-400">
-          Third-Party Delivery Partners
+          External Marketplace Listings
         </h2>
         <p className="text-xs text-zinc-400">
-          Use DoorDash and Uber drivers for delivery — white-labeled under your brand. Customers see delivery options at checkout without being redirected. You can also add store links as a fallback.
+          Keep your existing marketplace storefront links on file. MohnMenu does not connect to or modify Uber Eats, DoorDash, or Grubhub APIs.
         </p>
 
-        <label className="flex items-center justify-between cursor-pointer">
+        <div className="space-y-4 pt-2">
           <div>
-            <span className="font-bold text-black text-sm">Enable Third-Party Delivery</span>
-            <p className="text-xs text-zinc-400">Offer DoorDash / Uber delivery alongside your own drivers</p>
+            <label className="block text-xs font-bold text-zinc-500 mb-1">🟢 Uber Eats Store URL</label>
+            <input
+              type="url"
+              value={marketplaceListings.uberEatsUrl}
+              onChange={e => setMarketplaceListings(p => ({ ...p, uberEatsUrl: e.target.value }))}
+              className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="https://www.ubereats.com/store/your-restaurant/..."
+            />
           </div>
-          <Toggle checked={thirdPartyDelivery.enabled} onChange={() => setThirdPartyDelivery(p => ({ ...p, enabled: !p.enabled }))} />
-        </label>
-
-        {thirdPartyDelivery.enabled && (
-          <div className="space-y-5 pt-2">
-            {/* White-label toggle */}
-            <label className="flex items-center justify-between cursor-pointer bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-100">
-              <div>
-                <span className="font-bold text-black text-sm">⚡ White-Label Delivery API</span>
-                <p className="text-xs text-zinc-500">Use DoorDash Drive & Uber Direct APIs — customers see delivery options at checkout, no redirects. Powered by third-party drivers under your brand.</p>
-              </div>
-              <div className="shrink-0 ml-4">
-                <Toggle checked={thirdPartyDelivery.whiteLabel} onChange={() => setThirdPartyDelivery(p => ({ ...p, whiteLabel: !p.whiteLabel }))} color="bg-orange-500" />
-              </div>
-            </label>
-
-            {thirdPartyDelivery.whiteLabel && (
-              <div className="bg-amber-50/50 rounded-xl p-4 border border-amber-100 space-y-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-xs font-bold text-zinc-600">Delivery Providers</p>
-                  <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Coming Soon</span>
-                </div>
-                <div className="flex gap-3">
-                  {(['doordash', 'uber'] as const).map((p) => (
-                    <div
-                      key={p}
-                      className="px-4 py-2 rounded-lg text-sm font-bold bg-zinc-200 text-zinc-400 cursor-not-allowed opacity-60"
-                    >
-                      {p === 'doordash' ? '🔴 DoorDash' : '⬛ Uber'}
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[10px] text-amber-600 font-medium">
-                  ⏳ DoorDash Drive & Uber Direct APIs are awaiting approval. Once approved, professional drivers will be available at checkout. Community Couriers are fully operational now!
-                </p>
-              </div>
-            )}
-
-            {/* Fallback store links */}
-            <div className="border-t border-zinc-100 pt-4 space-y-4">
-              <p className="text-xs font-bold text-zinc-500">📎 Fallback Store Links (optional)</p>
-              <div>
-                <label className="block text-xs font-bold text-zinc-500 mb-1">🟢 Uber Eats Store URL</label>
-                <input
-                  type="url"
-                  value={thirdPartyDelivery.uberEatsUrl}
-                  onChange={e => setThirdPartyDelivery(p => ({ ...p, uberEatsUrl: e.target.value }))}
-                  className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black"
-                  placeholder="https://www.ubereats.com/store/your-restaurant/..."
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-zinc-500 mb-1">🔴 DoorDash Store URL</label>
-                <input
-                  type="url"
-                  value={thirdPartyDelivery.doordashUrl}
-                  onChange={e => setThirdPartyDelivery(p => ({ ...p, doordashUrl: e.target.value }))}
-                  className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black"
-                  placeholder="https://www.doordash.com/store/your-restaurant/..."
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-zinc-500 mb-1">🟠 Grubhub Store URL</label>
-                <input
-                  type="url"
-                  value={thirdPartyDelivery.grubhubUrl}
-                  onChange={e => setThirdPartyDelivery(p => ({ ...p, grubhubUrl: e.target.value }))}
-                  className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black"
-                  placeholder="https://www.grubhub.com/restaurant/your-restaurant/..."
-                />
-              </div>
-            </div>
+          <div>
+            <label className="block text-xs font-bold text-zinc-500 mb-1">🔴 DoorDash Store URL</label>
+            <input
+              type="url"
+              value={marketplaceListings.doordashUrl}
+              onChange={e => setMarketplaceListings(p => ({ ...p, doordashUrl: e.target.value }))}
+              className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="https://www.doordash.com/store/your-restaurant/..."
+            />
           </div>
-        )}
+          <div>
+            <label className="block text-xs font-bold text-zinc-500 mb-1">🟠 Grubhub Store URL</label>
+            <input
+              type="url"
+              value={marketplaceListings.grubhubUrl}
+              onChange={e => setMarketplaceListings(p => ({ ...p, grubhubUrl: e.target.value }))}
+              className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="https://www.grubhub.com/restaurant/your-restaurant/..."
+            />
+          </div>
+          <p className="text-[11px] text-zinc-500 font-medium">
+            Customers can still use those marketplace apps directly. Starting a MohnMenu trial does not change your existing listings.
+          </p>
+        </div>
       </section>
 
       {/* ── Community Courier Delivery ──────────────────────── */}
@@ -512,6 +469,7 @@ export default function OwnerSettingsPage() {
             <div>
               <label className="block text-xs font-bold text-zinc-500 mb-2">Delivery Radius: {courierDelivery.radiusMiles} miles</label>
               <input
+                title="Delivery radius in miles"
                 type="range"
                 min="0.5"
                 max="5"
@@ -592,7 +550,7 @@ export default function OwnerSettingsPage() {
         </p>
 
         {/* Crypto balance */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-xl p-4">
+        <div className="bg-linear-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-orange-500">Crypto Balance</p>
@@ -620,7 +578,7 @@ export default function OwnerSettingsPage() {
           <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3">
             <span className="text-amber-600 text-lg">⏳</span>
             <div>
-              <p className="font-bold text-amber-800 text-sm">Crypto Payments Active</p>
+            aria-checked={checked}
               <p className="text-[10px] text-amber-600">
                 Custody account will be created automatically on first crypto order.
               </p>
@@ -659,6 +617,13 @@ export default function OwnerSettingsPage() {
           ))}
         </div>
 
+        <div className={`rounded-xl border p-3 ${managedSupportEntitled ? 'bg-emerald-50 border-emerald-100' : 'bg-zinc-50 border-zinc-100'}`}>
+          <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Managed Support</p>
+          <p className={`font-bold text-sm mt-1 ${managedSupportEntitled ? 'text-emerald-700' : 'text-zinc-600'}`}>
+            {managedSupportEntitled ? 'Included with your current tier' : 'Upgrade to Growth or Professional to enable'}
+          </p>
+        </div>
+
         {/* Subscription Actions */}
         <div className="border-t border-zinc-100 pt-4 space-y-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -684,7 +649,7 @@ export default function OwnerSettingsPage() {
                   You&apos;ll keep access until the end of your billing period. After that, your account will revert to Free.
                 </p>
               </div>
-              <CancelSubscriptionButton businessId={currentBusiness.businessId} />
+              <SubscriptionBillingActions businessId={currentBusiness.businessId} />
             </div>
           )}
         </div>
@@ -997,65 +962,184 @@ function StripeConnectSection({
   );
 }
 
-// ── Cancel Subscription Button ────────────────────────────────
+// ── Subscription Billing Actions ──────────────────────────────
 
-function CancelSubscriptionButton({ businessId }: { businessId: string }) {
-  const [confirming, setConfirming] = useState(false);
+function SubscriptionBillingActions({ businessId }: { businessId: string }) {
+  const [loadingStatus, setLoadingStatus] = useState(true);
+  const [openingPortal, setOpeningPortal] = useState(false);
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const [cancelled, setCancelled] = useState(false);
+  const [statusError, setStatusError] = useState('');
+  const [subscriptionState, setSubscriptionState] = useState<{
+    hasSubscription: boolean;
+    subscriptionStatus: string | null;
+    cancelAtPeriodEnd: boolean;
+    currentPeriodEnd: string | null;
+    cancelAt: string | null;
+  }>({
+    hasSubscription: false,
+    subscriptionStatus: null,
+    cancelAtPeriodEnd: false,
+    currentPeriodEnd: null,
+    cancelAt: null,
+  });
+
+  const loadStatus = async () => {
+    setLoadingStatus(true);
+    setStatusError('');
+    try {
+      const res = await authFetch(`/api/billing/subscription-status?businessId=${businessId}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to load billing status');
+      }
+
+      setSubscriptionState({
+        hasSubscription: data.hasSubscription === true,
+        subscriptionStatus: typeof data.subscriptionStatus === 'string' ? data.subscriptionStatus : null,
+        cancelAtPeriodEnd: data.cancelAtPeriodEnd === true,
+        currentPeriodEnd: typeof data.currentPeriodEnd === 'string' ? data.currentPeriodEnd : null,
+        cancelAt: typeof data.cancelAt === 'string' ? data.cancelAt : null,
+      });
+    } catch (err) {
+      setStatusError(err instanceof Error ? err.message : 'Failed to load billing status');
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStatus();
+  }, [businessId]);
+
+  const handleOpenPortal = async () => {
+    setOpeningPortal(true);
+    setStatusError('');
+    try {
+      const res = await authFetch('/api/billing/create-portal-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || 'Failed to open billing portal');
+      }
+
+      window.open(data.url, '_blank');
+    } catch (err) {
+      setStatusError(err instanceof Error ? err.message : 'Failed to open billing portal');
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
 
   const handleCancel = async () => {
     setCancelling(true);
+    setStatusError('');
     try {
-      // Update business document to schedule cancellation
-      await updateDoc(doc(db, 'businesses', businessId), {
-        subscriptionStatus: 'cancelling',
-        cancelledAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+      const res = await authFetch('/api/billing/cancel-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId }),
       });
-      setCancelled(true);
-      setConfirming(false);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to cancel subscription');
+      }
+
+      setSubscriptionState(prev => ({
+        ...prev,
+        hasSubscription: true,
+        cancelAtPeriodEnd: data.cancelAtPeriodEnd === true,
+        currentPeriodEnd: typeof data.currentPeriodEnd === 'string' ? data.currentPeriodEnd : prev.currentPeriodEnd,
+        cancelAt: typeof data.cancelAt === 'string' ? data.cancelAt : prev.cancelAt,
+        subscriptionStatus: 'cancelling',
+      }));
+      setConfirmingCancel(false);
     } catch (err) {
-      alert('Failed to cancel. Please contact support.');
+      setStatusError(err instanceof Error ? err.message : 'Failed to cancel subscription');
     } finally {
       setCancelling(false);
     }
   };
 
-  if (cancelled) {
-    return (
-      <div className="px-5 py-2.5 bg-zinc-100 text-zinc-500 rounded-xl text-sm font-bold">
-        Cancellation Requested
-      </div>
-    );
-  }
-
-  if (confirming) {
-    return (
-      <div className="flex items-center gap-2 shrink-0">
-        <button
-          onClick={handleCancel}
-          disabled={cancelling}
-          className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
-        >
-          {cancelling ? 'Cancelling...' : 'Confirm Cancel'}
-        </button>
-        <button
-          onClick={() => setConfirming(false)}
-          className="px-4 py-2 bg-zinc-200 text-zinc-600 rounded-xl text-xs font-bold hover:bg-zinc-300 transition-colors"
-        >
-          Keep Plan
-        </button>
-      </div>
-    );
-  }
+  const formattedCancelDate = subscriptionState.cancelAt
+    ? new Date(subscriptionState.cancelAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null;
 
   return (
-    <button
-      onClick={() => setConfirming(true)}
-      className="px-5 py-2.5 border-2 border-red-200 text-red-600 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors shrink-0"
-    >
-      Cancel Plan
-    </button>
+    <div className="w-full sm:w-auto space-y-2">
+      {loadingStatus ? (
+        <p className="text-xs text-zinc-500">Loading billing status…</p>
+      ) : (
+        <>
+          {subscriptionState.hasSubscription ? (
+            <p className="text-[11px] text-zinc-600">
+              Stripe status: <span className="font-bold uppercase">{subscriptionState.subscriptionStatus || 'unknown'}</span>
+              {subscriptionState.cancelAtPeriodEnd && formattedCancelDate
+                ? ` · Cancels on ${formattedCancelDate}`
+                : ''}
+            </p>
+          ) : (
+            <p className="text-[11px] text-zinc-500">No active Stripe subscription is linked yet.</p>
+          )}
+
+          {statusError && (
+            <p className="text-[11px] font-bold text-red-600">{statusError}</p>
+          )}
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleOpenPortal}
+              disabled={openingPortal}
+              className="px-4 py-2 bg-black text-white rounded-xl text-xs font-bold hover:bg-zinc-800 transition-colors disabled:opacity-50"
+            >
+              {openingPortal ? 'Opening…' : 'Manage Billing'}
+            </button>
+
+            {subscriptionState.hasSubscription && !subscriptionState.cancelAtPeriodEnd && !confirmingCancel && (
+              <button
+                onClick={() => setConfirmingCancel(true)}
+                className="px-4 py-2 border-2 border-red-200 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors"
+              >
+                Cancel Plan
+              </button>
+            )}
+
+            {subscriptionState.cancelAtPeriodEnd && (
+              <div className="px-4 py-2 bg-zinc-100 text-zinc-600 rounded-xl text-xs font-bold">
+                Cancellation Scheduled
+              </div>
+            )}
+          </div>
+
+          {confirmingCancel && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {cancelling ? 'Cancelling...' : 'Confirm Cancel'}
+              </button>
+              <button
+                onClick={() => setConfirmingCancel(false)}
+                className="px-4 py-2 bg-zinc-200 text-zinc-600 rounded-xl text-xs font-bold hover:bg-zinc-300 transition-colors"
+              >
+                Keep Plan
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }

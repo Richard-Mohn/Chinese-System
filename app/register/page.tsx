@@ -170,7 +170,7 @@ export default function RegisterPage() {
           {/* Free promise */}
           <div className="mt-6 text-center">
             <p className="text-[11px] text-zinc-400 font-medium">
-              No credit card required. Free forever on our Starter plan.
+              No credit card required. 3-day free trial on all paid plans.
             </p>
           </div>
 

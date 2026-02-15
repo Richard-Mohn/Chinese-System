@@ -32,6 +32,9 @@ export default function OwnerSignupPage() {
     setLoading(true);
 
     try {
+      const now = new Date();
+      const trialEnds = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
       // 1. Create Firebase Auth user
       const result = await createUserWithEmailAndPassword(auth, email, password);
       const uid = result.user.uid;
@@ -67,7 +70,8 @@ export default function OwnerSignupPage() {
         type: 'restaurant',
         tier: 'starter',
         subscriptionStatus: 'trial',
-        subscriptionStartDate: new Date().toISOString(),
+        subscriptionStartDate: now.toISOString(),
+        subscriptionEndDate: trialEnds.toISOString(),
         brandColors: { primary: '#4F46E5', secondary: '#9333EA', accent: '#10B981' },
         ownerEmail: email,
         ownerPhone: '',
@@ -102,8 +106,8 @@ export default function OwnerSignupPage() {
         maxInhouseDrivers: 5,
         inHouseDriverIds: [],
         staffCount: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
       };
 
       await setDoc(businessRef, businessData);
@@ -116,8 +120,8 @@ export default function OwnerSignupPage() {
         role: 'owner',
         businessIds: [businessId],
         activeBusinessId: businessId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
       };
 
       await setDoc(doc(db, 'users', uid), MohnMenuUser);

@@ -18,22 +18,22 @@ const DEMO_STORES = [
   },
   {
     type: 'Bar & Grill',
-    slug: 'the-copper-tap',
-    name: 'The Copper Tap',
+    slug: 'demo/bars',
+    name: 'Bar Operations Demo',
     emoji: '🍺',
     color: 'from-purple-500 to-violet-500',
-    description: 'Full tenant website, cocktail menu, reservations, jukebox & karaoke, kiosk mode, crypto payments.',
-    pageName: 'Drink Menu',
+    description: 'Role-driven nightlife demo with owner, bartender, server, driver, and customer journeys.',
+    pageName: 'Role Demo',
     live: true,
   },
   {
     type: 'Coffee Shop',
-    slug: 'griffin-lounge',
-    name: 'Griffin Lounge',
+    slug: 'demo/coffee',
+    name: 'Coffee Operations Demo',
     emoji: '☕',
     color: 'from-amber-600 to-orange-700',
-    description: 'Order-ahead espresso, cold brew, pastries, peer delivery & loyalty rewards.',
-    pageName: 'Coffee Menu',
+    description: 'Role-based cafe demo for owner, barista, cashier, driver, and customer walkthroughs.',
+    pageName: 'Role Demo',
     live: true,
   },
   {
@@ -276,7 +276,7 @@ export default function DemoPage() {
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Like what you see?</h2>
             <p className="text-zinc-400 text-lg mb-10 max-w-xl mx-auto">
-              Your store can look this good in under 10 minutes. Start your 14-day free trial — no credit card required.
+              Your store can look this good in under 10 minutes. Start your 3-day free trial — no credit card required.
             </p>
             <Link href="/register" className="group inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-orange-500/20 transition-all">
               Start Your Free Trial <FaArrowRight className="group-hover:translate-x-1 transition-transform" />

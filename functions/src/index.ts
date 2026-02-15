@@ -208,6 +208,58 @@ export const onOrderStatusUpdate = onDocumentUpdated(
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
+        // ── Update customer profile stats for social features ──
+        const profileRef = db.collection("customerProfiles").doc(orderAfter.customerId);
+        const profileSnap = await profileRef.get();
+
+        if (!profileSnap.exists) {
+          // Initialize profile on first order
+          const userSnap = await customerRef.get();
+          const userData = userSnap.data();
+          await profileRef.set({
+            displayName: userData?.displayName || orderAfter.customerName || "Anonymous",
+            email: userData?.email || orderAfter.customerEmail || "",
+            photoURL: userData?.photoURL || null,
+            stats: {
+              totalOrders: 1,
+              totalSpent: orderTotal,
+              badges: ["first_order"],
+              friendsOrderedFor: 0,
+            },
+            privacy: {
+              showLeaderboard: true,
+              disableSocialPosts: false,
+              socialPostPrivacy: "public",
+              acceptFriendOrders: true,
+            },
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        } else {
+          // Update existing profile
+          const profileData = profileSnap.data();
+          const currentSpent = profileData?.stats?.totalSpent || 0;
+          const currentOrders = profileData?.stats?.totalOrders || 0;
+          const newSpent = currentSpent + orderTotal;
+          const newOrders = currentOrders + 1;
+
+          // Badge assignment logic
+          const badges = new Set(profileData?.stats?.badges || []);
+          if (newOrders === 1) badges.add("first_order");
+          if (newSpent >= 100) badges.add("big_spender");
+          if (newSpent >= 500) badges.add("foodie");
+          if (newSpent >= 1000) badges.add("vip");
+          if (newSpent >= 5000) badges.add("legend");
+          if (newOrders >= 50) badges.add("champion");
+
+          await profileRef.update({
+            "stats.totalOrders": admin.firestore.FieldValue.increment(1),
+            "stats.totalSpent": admin.firestore.FieldValue.increment(orderTotal),
+            "stats.badges": Array.from(badges),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+
         // Log $MOHN reward event for audit trail
         await db.collection("mohn_rewards").add({
           action: "food_order",

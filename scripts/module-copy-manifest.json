@@ -1,0 +1,113 @@
+{
+  "version": "1.0.0",
+  "modules": [
+    {
+      "id": "core-types",
+      "description": "Shared domain types and contracts",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["lib/types.ts", "lib/mohn-empire/types.ts"] },
+        { "project": "MohnMint", "patterns": ["packages/shared/src/*.ts"] },
+        { "project": "MohnPay", "patterns": ["apps/web/lib/*.ts", "apps/api/src/lib/*.ts"] }
+      ]
+    },
+    {
+      "id": "core-auth",
+      "description": "Auth context, modal, guards, API auth",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["context/AuthContext.tsx", "context/AuthModalContext.tsx", "components/AuthModal.tsx", "components/ProtectedRoute.tsx", "lib/apiAuth.ts", "lib/authFetch.ts"] },
+        { "project": "MohnMove", "patterns": ["apps/platform/src/contexts/AuthContext.tsx", "apps/platform/src/components/LoginModal.tsx", "apps/platform/src/components/LoginModalProvider.tsx", "apps/platform/src/lib/apiAuth.ts", "apps/platform/src/lib/authFetch.ts"] },
+        { "project": "MohnPay", "patterns": ["apps/web/components/AuthProvider.tsx", "apps/web/components/auth-guard.tsx", "apps/web/lib/auth-context.tsx"] }
+      ]
+    },
+    {
+      "id": "core-cart-ordering",
+      "description": "Cart and order lifecycle modules",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["context/CartContext.tsx", "components/QuickOrderModal.tsx", "app/order/[businessSlug]/page.tsx", "components/MenuBrowser.tsx"] },
+        { "project": "FlamingSocialMedia", "patterns": ["apps/nextjs-web-suite/app/components/OrderModal.tsx", "apps/nextjs-web-suite/app/context/CartContext.tsx"] },
+        { "project": "MohnServe", "patterns": ["platform/components/ClientOrderModal.tsx"] }
+      ]
+    },
+    {
+      "id": "core-payments",
+      "description": "Stripe, wallet, and payment orchestration",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["app/api/stripe/**/*.ts", "lib/stripe/**/*.ts", "lib/nowpayments.ts", "app/api/crypto/**/*.ts"] },
+        { "project": "MohnPay", "patterns": ["apps/api/src/routes/payments.ts", "apps/api/src/lib/stripe.ts", "apps/web/lib/stripe.ts", "apps/web/components/StripeWrapper.tsx", "apps/web/components/PaymentModal.tsx"] },
+        { "project": "MohnMatrix", "patterns": ["apps/web/src/lib/stripe.ts", "apps/web/src/lib/stripe-server.ts", "functions/src/payments.ts", "functions/src/webhooks.ts"] }
+      ]
+    },
+    {
+      "id": "core-tracking",
+      "description": "Driver/customer GPS tracking, map surfaces, dispatch",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["lib/realTimeTracking.ts", "lib/trackingHooks.ts", "components/RealTimeMap.tsx", "components/DriverAssignmentUI.tsx", "app/track-delivery/[id]/*.tsx", "app/owner/dispatch/page.tsx", "app/driver/page.tsx"] },
+        { "project": "MohnMove", "patterns": ["apps/platform/src/components/CustomerTrackingMap.tsx", "apps/platform/src/components/DispatchMap.tsx"] },
+        { "project": "MohnServe", "patterns": ["platform/components/LiveMap.tsx"] }
+      ]
+    },
+    {
+      "id": "core-seo-domain",
+      "description": "SEO endpoints and domain provisioning",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["app/robots.ts", "app/sitemap.ts", "app/api/tenant-seo/**/*.ts", "app/api/tenant-sitemap/**/*.ts", "app/api/tenant-robots/**/*.ts", "app/api/domains/**/*.ts", "app/api/resolve-domain/**/*.ts", "lib/platform-seo.ts", "lib/tenant-seo.ts", "lib/domain-registrar.ts"] },
+        { "project": "MohnMove", "patterns": ["apps/platform/src/app/robots.ts", "apps/platform/src/app/sitemap.ts", "apps/platform/src/components/DomainManager.tsx", "apps/platform/src/lib/domain-registrar.ts"] },
+        { "project": "MohnPay", "patterns": ["apps/marketing/app/robots.ts", "apps/marketing/app/sitemap.ts", "apps/marketing/lib/seo-logic.ts"] }
+      ]
+    },
+    {
+      "id": "core-offerwall",
+      "description": "Offerwall payout engine, tracking, UI",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["lib/offerwall/*.ts", "components/OGAdsOfferWall.tsx"] },
+        { "project": "MohnMint", "patterns": ["apps/webapp/components/offerwall/*.tsx", "apps/webapp/lib/offerwall/*.ts", "apps/webapp/app/api/offerwall/**/*.ts"] },
+        { "project": "MohnMatrix", "patterns": ["apps/web/src/lib/offerwall.ts", "apps/web/src/lib/rewards.ts"] }
+      ]
+    },
+    {
+      "id": "core-admin-support",
+      "description": "Admin dashboards and support workflows",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["app/admin/**/*.tsx", "app/owner/**/*.tsx", "app/admin/**/*.ts"] },
+        { "project": "MohnPay", "patterns": ["apps/api/scripts/setup-master-admin.ts", "scripts/create-super-admin.ts", "apps/web/components/SupportWidget.tsx", "apps/api/src/routes/notifications.ts"] },
+        { "project": "MohnMatrix", "patterns": ["apps/web/src/app/admin/**/*.tsx", "apps/web/src/app/admin/**/*.ts"] }
+      ]
+    },
+    {
+      "id": "core-compliance",
+      "description": "Background check, application intake, policy surfaces",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["components/ApplicationBackgroundCheckModal.tsx", "components/QuickApplicationModal.tsx", "lib/mohn-empire/background-checks.ts", "lib/careers/*.ts", "app/apply/**/*.tsx", "app/careers/page.tsx", "app/privacy/page.tsx", "app/terms/page.tsx"] },
+        { "project": "MohnServe", "patterns": ["platform/components/LogAttemptModal.tsx", "platform/components/JobDetailModal.tsx"] },
+        { "project": "NeighborTechs", "patterns": ["marketing_site/app/components/RemoteSupportModal.tsx", "marketing_site/app/components/AuthGatewayModal.tsx"] }
+      ]
+    },
+    {
+      "id": "core-notifications",
+      "description": "In-app notifications, preferences, and integrations",
+      "sources": [
+        { "project": "MohnPay", "patterns": ["apps/api/src/lib/notifications.ts", "apps/api/src/lib/notification-integrations.ts", "apps/web/components/NotificationPreferences.tsx"] },
+        { "project": "FlamingSocialMedia", "patterns": ["apps/nextjs-web-suite/app/components/EmailVerificationBanner.tsx"] },
+        { "project": "MohnMenu", "patterns": ["app/api/delivery/webhook/route.ts", "app/api/stripe/webhook/route.ts", "app/api/crypto/webhook/route.ts"] }
+      ]
+    },
+    {
+      "id": "core-live-ops",
+      "description": "Live streaming, camera feeds, and real-time ops panels",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["components/LiveStreamManager.tsx", "components/LiveStreamViewer.tsx", "components/ChefCameraStream.tsx", "components/LiveStaffSection.tsx", "app/owner/live-stream/page.tsx", "app/owner/chef-cam/page.tsx", "app/owner/kds/page.tsx"] },
+        { "project": "MohnMatrix", "patterns": ["apps/web/src/app/admin/live-monitor/_components/*.tsx"] },
+        { "project": "MohnServe", "patterns": ["platform/components/TacticalMenu.tsx"] }
+      ]
+    },
+    {
+      "id": "core-ui-shell",
+      "description": "Cross-site shared UI primitives and shell components",
+      "sources": [
+        { "project": "MohnMenu", "patterns": ["components/Header.tsx", "components/Footer.tsx", "components/Providers.tsx", "components/Animated*.tsx"] },
+        { "project": "NeighborTechs", "patterns": ["marketing_site/app/components/MegaMenu.tsx", "marketing_site/app/components/HolodeckMenu.tsx", "marketing_site/app/components/Providers.tsx"] },
+        { "project": "FlamingSocialMedia", "patterns": ["apps/nextjs-web-suite/app/ClientProviders.tsx", "apps/nextjs-web-suite/app/components/PerformanceGuard.tsx"] }
+      ]
+    }
+  ]
+}

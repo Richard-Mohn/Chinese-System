@@ -2,8 +2,8 @@
 
 > **Target:** Launch with the convenience store next door  
 > **Validation Plan:** Deliver on scooter, give store free website, OGAds offer wall for customer rewards  
-> **Status:** ~85% complete — needs delivery tracking, offer wall, and critical fixes  
-> **Last Updated:** 2025-01-XX
+> **Status:** Core delivery tracking + OGAds + rewards implemented; compliance and checkout hardening remain  
+> **Last Updated:** 2026-02-14
 
 ---
 
@@ -21,7 +21,7 @@
 ## 🔴 CRITICAL — Must Fix Before Launch
 
 ### 1. Customer Delivery Tracking Page ⭐ PRIORITY
-**Status:** ❌ Does not exist  
+**Status:** ✅ Implemented  
 **What exists:** Driver dashboard (783 lines), realTimeTracking.ts (366 lines), trackingHooks.ts (214 lines) — all driver-side  
 **What's missing:** Customer-facing page that shows:
 - Real-time driver location on Mapbox map
@@ -31,9 +31,10 @@
 - Driver name + vehicle type
 - Delivery address confirmation
 
-**Files to create:**
+**Created files:**
 - `app/order/[businessSlug]/tracking/page.tsx` — Customer tracking page
-- Redirect customer here after order placement with `?orderId=xxx`
+- `app/track-delivery/[orderId]/page.tsx` — Direct tracking route
+- `components/OrderTrackingPanel.tsx` — Shared real-time tracking UI
 
 **Backend already done:**
 - ✅ `lib/realTimeTracking.ts` — subscribeToDriverLocation(), subscribeToCourierLocation(), calculateETA()
@@ -42,7 +43,7 @@
 - ✅ Driver dashboard writes GPS every 1 second via watchPosition
 
 ### 2. OGAds Offer Wall Integration ⭐ PRIORITY
-**Status:** ❌ Not functional in MohnMenu  
+**Status:** ✅ Functional in MohnMenu  
 **What exists in MohnMenu:**
 - `lib/offerwall/offerwall-engine.ts` — payout computation engine (73 lines)
 - `lib/offerwall/offerwall-tracking.ts` — role-aware tracking context
@@ -56,12 +57,14 @@
 - `apps/webapp/lib/offerwall/types.ts` — Shared type definitions
 - `apps/webapp/lib/offerwall/tracking.ts` — aff_sub builder + session IDs
 
-**Integration plan:**
-- Port OGAds types + tracking helpers into MohnMenu
-- Create `/api/offerwall/get-offers` route in MohnMenu (proxy to OGAds)
-- Create `/api/offerwall/postback` route in MohnMenu OR use MohnMint's centralized postback
-- Port OGAdsOfferWall.tsx component, restyle for MohnMenu's white theme
-- Add offer wall to customer order page and rewards page
+**Implemented files:**
+- `app/api/offerwall/get-offers/route.ts`
+- `app/api/offerwall/postback/route.ts`
+- `components/OGAdsOfferWall.tsx`
+- `app/rewards/page.tsx`
+- `lib/offerwall/ogads-types.ts`
+- `lib/offerwall/ogads-tracking.ts`
+- `lib/offerwall/revenue-splits.ts`
 
 **Revenue split (founder's model):**
 - Platform (founder): **50-75%** — ALWAYS the majority
@@ -70,18 +73,34 @@
 - Tiered by business subscription: Free tier = founder gets 75%, Premium = founder gets 50%
 
 ### 3. Onboarding Geocoding
-**Status:** ❌ Hardcoded `latitude: 0, longitude: 0`  
+**Status:** ✅ Implemented  
 **File:** `app/onboarding/page.tsx` line ~160  
-**Fix:** Use browser Geolocation API or Mapbox geocoding to convert address → lat/lng during onboarding  
-**Impact:** Without this, delivery radius calculations don't work
+**Fix:** Use browser geolocation or geocoded coordinates to persist non-zero lat/lng during onboarding  
+**Impact:** Delivery radius and ETA become usable for local rollout
 
-### 4. Guest Checkout
+### 4. Age-Restricted Commerce (Alcohol + Tobacco) ⭐ COMPLIANCE BLOCKER
+**Status:** ❌ Not implemented  
+**Must-have rules before launch:**
+- Restricted products must require verified 21+ identity before checkout
+- Delivery must require in-person ID + face check at handoff
+- No unattended drop-off for restricted products
+- Checkout must reject restricted items when verification is missing/expired
+- Geo/time compliance checks (state/local restrictions and sale windows)
+
+**Implementation path:**
+1. Add product flags in menu items (`isRestricted`, `restrictionType`, `minAge`).
+2. Add verification state on user profile (`ageVerified`, `verificationProvider`, `verifiedAt`).
+3. Integrate third-party verification provider first (recommended), not custom document parsing for MVP.
+4. Add driver completion guard: restricted order cannot be completed until handoff check is passed.
+5. Store immutable audit events for every verification decision.
+
+### 5. Guest Checkout
 **Status:** ❌ Requires Firebase auth for card payments  
 **File:** `app/order/[businessSlug]/page.tsx`  
 **Fix:** Allow name + email + phone for guest orders (Stripe doesn't need Firebase auth)  
 **Impact:** Convenience store customers won't want to create accounts just to order
 
-### 5. Order Confirmation / Status Page
+### 6. Order Confirmation / Status Page
 **Status:** ❌ No post-checkout status page  
 **Fix:** After payment success, redirect to order status page showing:
 - Order number + timestamp
@@ -89,7 +108,7 @@
 - Estimated preparation time
 - Link to delivery tracking (when out for delivery)
 
-### 6. Business Hours Enforcement
+### 7. Business Hours Enforcement
 **Status:** ❌ No hours checking  
 **Fix:** Check `business.hours` before allowing orders. Show "Currently Closed" banner.
 
@@ -97,20 +116,20 @@
 
 ## 🟡 IMPORTANT — Should Fix Before Launch
 
-### 7. Push Notifications (Order Updates)
+### 8. Push Notifications (Order Updates)
 **Status:** ❌ No notification system  
 **Minimum:** Toast notifications in-app when order status changes  
 **Nice-to-have:** Firebase Cloud Messaging for push notifications
 
-### 8. Order Confirmation Emails
+### 9. Order Confirmation Emails
 **Status:** ❌ No transactional emails  
 **Fix:** Send email via SendGrid/Resend on order placement + status updates
 
-### 9. Menu Image Uploads
+### 10. Menu Image Uploads
 **Status:** ⚠️ Uses URL input (no file upload)  
 **Fix:** Add Firebase Storage upload for menu item photos
 
-### 10. Driver Assignment UI for Owners
+### 11. Driver Assignment UI for Owners
 **Status:** ⚠️ Partial — drivers auto-discover orders, but owner can't manually assign  
 **Fix:** Add driver dispatch panel to owner dashboard
 
@@ -118,19 +137,19 @@
 
 ## 🟢 NICE TO HAVE — Post-Launch
 
-### 11. Multi-location Support
+### 12. Multi-location Support
 Business owners managing multiple stores from one account
 
-### 12. Analytics Dashboard  
+### 13. Analytics Dashboard  
 Sales graphs, popular items, peak hours, customer retention
 
-### 13. Promo Codes / Discounts
+### 14. Promo Codes / Discounts
 Business owners create discount codes for their menu
 
-### 14. Customer Reviews
+### 15. Customer Reviews
 Star ratings + text reviews per business
 
-### 15. Inventory Management
+### 16. Inventory Management
 Track stock levels, auto-disable out-of-stock items
 
 ---

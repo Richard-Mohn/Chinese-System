@@ -21,6 +21,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'provider and deliveryId are required' }, { status: 400 });
   }
 
+  if (provider !== 'community') {
+    return NextResponse.json({ error: 'Only community delivery is supported' }, { status: 400 });
+  }
+
   try {
     const status = await getDeliveryStatus(provider, deliveryId);
     return NextResponse.json(status);

@@ -23,11 +23,11 @@ export type BusinessType =
   | 'other';
 
 // Subscription tiers that determine feature access & pricing
-// All tiers include 14-day free trial, then monthly billing
+// All paid tiers include a 3-day free trial, then monthly billing
 export type SubscriptionTier = 
-  | 'free'         // 14-day trial (all tiers start here)
-  | 'starter'      // $19.99/mo — core ordering, payments, storefront
-  | 'growth'       // $49.99/mo — GPS tracking, KDS, analytics, marketing
+  | 'free'         // 3-day trial state before paid billing begins
+  | 'starter'      // $39.99/mo — core ordering, payments, storefront
+  | 'growth'       // $79.99/mo — advanced ops, analytics, managed support
   | 'professional' // $99.99/mo — multi-location, API, priority support
   | 'reseller';    // Custom, white-label partner
 
@@ -74,7 +74,11 @@ export type SubscriptionStatus =
   | 'active'
   | 'past_due'
   | 'cancelled'
-  | 'trial';
+  | 'trial'
+  | 'cancelling'
+  | 'trialing'
+  | 'incomplete'
+  | 'unpaid';
 
 /**
  * USER OBJECT (Firebase Auth Custom Claims)
@@ -135,6 +139,11 @@ export interface MohnMenuBusiness {
   subscriptionStatus: SubscriptionStatus;
   subscriptionStartDate: string;
   subscriptionEndDate?: string;
+  stripeSubscriptionId?: string;
+  stripeCustomerId?: string;
+  subscriptionCancelAtPeriodEnd?: boolean;
+  subscriptionCurrentPeriodEnd?: string;
+  subscriptionCancelAt?: string;
   
   // Stripe Connect
   stripeAccountId?: string; // Owner's Stripe Express Connected Account

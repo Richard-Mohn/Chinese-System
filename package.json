@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next build",
     "start": "next start",
-    "seed": "ts-node scripts/seedFirestore.ts"
+    "seed": "ts-node scripts/seedFirestore.ts",
+    "demo:audit": "node scripts/demo-parity-audit.mjs"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
@@ -16,6 +17,7 @@
     "@stripe/react-stripe-js": "^5.6.0",
     "@stripe/stripe-js": "^8.7.0",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "firebase": "^12.8.0",
     "firebase-admin": "^13.6.0",
     "framer-motion": "^12.31.0",
@@ -32,6 +34,7 @@
     "react-map-gl": "^8.1.0",
     "stripe": "^20.3.1",
     "tailwind-merge": "^3.4.0",
+    "tesseract.js": "^7.0.0",
     "three": "^0.182.0"
   },
   "overrides": {

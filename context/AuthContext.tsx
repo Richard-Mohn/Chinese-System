@@ -227,7 +227,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isOwner = () => MohnMenuUser?.role === 'owner';
   const isManager = () => MohnMenuUser?.role === 'manager';
   const isDriver = () => 
-    MohnMenuUser?.role === 'driver_inhouse' || MohnMenuUser?.role === 'driver_marketplace' || MohnMenuUser?.role === 'driver';
+    MohnMenuUser?.role === 'driver_inhouse' ||
+    MohnMenuUser?.role === 'driver_marketplace' ||
+    MohnMenuUser?.role === 'driver' ||
+    // Staff can also deliver (server/both) — gated in driver dashboard by license/background verification.
+    (MohnMenuUser?.role === 'staff' && ['server', 'both'].includes(String((MohnMenuUser as any)?.staffRole || '').toLowerCase()));
   const isCustomer = () => MohnMenuUser?.role === 'customer';
   const isAdmin = () => MohnMenuUser?.role === 'admin';
 

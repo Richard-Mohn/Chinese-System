@@ -198,6 +198,7 @@ export default function AdminDashboardPage() {
     { label: 'Owner Dashboard', href: '/owner', icon: FaStore, desc: 'Manage business settings' },
     { label: 'Analytics', href: '/owner/analytics', icon: FaChartBar, desc: 'SEO & traffic data' },
     { label: 'Settings', href: '/owner/settings', icon: FaCog, desc: 'Platform configuration' },
+    { label: 'HR Verification', href: '/admin/hr', icon: FaUsers, desc: 'Video ID vetting and background checks' },
     { label: 'Tenant Console', href: '/admin/super', icon: FaTools, desc: 'Cross-tenant oversight and support context' },
     { label: 'Support Queue', href: '/admin/support', icon: FaLifeRing, desc: 'Support tickets and assist workflows' },
   ];

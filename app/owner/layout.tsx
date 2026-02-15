@@ -26,6 +26,7 @@ import {
   FaCalendarAlt,
   FaMusic,
   FaThLarge,
+  FaStar,
 } from 'react-icons/fa';
 import type { FeatureKey } from '@/lib/tier-features';
 import { OWNER_PAGE_FEATURE, tierMeetsRequirement, FEATURE_REGISTRY } from '@/lib/tier-features';
@@ -44,6 +45,7 @@ const NAV_ITEMS: { href: string; label: string; icon: any; beta?: boolean }[] = 
   { href: '/owner/floor-plan', label: 'Floor Plan', icon: FaThLarge },
   { href: '/owner/auctions', label: 'Auctions', icon: FaGavel, beta: true },
   { href: '/owner/drivers', label: 'Drivers', icon: FaTruck },
+  { href: '/owner/reviews', label: 'Reviews', icon: FaStar },
   { href: '/owner/dispatch', label: 'Dispatch', icon: FaMapMarkerAlt },
   { href: '/owner/domain', label: 'Custom Domain', icon: FaLink },
   { href: '/owner/analytics', label: 'Analytics', icon: FaChartLine },
@@ -51,7 +53,7 @@ const NAV_ITEMS: { href: string; label: string; icon: any; beta?: boolean }[] = 
 ];
 
 const TIER_BADGE: Record<string, { label: string; color: string }> = {
-  free:         { label: 'Free Trial',    color: 'bg-zinc-100 text-zinc-500' },
+  free:         { label: '3-Day Trial',   color: 'bg-zinc-100 text-zinc-500' },
   starter:      { label: 'Starter',       color: 'bg-emerald-50 text-emerald-700' },
   growth:       { label: 'Growth',        color: 'bg-blue-50 text-blue-700' },
   professional: { label: 'Professional',  color: 'bg-amber-50 text-amber-700' },
@@ -243,6 +245,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
+                aria-label="Close menu"
                 className="p-2 text-zinc-400 hover:text-black rounded-xl hover:bg-zinc-100 transition-colors"
               >
                 <FaTimes />

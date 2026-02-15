@@ -3,11 +3,11 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaCheck, FaUser } from 'react-icons/fa';
+import { FaArrowLeft, FaCheck, FaUser, FaUserFriends, FaTrophy, FaNewspaper } from 'react-icons/fa';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 
 export default function CustomerProfilePage() {
@@ -18,6 +18,9 @@ export default function CustomerProfilePage() {
   const [address, setAddress] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [autoPostOrders, setAutoPostOrders] = useState(true);
+  const [postPrivacy, setPostPrivacy] = useState<'public' | 'friends' | 'private'>('public');
+  const [acceptFriendOrders, setAcceptFriendOrders] = useState(true);
 
   useEffect(() => {
     if (!loading && (!user || !isCustomer())) {
@@ -31,7 +34,21 @@ export default function CustomerProfilePage() {
       setPhone((MohnMenuUser as any).phone || '');
       setAddress((MohnMenuUser as any).address || '');
     }
-  }, [MohnMenuUser]);
+    // Load privacy settings from customer profile
+    const loadPrivacySettings = async () => {
+      if (user) {
+        const profileRef = doc(db, 'customerProfiles', user.uid);
+        const snap = await getDoc(profileRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          setAutoPostOrders(data.privacy?.disableSocialPosts !== true);
+          setPostPrivacy(data.privacy?.socialPostPrivacy || 'public');
+          setAcceptFriendOrders(data.privacy?.acceptFriendOrders !== false);
+        }
+      }
+    };
+    loadPrivacySettings();
+  }, [MohnMenuUser, user]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -45,6 +62,19 @@ export default function CustomerProfilePage() {
         address,
         updatedAt: new Date().toISOString(),
       });
+
+      // Update customer profile privacy settings
+      const profileDocRef = doc(db, 'customerProfiles', user.uid);
+      await updateDoc(profileDocRef, {
+        privacy: {
+          disableSocialPosts: !autoPostOrders,
+          socialPostPrivacy: postPrivacy,
+          acceptFriendOrders: acceptFriendOrders,
+        },
+      }).catch(() => {
+        // Profile might not exist yet, that's ok
+      });
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
@@ -127,6 +157,80 @@ export default function CustomerProfilePage() {
               placeholder="123 Main St, City, State"
               inputClassName="px-5 py-3.5 border-zinc-100 bg-zinc-50 text-black font-bold placeholder:text-zinc-300"
             />
+
+            {/* Social Privacy Settings */}
+            <div className="pt-6 border-t border-zinc-200">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-3 ml-1">
+                Social Feed Privacy
+              </label>
+              
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-4 bg-zinc-50 rounded-xl cursor-pointer hover:bg-zinc-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={autoPostOrders}
+                    onChange={(e) => setAutoPostOrders(e.target.checked)}
+                    className="w-5 h-5 rounded border-zinc-300"
+                  />
+                  <div>
+                    <p className="font-bold text-black text-sm">Auto-post when I order</p>
+                    <p className="text-xs text-zinc-500">Share your orders with friends automatically</p>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-4 bg-zinc-50 rounded-xl cursor-pointer hover:bg-zinc-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={acceptFriendOrders}
+                    onChange={(e) => setAcceptFriendOrders(e.target.checked)}
+                    className="w-5 h-5 rounded border-zinc-300"
+                  />
+                  <div>
+                    <p className="font-bold text-black text-sm">Accept orders from friends</p>
+                    <p className="text-xs text-zinc-500">Allow friends to send you gift orders</p>
+                  </div>
+                </label>
+
+                <div className="p-4 bg-zinc-50 rounded-xl">
+                  <p className="font-bold text-black text-sm mb-3">Post visibility</p>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="postPrivacy"
+                        value="public"
+                        checked={postPrivacy === 'public'}
+                        onChange={() => setPostPrivacy('public')}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-zinc-700">Public - Everyone can see</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="postPrivacy"
+                        value="friends"
+                        checked={postPrivacy === 'friends'}
+                        onChange={() => setPostPrivacy('friends')}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-zinc-700">Friends only</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="postPrivacy"
+                        value="private"
+                        checked={postPrivacy === 'private'}
+                        onChange={() => setPostPrivacy('private')}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-zinc-700">Private - Only me</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <button
@@ -142,6 +246,30 @@ export default function CustomerProfilePage() {
               'Save Changes'
             )}
           </button>
+        </motion.div>
+
+        {/* Social Features */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
+        >
+          <Link href="/customer/feed" className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white hover:shadow-xl transition-all group">
+            <FaNewspaper className="text-3xl mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-black text-lg mb-1">Social Feed</h3>
+            <p className="text-sm text-blue-100">See what friends are ordering</p>
+          </Link>
+          <Link href="/customer/friends" className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white hover:shadow-xl transition-all group">
+            <FaUserFriends className="text-3xl mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-black text-lg mb-1">Friends</h3>
+            <p className="text-sm text-indigo-100">Connect with other customers</p>
+          </Link>
+          <Link href="/customer/leaderboard" className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white hover:shadow-xl transition-all group">
+            <FaTrophy className="text-3xl mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-black text-lg mb-1">Leaderboard</h3>
+            <p className="text-sm text-orange-100">See top spenders & your rank</p>
+          </Link>
         </motion.div>
 
         {/* Account Info */}

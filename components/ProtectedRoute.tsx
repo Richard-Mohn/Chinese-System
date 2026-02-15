@@ -35,7 +35,7 @@ export default function ProtectedRoute({ children, allowedRoles, fallbackPath }:
 
     if (MohnMenuUser && !allowedRoles.includes(MohnMenuUser.role)) {
       // Redirect to the correct dashboard for their role
-      const roleDashboard = getRoleDashboard(MohnMenuUser.role);
+      const roleDashboard = getRoleDashboard(MohnMenuUser.role, String((MohnMenuUser as any)?.staffRole || ''));
       router.push(fallbackPath || roleDashboard);
     }
   }, [user, MohnMenuUser, loading, allowedRoles, fallbackPath, router]);
@@ -58,13 +58,13 @@ export default function ProtectedRoute({ children, allowedRoles, fallbackPath }:
   return <>{children}</>;
 }
 
-function getRoleDashboard(role: string): string {
+function getRoleDashboard(role: string, staffRole?: string): string {
   switch (role) {
     case 'owner':
     case 'manager':
       return '/owner';
     case 'staff':
-      return '/owner/kds';
+      return String(staffRole || '').toLowerCase() === 'bartender' ? '/owner/kds' : '/owner/orders';
     case 'driver_inhouse':
     case 'driver_marketplace':
       return '/driver';

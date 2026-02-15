@@ -18,6 +18,7 @@ import {
   FaExclamationTriangle,
   FaCreditCard,
   FaLink,
+  FaStar,
 } from 'react-icons/fa';
 
 interface RecentOrder {
@@ -189,7 +190,7 @@ export default function OwnerDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl p-6 border bg-gradient-to-r from-orange-50 to-red-50 border-orange-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          className="rounded-2xl p-6 border bg-linear-to-r from-orange-50 to-red-50 border-orange-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
         >
           <div className="flex items-center gap-4">
             <FaCreditCard className="text-orange-500 text-xl shrink-0" />
@@ -202,7 +203,7 @@ export default function OwnerDashboard() {
           </div>
           <Link
             href="/owner/settings"
-            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-orange-500/20 transition-all whitespace-nowrap"
+            className="px-6 py-2.5 bg-linear-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-orange-500/20 transition-all whitespace-nowrap"
           >
             Connect Stripe →
           </Link>
@@ -214,7 +215,7 @@ export default function OwnerDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl p-6 border bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          className="rounded-2xl p-6 border bg-linear-to-r from-blue-50 to-indigo-50 border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
         >
           <div className="flex items-center gap-4">
             <FaLink className="text-blue-500 text-xl shrink-0" />
@@ -227,7 +228,7 @@ export default function OwnerDashboard() {
           </div>
           <Link
             href="/owner/domain"
-            className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-blue-500/20 transition-all whitespace-nowrap"
+            className="px-6 py-2.5 bg-linear-to-r from-blue-500 to-indigo-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-blue-500/20 transition-all whitespace-nowrap"
           >
             Search Domains →
           </Link>
@@ -308,6 +309,13 @@ export default function OwnerDashboard() {
             desc: `${currentBusiness.inHouseDriverIds?.length || 0} active`,
             href: '/owner/drivers',
             accent: 'group-hover:bg-orange-400',
+          },
+          {
+            icon: FaStar,
+            title: 'Reviews',
+            desc: 'Customer feedback inbox',
+            href: '/owner/reviews',
+            accent: 'group-hover:bg-amber-500',
           },
           {
             icon: FaChartLine,

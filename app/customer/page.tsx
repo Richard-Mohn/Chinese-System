@@ -2,12 +2,12 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { collectionGroup, doc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaPizzaSlice, FaHistory, FaGift, FaUserCircle, FaSignOutAlt, FaCoins } from 'react-icons/fa';
+import { FaPizzaSlice, FaHistory, FaGift, FaUserCircle, FaSignOutAlt, FaCoins, FaTimes, FaMapMarkedAlt, FaClock } from 'react-icons/fa';
 
 interface StatCardProps {
   title: string;
@@ -53,11 +53,31 @@ const NavCard = ({ icon: Icon, title, description, href, delay }: NavCardProps) 
   </Link>
 );
 
+interface CustomerOrder {
+  id: string;
+  businessId: string;
+  businessName: string;
+  status: string;
+  total: number;
+  createdAt?: string;
+  items?: Array<{ name: string; quantity: number }>;
+  orderType?: string;
+}
+
+function isActiveOrder(status: string) {
+  const value = String(status || '').toLowerCase();
+  return ['pending', 'confirmed', 'preparing', 'ready', 'driver_en_route_pickup', 'out_for_delivery'].includes(value);
+}
+
 export default function CustomerDashboard() {
   const { user, MohnMenuUser, loading, isCustomer, logout } = useAuth();
   const router = useRouter();
   const [loyaltyPoints, setLoyaltyPoints] = useState(0);
   const [mohnBalance, setMohnBalance] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [orders, setOrders] = useState<CustomerOrder[]>([]);
+  const [ordersModalOpen, setOrdersModalOpen] = useState(false);
+  const prevStatusRef = useRef<Record<string, string>>({});
 
   useEffect(() => {
     if (!loading && (!user || !isCustomer())) {
@@ -82,6 +102,100 @@ export default function CustomerDashboard() {
     };
     if (user) fetchStats();
   }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const emailLower = (MohnMenuUser?.email || user.email || '').trim().toLowerCase();
+    let uidRows: CustomerOrder[] = [];
+    let emailRows: CustomerOrder[] = [];
+
+    const mapSnapshot = (snap: any): CustomerOrder[] => {
+      return snap.docs.map((docSnap: any) => {
+        const data = docSnap.data() as Record<string, any>;
+        const path = docSnap.ref.path.split('/');
+        const pathBusinessId = path.length >= 2 ? path[1] : '';
+        return {
+          id: docSnap.id,
+          businessId: data.businessId || pathBusinessId,
+          businessName: data.businessName || data.restaurantName || 'Business',
+          status: data.status || 'pending',
+          total: Number(data.total || 0),
+          createdAt: data.createdAt || data.updatedAt || '',
+          items: Array.isArray(data.items) ? data.items : [],
+          orderType: data.orderType || 'delivery',
+        };
+      });
+    };
+
+    const mergeAndCommit = () => {
+      const merged = new Map<string, CustomerOrder>();
+      [...uidRows, ...emailRows].forEach((row) => {
+        merged.set(`${row.businessId}:${row.id}`, row);
+      });
+
+      const list = Array.from(merged.values()).sort((a, b) => {
+        const aTime = new Date(a.createdAt || 0).getTime();
+        const bTime = new Date(b.createdAt || 0).getTime();
+        return bTime - aTime;
+      });
+
+      // Lightweight customer notification when status changes
+      const currentStatuses: Record<string, string> = {};
+      for (const row of list) {
+        const key = `${row.businessId}:${row.id}`;
+        currentStatuses[key] = row.status;
+        const prev = prevStatusRef.current[key];
+        if (prev && prev !== row.status && isActiveOrder(row.status)) {
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Order Update', {
+              body: `${row.businessName}: ${row.status.replace(/_/g, ' ')}`,
+              icon: '/icon.png',
+            });
+          }
+        }
+      }
+      prevStatusRef.current = currentStatuses;
+
+      setOrders(list);
+      setTotalOrders(list.length);
+    };
+
+    const unsubs: Array<() => void> = [];
+
+    unsubs.push(
+      onSnapshot(
+        query(collectionGroup(db, 'orders'), where('customerId', '==', user.uid)),
+        (snap) => {
+          uidRows = mapSnapshot(snap);
+          mergeAndCommit();
+        },
+      ),
+    );
+
+    if (emailLower) {
+      unsubs.push(
+        onSnapshot(
+          query(collectionGroup(db, 'orders'), where('customerEmailLower', '==', emailLower)),
+          (snap) => {
+            emailRows = mapSnapshot(snap);
+            mergeAndCommit();
+          },
+        ),
+      );
+    }
+
+    return () => unsubs.forEach((u) => u());
+  }, [user, MohnMenuUser?.email]);
+
+  useEffect(() => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+  }, []);
+
+  const activeOrders = useMemo(() => orders.filter((o) => isActiveOrder(o.status)), [orders]);
 
   if (loading) {
     return (
@@ -122,7 +236,7 @@ export default function CustomerDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
           <StatCard title="Loyalty Points" value={loyaltyPoints.toLocaleString()} color="text-orange-600" delay={0.1} />
           <StatCard title="$MOHN Tokens" value={mohnBalance.toLocaleString()} color="text-indigo-600" delay={0.2} />
-          <StatCard title="Total Orders" value="—" color="text-emerald-600" delay={0.3} />
+          <StatCard title="Total Orders" value={totalOrders.toLocaleString()} color="text-emerald-600" delay={0.3} />
           <StatCard title="Wallet Balance" value="—" color="text-black" delay={0.4} />
         </div>
 
@@ -157,6 +271,81 @@ export default function CustomerDashboard() {
             delay={0.4}
           />
         </div>
+
+        {activeOrders.length > 0 && (
+          <button
+            onClick={() => setOrdersModalOpen(true)}
+            className="fixed bottom-6 right-6 z-50 bg-black text-white rounded-2xl px-5 py-3.5 shadow-2xl flex items-center gap-3 hover:bg-zinc-800 transition-colors"
+          >
+            <FaClock className="text-emerald-400" />
+            <span className="text-left">
+              <span className="block text-[10px] font-black uppercase tracking-widest text-zinc-400">Live Order</span>
+              <span className="block text-sm font-black">{activeOrders.length} active delivery{activeOrders.length > 1 ? 's' : ''}</span>
+            </span>
+          </button>
+        )}
+
+        {ordersModalOpen && (
+          <div className="fixed inset-0 z-60 bg-black/60 flex items-center justify-center px-4" onClick={() => setOrdersModalOpen(false)}>
+            <div className="w-full max-w-3xl max-h-[86vh] overflow-y-auto bg-white rounded-3xl border border-zinc-100 p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-2xl font-black text-black">Your Orders</h3>
+                  <p className="text-sm text-zinc-500">Uber-style live activity and order history</p>
+                </div>
+                <button title="Close orders modal" onClick={() => setOrdersModalOpen(false)} className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center">
+                  <FaTimes className="text-zinc-600" />
+                </button>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2">Active Orders</p>
+                  {activeOrders.length === 0 ? (
+                    <p className="text-sm text-zinc-500">No active orders right now.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {activeOrders.map((order) => (
+                        <div key={`active-${order.businessId}-${order.id}`} className="rounded-2xl border border-zinc-200 p-4">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                              <p className="font-black text-black text-sm">{order.businessName}</p>
+                              <p className="text-xs text-zinc-500">#{order.id.slice(-8).toUpperCase()} · {order.status}</p>
+                            </div>
+                            <Link href={`/track-delivery/${order.id}`} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-xs font-black hover:bg-zinc-800">
+                              <FaMapMarkedAlt /> Track
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2">Order History</p>
+                  {orders.length === 0 ? (
+                    <p className="text-sm text-zinc-500">No order history yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {orders.slice(0, 10).map((order) => (
+                        <div key={`history-${order.businessId}-${order.id}`} className="rounded-2xl border border-zinc-100 p-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <div>
+                              <p className="text-sm font-bold text-black">{order.businessName}</p>
+                              <p className="text-xs text-zinc-500">{order.createdAt ? new Date(order.createdAt).toLocaleString() : 'Unknown date'} · {order.status}</p>
+                            </div>
+                            <p className="font-black text-zinc-700">${order.total.toFixed(2)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Recent Activity */}
         <motion.div 

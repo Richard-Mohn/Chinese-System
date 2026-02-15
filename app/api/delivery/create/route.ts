@@ -1,7 +1,7 @@
 /**
  * Create Delivery API — POST /api/delivery/create
  * 
- * Creates a delivery with the specified provider (DoorDash / Uber / Community).
+ * Creates a delivery in the community courier flow.
  * Stores the delivery info on the order document for tracking.
  * 
  * Body: { businessId, orderId, provider, quoteId?, dropoffAddress, dropoffPhone, dropoffName, dropoffInstructions?, tip? }
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { businessId, orderId, provider, quoteId, dropoffAddress, dropoffPhone, dropoffName, dropoffInstructions, tip } = body;
+    const { businessId, orderId, provider, dropoffAddress, dropoffPhone, dropoffName, dropoffInstructions, tip } = body;
 
     if (!businessId || !orderId || !provider || !dropoffAddress) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -33,19 +33,11 @@ export async function POST(request: NextRequest) {
 
     const order = orderDoc.data()!;
 
-    // If community courier, just mark the order as awaiting courier
-    if (provider === 'community') {
-      await orderRef.update({
-        deliveryProvider: 'community',
-        deliveryStatus: 'awaiting_courier',
-        updatedAt: new Date().toISOString(),
-      });
-
-      return NextResponse.json({
-        provider: 'community',
-        status: 'awaiting_courier',
-        message: 'Order is awaiting community courier assignment',
-      });
+    if (provider !== 'community') {
+      return NextResponse.json(
+        { error: 'Only community delivery is supported' },
+        { status: 400 },
+      );
     }
 
     // Get business info for pickup
@@ -73,7 +65,7 @@ export async function POST(request: NextRequest) {
       })),
     };
 
-    const result = await createDelivery(provider as DeliveryProvider, req, quoteId);
+    const result = await createDelivery(provider as DeliveryProvider, req);
 
     // Update order with delivery info
     await orderRef.update({
