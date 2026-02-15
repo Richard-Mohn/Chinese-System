@@ -578,7 +578,7 @@ export default function OwnerSettingsPage() {
           <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3">
             <span className="text-amber-600 text-lg">⏳</span>
             <div>
-            aria-checked={checked}
+              <p className="font-bold text-amber-800 text-sm">Set Up NOWPayments</p>
               <p className="text-[10px] text-amber-600">
                 Custody account will be created automatically on first crypto order.
               </p>
