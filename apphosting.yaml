@@ -1,4 +1,5 @@
 # Firebase App Hosting configuration
+# All secrets have been created and granted access to backend: ordersystem
 kind: "apphosting.yaml"
 version: "v1"
 runConfig:
